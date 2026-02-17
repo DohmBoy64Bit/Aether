@@ -1,58 +1,57 @@
-# Full SDD workflow
+# Implementation Plan - Project "Aether"
 
 ## Configuration
-- **Artifacts Path**: {@artifacts_path} → `.zenflow/tasks/{task_id}`
+- **Artifacts Path**: `.zenflow/tasks/new-task-1ccb`
 
 ---
 
 ## Workflow Steps
 
 ### [x] Step: Requirements
-<!-- chat-id: 9938acfc-472c-4017-831a-82a362e14826 -->
-
 Create a Product Requirements Document (PRD) based on the feature description.
 
-1. Review existing codebase to understand current architecture and patterns
-2. Analyze the feature definition and identify unclear aspects
-3. Ask the user for clarifications on aspects that significantly impact scope or user experience
-4. Make reasonable decisions for minor details based on context and conventions
-5. If user can't clarify, make a decision, state the assumption, and continue
+### [x] Step: Technical Specification
+Create a technical specification based on the PRD.
 
-Save the PRD to `{@artifacts_path}/requirements.md`.
+### [x] Step: Planning
+Create a detailed implementation plan based on `spec.md`.
 
-### [ ] Step: Technical Specification
+## Implementation Tasks
 
-Create a technical specification based on the PRD in `{@artifacts_path}/requirements.md`.
+### [ ] Phase 1: Environment Setup & Core Auth
+- **Task**: Setup the project structure (Next.js frontend, Express.js backend, PostgreSQL database).
+- **Task**: Implement the database schema for Users, Recovery Codes, and Sessions.
+- **Task**: Build the signup API endpoint (Username/Password + 5 recovery codes).
+- **Task**: Build the login API endpoint (JWT).
+- **Verification**: Run unit tests for auth logic and integration tests for signup/login.
 
-1. Review existing codebase architecture and identify reusable components
-2. Define the implementation approach
+### [ ] Phase 2: Social Core & Personas
+- **Task**: Implement the `posts` and `interactions` database schema.
+- **Task**: Build API endpoints for creating tweets, replying, and retweeting.
+- **Task**: Build the profile retrieval API (Human and AI users).
+- **Task**: Implement the `personas` database schema and persistence logic.
+- **Verification**: Run integration tests for post creation and interaction.
 
-Save to `{@artifacts_path}/spec.md` with:
-- Technical context (language, dependencies)
-- Implementation approach referencing existing code patterns
-- Source code structure changes
-- Data model / API / interface changes
-- Delivery phases (incremental, testable milestones)
-- Verification approach using project lint/test commands
+### [ ] Phase 3: AI Engine & Ollama Integration
+- **Task**: Setup the Ollama client and persona generation logic.
+- **Task**: Build the AI Action Loop (background service to trigger AI acts).
+- **Task**: Implement image generation for AI profiles (generated once).
+- **Task**: Connect AI actions to the social API.
+- **Verification**: Verify AI personas can successfully post/reply via tests.
 
-### [ ] Step: Planning
+### [ ] Phase 4: Frontend Development (Design Match)
+- **Task**: Build the layout (Sidebars + Feed) based on `WebsiteReference/`.
+- **Task**: Implement the Login/Signup pages (including recovery code display).
+- **Task**: Build the Feed, Profile, and Post-creation components.
+- **Task**: Integrate frontend with the backend API.
+- **Verification**: Component testing and manual UI verification.
 
-Create a detailed implementation plan based on `{@artifacts_path}/spec.md`.
+### [ ] Phase 5: Web Search & Moderation
+- **Task**: Integrate Tavily or Brave Search for real-time persona awareness.
+- **Task**: Implement the AI moderation service to monitor posts.
+- **Verification**: Integration tests for search-based AI posting.
 
-1. Break down the work into concrete tasks
-2. Each task should reference relevant contracts and include verification steps
-3. Replace the Implementation step below with the planned tasks
-
-Rule of thumb for step size: each step should represent a coherent unit of work (e.g., implement a component, add an API endpoint). Avoid steps that are too granular (single function) or too broad (entire feature).
-
-Important: unit tests must be part of each implementation task, not separate tasks. Each task should implement the code and its tests together, if relevant.
-
-If the feature is trivial and doesn't warrant full specification, update this workflow to remove unnecessary steps and explain the reasoning to the user.
-
-Save to `{@artifacts_path}/plan.md`.
-
-### [ ] Step: Implementation
-
-This step should be replaced with detailed implementation tasks from the Planning step.
-
-If Planning didn't replace this step, execute the tasks in `{@artifacts_path}/plan.md`, updating checkboxes as you go. Run planned tests/lint and record results in plan.md.
+### [ ] Phase 6: Final Audit & Polish
+- **Task**: Security audit (JWT checks, input validation).
+- **Task**: Final bug fixes and UI polish.
+- **Verification**: Run the full suite of unit and integration tests.
