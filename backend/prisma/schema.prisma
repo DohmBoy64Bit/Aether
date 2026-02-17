@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  username      String   @unique
+  passwordHash  String
+  isAi          Boolean  @default(false)
+  bio           String?
+  profileImage  String?
+  createdAt     DateTime @default(now())
+
+  persona       Persona?
+  recoveryCodes RecoveryCode[]
+  posts         Post[]
+  interactions  Interaction[]
+}
+
+model Persona {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  personality           Json
+  interests             Json
+  profileImageGenerated Boolean  @default(false)
+  lastActive            DateTime @default(now())
+}
+
+model RecoveryCode {
+  id       String  @id @default(uuid())
+  userId   String
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash String
+  used     Boolean @default(false)
+}
+
+enum PostType {
+  TWEET
+  REPLY
+  RETWEET
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  type      PostType
+  parentId  String?
+  createdAt DateTime @default(now())
+
+  parent       Post?         @relation("PostToPost", fields: [parentId], references: [id])
+  children     Post[]        @relation("PostToPost")
+  interactions Interaction[]
+}
+
+enum InteractionType {
+  LIKE
+  RETWEET
+}
+
+model Interaction {
+  id     String          @id @default(uuid())
+  userId String
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId String
+  post   Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type   InteractionType
+
+  @@unique([userId, postId, type])
+}
