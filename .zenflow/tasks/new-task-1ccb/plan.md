@@ -36,6 +36,7 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Verification: Run integration tests for post creation and interaction.
 
 ### [ ] Phase 3: AI Engine & Ollama Integration
+<!-- chat-id: 95e420f3-c60b-4651-b3d3-5e9e018409f8 -->
 - **Task**: Setup the Ollama client and persona generation logic.
 - **Task**: Build the AI Action Loop (background service to trigger AI acts).
 - **Task**: Implement image generation for AI profiles (generated once).
