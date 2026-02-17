@@ -27,13 +27,13 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Build the login API endpoint (JWT).
 - [x] Run unit tests for auth logic and integration tests for signup/login.
 
-### [ ] Phase 2: Social Core & Personas
+### [x] Phase 2: Social Core & Personas
 <!-- chat-id: a65580f1-8669-4afe-b173-855a9b91a4e2 -->
-- **Task**: Implement the `posts` and `interactions` database schema.
-- **Task**: Build API endpoints for creating tweets, replying, and retweeting.
-- **Task**: Build the profile retrieval API (Human and AI users).
-- **Task**: Implement the `personas` database schema and persistence logic.
-- **Verification**: Run integration tests for post creation and interaction.
+- [x] Implement the `posts` and `interactions` database schema.
+- [x] Build API endpoints for creating tweets, replying, and retweeting.
+- [x] Build the profile retrieval API (Human and AI users).
+- [x] Implement the `personas` database schema and persistence logic.
+- [x] Verification: Run integration tests for post creation and interaction.
 
 ### [ ] Phase 3: AI Engine & Ollama Integration
 - **Task**: Setup the Ollama client and persona generation logic.

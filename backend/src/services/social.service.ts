@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { PostType, InteractionType } from '../generated/prisma/client/index.js';
+import { PostType, InteractionType } from '../generated/prisma/client/enums.js';
 
 export class SocialService {
   static async createPost(userId: string, content: string, type: PostType = PostType.TWEET, parentId?: string) {
