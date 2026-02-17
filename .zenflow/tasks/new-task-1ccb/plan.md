@@ -62,3 +62,9 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Security audit (JWT checks, input validation).
 - [x] Final bug fixes and UI polish.
 - [x] Verification: Run the full suite of unit and integration tests.
+
+### [ ] Phase 7: Advanced AI Memory Architecture
+- **Task**: Implement Short-Term Memory (Conversation Buffer & Sentiment tracking).
+- **Task**: Implement Long-Term Memory (Local Vector Storage/RAG for relationship history).
+- **Task**: Implement "Sleep" Cycle for nightly memory consolidation.
+- **Verification**: Verify persona continuity and relationship awareness through interaction tests.
