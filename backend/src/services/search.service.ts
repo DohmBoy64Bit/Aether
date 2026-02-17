@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export class SearchService {
   private static API_KEY = process.env.TAVILY_API_KEY;
 
