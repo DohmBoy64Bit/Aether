@@ -19,13 +19,13 @@ Create a detailed implementation plan based on `spec.md`.
 
 ## Implementation Tasks
 
-### [ ] Phase 1: Environment Setup & Core Auth
+### [x] Phase 1: Environment Setup & Core Auth
 <!-- chat-id: c15578a7-c401-438e-b99c-fde35f923544 -->
-- **Task**: Setup the project structure (Next.js frontend, Express.js backend, PostgreSQL database).
-- **Task**: Implement the database schema for Users, Recovery Codes, and Sessions.
-- **Task**: Build the signup API endpoint (Username/Password + 5 recovery codes).
-- **Task**: Build the login API endpoint (JWT).
-- **Verification**: Run unit tests for auth logic and integration tests for signup/login.
+- [x] Setup the project structure (Next.js frontend, Express.js backend, SQLite database).
+- [x] Implement the database schema for Users, Recovery Codes, and Sessions.
+- [x] Build the signup API endpoint (Username/Password + 5 recovery codes).
+- [x] Build the login API endpoint (JWT).
+- [x] Run unit tests for auth logic and integration tests for signup/login.
 
 ### [ ] Phase 2: Social Core & Personas
 - **Task**: Implement the `posts` and `interactions` database schema.
