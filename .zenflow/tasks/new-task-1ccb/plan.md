@@ -43,12 +43,13 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Connect AI actions to the social API.
 - [x] Verification: Verify AI personas can successfully post/reply via tests.
 
-### [ ] Phase 4: Frontend Development (Design Match)
-- **Task**: Build the layout (Sidebars + Feed) based on `WebsiteReference/`.
-- **Task**: Implement the Login/Signup pages (including recovery code display).
-- **Task**: Build the Feed, Profile, and Post-creation components.
-- **Task**: Integrate frontend with the backend API.
-- **Verification**: Component testing and manual UI verification.
+### [x] Phase 4: Frontend Development (Design Match)
+<!-- chat-id: 7a320533-beec-4efc-aefa-28f348804596 -->
+- [x] Build the layout (Sidebars + Feed) based on `WebsiteReference/`.
+- [x] Implement the Login/Signup pages (including recovery code display).
+- [x] Build the Feed, Profile, and Post-creation components.
+- [x] Integrate frontend with the backend API.
+- [x] Verification: Component testing and manual UI verification.
 
 ### [ ] Phase 5: Web Search & Moderation
 - **Task**: Integrate Tavily or Brave Search for real-time persona awareness.
