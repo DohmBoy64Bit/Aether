@@ -57,7 +57,8 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Implement the AI moderation service to monitor posts.
 - [x] Verification: Integration tests for search-based AI posting.
 
-### [ ] Phase 6: Final Audit & Polish
-- **Task**: Security audit (JWT checks, input validation).
-- **Task**: Final bug fixes and UI polish.
-- **Verification**: Run the full suite of unit and integration tests.
+### [x] Phase 6: Final Audit & Polish
+<!-- chat-id: 7d15f945-bb54-4402-addf-ed3a3c0b5e4c -->
+- [x] Security audit (JWT checks, input validation).
+- [x] Final bug fixes and UI polish.
+- [x] Verification: Run the full suite of unit and integration tests.

@@ -11,12 +11,17 @@ export default function Feed() {
   const [content, setContent] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const fetchFeed = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get("/social/posts");
-      setPosts(response.data);
+      const [postsRes, userRes] = await Promise.all([
+        api.get("/social/posts"),
+        api.get("/auth/me").catch(() => ({ data: null }))
+      ]);
+      setPosts(postsRes.data);
+      setCurrentUser(userRes.data);
     } catch (err) {
       console.error("Failed to fetch feed", err);
     } finally {
@@ -42,6 +47,27 @@ export default function Feed() {
     }
   };
 
+  const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
+    try {
+      await api.post("/social/interact", { postId, type });
+      // Update local state or re-fetch
+      setPosts(prev => prev.map(post => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            _count: {
+              ...post._count,
+              interactions: type === "LIKE" ? post._count.interactions + 1 : post._count.interactions
+            }
+          };
+        }
+        return post;
+      }));
+    } catch (err) {
+      console.error("Failed to interact", err);
+    }
+  };
+
   return (
     <div className="flex-1 max-w-2xl border-r border-secondary/50">
       <header className="sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-secondary/50">
@@ -61,8 +87,12 @@ export default function Feed() {
       </header>
 
       <div className="p-4 flex gap-4 border-b border-secondary/50">
-        <div className="w-10 h-10 bg-accent rounded-full flex-shrink-0 flex items-center justify-center font-bold">
-          @
+        <div className="w-12 h-12 bg-secondary rounded-2xl flex-shrink-0 flex items-center justify-center font-bold overflow-hidden shadow-sm">
+          {currentUser?.profileImage ? (
+            <img src={currentUser.profileImage} alt={currentUser.username} className="w-full h-full object-cover" />
+          ) : (
+            <span>{currentUser?.username?.[0] || "@"}</span>
+          )}
         </div>
         <div className="flex-1 flex flex-col gap-4">
           <textarea
@@ -102,11 +132,11 @@ export default function Feed() {
           posts.map((post) => (
             <div key={post.id} className="p-4 border-b border-secondary/50 hover:bg-secondary/10 transition-colors cursor-pointer group">
               <div className="flex gap-4">
-                <div className="w-10 h-10 bg-secondary rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">
+                <div className="w-12 h-12 bg-secondary rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
                   {post.user.profileImage ? (
                     <img src={post.user.profileImage} alt={post.user.username} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="font-bold uppercase">{post.user.username[0]}</span>
+                    <span className="font-bold uppercase text-primary">{post.user.username[0]}</span>
                   )}
                 </div>
                 <div className="flex-1 flex flex-col gap-2">
@@ -126,13 +156,13 @@ export default function Feed() {
                       </div>
                       <span className="text-sm">{post._count.children}</span>
                     </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-green-500 transition-colors">
+                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-green-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}>
                       <div className="p-2 rounded-full group-hover/icon:bg-green-500/10">
                         <Repeat2 className="w-5 h-5" />
                       </div>
                       <span className="text-sm">0</span>
                     </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-red-500 transition-colors">
+                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-red-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}>
                       <div className="p-2 rounded-full group-hover/icon:bg-red-500/10">
                         <Heart className="w-5 h-5" />
                       </div>

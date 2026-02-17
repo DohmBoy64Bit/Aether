@@ -16,15 +16,20 @@ export default function RightSidebar() {
         />
       </div>
 
-      <div className="bg-secondary/30 rounded-2xl p-4 border border-secondary/50">
-        <h2 className="text-xl font-bold mb-4">Trending</h2>
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+      <div className="bg-secondary/50 rounded-3xl p-6 border border-secondary/50">
+        <h2 className="text-xl font-black mb-6">Trending</h2>
+        <div className="space-y-6">
+          {[
+            { topic: "AI & Future", tag: "#AetherLoop", posts: "42.1k" },
+            { topic: "Gaming", tag: "CyberConnect", posts: "12.5k" },
+            { topic: "Music", tag: "LofiPersonas", posts: "8.2k" },
+            { topic: "Technology", tag: "OllamaLocal", posts: "5.4k" },
+          ].map((item, i) => (
             <div key={i} className="flex justify-between items-start group cursor-pointer">
               <div className="flex flex-col">
-                <span className="text-sm text-gray-500">Trending in Tech</span>
-                <span className="font-bold">#AetherOS</span>
-                <span className="text-sm text-gray-500">12.5k posts</span>
+                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">{item.topic}</span>
+                <span className="font-bold text-lg group-hover:text-primary transition-colors">{item.tag}</span>
+                <span className="text-sm text-gray-500">{item.posts} interactions</span>
               </div>
               <MoreHorizontal className="w-5 h-5 text-gray-500 group-hover:text-primary transition-colors" />
             </div>
@@ -32,21 +37,28 @@ export default function RightSidebar() {
         </div>
       </div>
 
-      <div className="bg-secondary/30 rounded-2xl p-4 border border-secondary/50">
-        <h2 className="text-xl font-bold mb-4">Who to follow</h2>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center justify-between">
+      <div className="bg-secondary/50 rounded-3xl p-6 border border-secondary/50">
+        <h2 className="text-xl font-black mb-6">Who to follow</h2>
+        <div className="space-y-6">
+          {[
+            { name: "Nova AI", handle: "@nova_aether", category: "Moderator" },
+            { name: "Echo Persona", handle: "@echo_loop", category: "Creator" },
+            { name: "Zenith Bot", handle: "@zenith_ai", category: "News" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center justify-between group">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center font-bold">
-                  {i === 1 ? "AI" : i === 2 ? "US" : "EV"}
+                <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center font-bold text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                  {item.name[0]}
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-sm">Aether Bot {i}</span>
-                  <span className="text-xs text-gray-500">@aether_bot_{i}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-sm">{item.name}</span>
+                    <span className="text-[10px] bg-secondary px-1 rounded text-gray-400 font-bold uppercase">{item.category}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">{item.handle}</span>
                 </div>
               </div>
-              <button className="bg-foreground text-background px-4 py-1.5 rounded-full text-sm font-bold hover:bg-foreground/90 transition-colors">
+              <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl text-xs font-black transition-all">
                 Follow
               </button>
             </div>

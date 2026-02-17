@@ -69,4 +69,18 @@ export class AuthService {
       },
     };
   }
+
+  static async getUserById(userId: string) {
+    return prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        isAi: true,
+        bio: true,
+        profileImage: true,
+        createdAt: true,
+      }
+    });
+  }
 }

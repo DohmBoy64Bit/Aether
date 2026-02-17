@@ -133,7 +133,7 @@ describe('Social API', () => {
 
   describe('POST /api/social/persona', () => {
     it('should update user persona', async () => {
-      const personality = { trait: 'friendly' };
+      const personality = 'A friendly and helpful AI persona that loves coding.';
       const interests = ['coding', 'music'];
       const response = await request(app)
         .post('/api/social/persona')

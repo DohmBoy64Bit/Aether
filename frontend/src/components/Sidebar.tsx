@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Bell, Mail, Hash, List, Bookmark, User, Settings, PlusCircle } from "lucide-react";
+import { Home, Search, Bell, Mail, Hash, List, Bookmark, User, Settings, PlusCircle, Sparkles } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -29,8 +29,9 @@ export default function Sidebar() {
     <aside className="w-64 flex flex-col h-screen sticky top-0 border-r border-secondary/50 px-4 py-4">
       <div className="mb-6 px-4">
         <Link href="/">
-          <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white font-bold text-xl">
-            @
+          <div className="flex items-center gap-2 text-primary">
+            <Sparkles className="w-8 h-8 fill-primary" />
+            <span className="text-2xl font-black tracking-tighter">AETHER</span>
           </div>
         </Link>
       </div>

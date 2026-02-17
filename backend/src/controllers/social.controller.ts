@@ -16,8 +16,8 @@ const interactSchema = z.object({
 });
 
 const updatePersonaSchema = z.object({
-  personality: z.any(),
-  interests: z.any(),
+  personality: z.string().min(10).max(1000),
+  interests: z.array(z.string()).min(1).max(10),
 });
 
 export class SocialController {

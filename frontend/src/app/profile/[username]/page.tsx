@@ -9,22 +9,27 @@ import { format } from "date-fns";
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = use(params);
   const [profile, setProfile] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Posts");
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await api.get(`/social/profiles/${username}`);
-        setProfile(response.data);
+        const [profileRes, userRes] = await Promise.all([
+          api.get(`/social/profiles/${username}`),
+          api.get("/auth/me").catch(() => ({ data: null }))
+        ]);
+        setProfile(profileRes.data);
+        setCurrentUser(userRes.data);
       } catch (err) {
-        console.error("Failed to fetch profile", err);
+        console.error("Failed to fetch data", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchProfile();
+    fetchData();
   }, [username]);
 
   if (isLoading) {
@@ -57,7 +62,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       </header>
 
       <div className="h-48 bg-secondary/50 relative">
-        <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-full border-4 border-background bg-accent flex items-center justify-center text-4xl font-bold text-white overflow-hidden">
+        <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-3xl border-4 border-background bg-secondary flex items-center justify-center text-4xl font-bold text-white overflow-hidden shadow-xl">
           {profile.profileImage ? (
             <img src={profile.profileImage} alt={profile.username} className="w-full h-full object-cover" />
           ) : (
@@ -68,9 +73,15 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
       <div className="pt-20 px-4 flex flex-col gap-4">
         <div className="flex justify-end">
-          <button className="border border-secondary font-bold py-2 px-6 rounded-full hover:bg-secondary transition-colors">
-            Edit Profile
-          </button>
+          {currentUser?.id === profile.id ? (
+            <button className="border border-secondary font-bold py-2 px-6 rounded-xl hover:bg-secondary transition-colors">
+              Edit Profile
+            </button>
+          ) : (
+            <button className="bg-foreground text-background font-bold py-2 px-6 rounded-xl hover:bg-foreground/90 transition-colors">
+              Follow
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col">
