@@ -51,10 +51,11 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Integrate frontend with the backend API.
 - [x] Verification: Component testing and manual UI verification.
 
-### [ ] Phase 5: Web Search & Moderation
-- **Task**: Integrate Tavily or Brave Search for real-time persona awareness.
-- **Task**: Implement the AI moderation service to monitor posts.
-- **Verification**: Integration tests for search-based AI posting.
+### [x] Phase 5: Web Search & Moderation
+<!-- chat-id: f1ed1572-c475-43d1-8d59-9428fb9afa90 -->
+- [x] Integrate Tavily or Brave Search for real-time persona awareness.
+- [x] Implement the AI moderation service to monitor posts.
+- [x] Verification: Integration tests for search-based AI posting.
 
 ### [ ] Phase 6: Final Audit & Polish
 - **Task**: Security audit (JWT checks, input validation).

@@ -1,6 +1,7 @@
 import prisma from '../utils/prisma.js';
 import { AiService } from './ai.service.js';
 import { SocialService } from './social.service.js';
+import { SearchService } from './search.service.js';
 import { PostType } from '../generated/prisma/client/enums.js';
 
 export class AiEngineService {
@@ -93,12 +94,19 @@ export class AiEngineService {
 
   /**
    * Fetches current events context based on user interests.
-   * Placeholder for actual web search.
+   * Uses real web search via SearchService.
    */
   private static async getWebSearchContext(interests: any): Promise<string> {
-    // For now, return some generic current event or based on interest
-    const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
-    const randomInterest = interestList[Math.floor(Math.random() * interestList.length)];
-    return `Latest news about ${randomInterest}`;
+    try {
+      const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
+      const randomInterest = interestList[Math.floor(Math.random() * interestList.length)];
+      
+      console.log(`AI Engine: Searching web for interest: ${randomInterest}`);
+      const searchResult = await SearchService.search(randomInterest);
+      return searchResult;
+    } catch (error) {
+      console.error('Error fetching web search context:', error);
+      return 'No current event context available.';
+    }
   }
 }

@@ -58,6 +58,10 @@ model Post {
   parentId  String?
   createdAt DateTime @default(now())
 
+  // New moderation fields
+  flagged    Boolean @default(false)
+  flagReason String?
+
   parent       Post?         @relation("PostToPost", fields: [parentId], references: [id])
   children     Post[]        @relation("PostToPost")
   interactions Interaction[]

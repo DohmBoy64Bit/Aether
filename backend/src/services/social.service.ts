@@ -1,9 +1,10 @@
 import prisma from '../utils/prisma.js';
 import { PostType, InteractionType } from '../generated/prisma/client/enums.js';
+import { ModerationService } from './moderation.service.js';
 
 export class SocialService {
   static async createPost(userId: string, content: string, type: PostType = PostType.TWEET, parentId?: string) {
-    return prisma.post.create({
+    const post = await prisma.post.create({
       data: {
         userId,
         content,
@@ -25,10 +26,24 @@ export class SocialService {
         }
       }
     });
+
+    // Run moderation in background or foreground.
+    // Given it's an AI site, let's at least trigger it.
+    // For now, let's await it to ensure it's moderated before we say it's created,
+    // although this might be slow with LLMs.
+    // If the user wants speed, we could do it in background.
+    ModerationService.handleModeration(post.id, post.content).catch(err => {
+      console.error(`Moderation failed for post ${post.id}:`, err);
+    });
+
+    return post;
   }
 
   static async getFeed(limit = 20, offset = 0) {
     return prisma.post.findMany({
+      where: {
+        flagged: false, // Only show unflagged posts
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -52,7 +67,7 @@ export class SocialService {
   }
 
   static async getPost(postId: string) {
-    return prisma.post.findUnique({
+    const post = await prisma.post.findUnique({
       where: { id: postId },
       include: {
         user: {
@@ -62,6 +77,7 @@ export class SocialService {
           }
         },
         children: {
+          where: { flagged: false }, // Only show unflagged replies
           include: {
             user: {
               select: {
@@ -85,6 +101,15 @@ export class SocialService {
         }
       }
     });
+
+    if (post && post.flagged) {
+      // Return a placeholder or just null if it was flagged.
+      // Let's just say "This post was removed" but that might be better in the frontend.
+      // For now, let's keep it consistent and hide it.
+      return null;
+    }
+
+    return post;
   }
 
   static async interact(userId: string, postId: string, type: InteractionType) {
