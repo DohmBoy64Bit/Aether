@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth.service.js';
 import { z } from 'zod';
 
 const authSchema = z.object({
@@ -14,10 +14,10 @@ export class AuthController {
       const result = await AuthService.signup(validatedData);
       res.status(201).json(result);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: error.errors });
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: 'Validation failed', details: error.errors });
       }
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ error: error.message || 'An unknown error occurred' });
     }
   }
 
@@ -27,10 +27,10 @@ export class AuthController {
       const result = await AuthService.login(validatedData);
       res.json(result);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: error.errors });
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: 'Validation failed', details: error.errors });
       }
-      res.status(401).json({ error: error.message });
+      res.status(401).json({ error: error.message || 'Authentication failed' });
     }
   }
 }

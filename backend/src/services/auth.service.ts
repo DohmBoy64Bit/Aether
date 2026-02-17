@@ -1,6 +1,6 @@
-import prisma from '../utils/prisma';
-import { hashPassword, comparePassword, generateToken, generateRecoveryCode } from '../utils/auth';
-import { SignupData, LoginData, AuthResponse } from '../types';
+import prisma from '../utils/prisma.js';
+import { hashPassword, comparePassword, generateToken, generateRecoveryCode } from '../utils/auth.js';
+import { SignupData, LoginData, AuthResponse } from '../types/index.js';
 
 export class AuthService {
   static async signup(data: SignupData): Promise<AuthResponse & { recoveryCodes: string[] }> {

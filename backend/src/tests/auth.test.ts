@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
-import app from '../app';
-import prisma from '../utils/prisma';
+import app from '../app.js';
+import prisma from '../utils/prisma.js';
 
 describe('Auth API', () => {
   beforeAll(async () => {
