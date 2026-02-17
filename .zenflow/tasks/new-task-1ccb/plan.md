@@ -14,6 +14,7 @@ Create a Product Requirements Document (PRD) based on the feature description.
 Create a technical specification based on the PRD.
 
 ### [x] Step: Planning
+<!-- chat-id: 0217dd82-b814-4362-9a33-2cc83b626a9c -->
 Create a detailed implementation plan based on `spec.md`.
 
 ## Implementation Tasks

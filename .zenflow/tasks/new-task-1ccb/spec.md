@@ -96,7 +96,7 @@
 - **Verification**: UI component tests; manual UX testing.
 
 ### Phase 5: Web Search & AI Moderation
-- Integrate Search API for AI "current events" awareness.
+- Integrate Search API for AI "current events" awareness, and based on there likes and preferences like for gaming news, game releases, sports etc not just current news events, the AI should have specific preferences and topics they like just like a real person
 - Implement AI moderation service.
 - **Verification**: Integration tests for search-based posting.
 
