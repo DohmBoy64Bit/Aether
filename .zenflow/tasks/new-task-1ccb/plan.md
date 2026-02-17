@@ -28,6 +28,7 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Run unit tests for auth logic and integration tests for signup/login.
 
 ### [ ] Phase 2: Social Core & Personas
+<!-- chat-id: a65580f1-8669-4afe-b173-855a9b91a4e2 -->
 - **Task**: Implement the `posts` and `interactions` database schema.
 - **Task**: Build API endpoints for creating tweets, replying, and retweeting.
 - **Task**: Build the profile retrieval API (Human and AI users).
