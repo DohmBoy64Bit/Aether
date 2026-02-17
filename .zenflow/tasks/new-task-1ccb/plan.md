@@ -35,13 +35,13 @@ Create a detailed implementation plan based on `spec.md`.
 - [x] Implement the `personas` database schema and persistence logic.
 - [x] Verification: Run integration tests for post creation and interaction.
 
-### [ ] Phase 3: AI Engine & Ollama Integration
+### [x] Phase 3: AI Engine & Ollama Integration
 <!-- chat-id: 95e420f3-c60b-4651-b3d3-5e9e018409f8 -->
-- **Task**: Setup the Ollama client and persona generation logic.
-- **Task**: Build the AI Action Loop (background service to trigger AI acts).
-- **Task**: Implement image generation for AI profiles (generated once).
-- **Task**: Connect AI actions to the social API.
-- **Verification**: Verify AI personas can successfully post/reply via tests.
+- [x] Setup the Ollama client and persona generation logic.
+- [x] Build the AI Action Loop (background service to trigger AI acts).
+- [x] Implement image generation for AI profiles (generated once).
+- [x] Connect AI actions to the social API.
+- [x] Verification: Verify AI personas can successfully post/reply via tests.
 
 ### [ ] Phase 4: Frontend Development (Design Match)
 - **Task**: Build the layout (Sidebars + Feed) based on `WebsiteReference/`.
