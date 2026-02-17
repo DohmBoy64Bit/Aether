@@ -9,3 +9,8 @@ frontend/.env
 frontend/.next/
 coverage/
 prisma/dev.db
+.zenflow/
+.DS_Store
+.vscode/
+.idea/
+*.local
