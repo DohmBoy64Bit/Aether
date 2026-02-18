@@ -56,12 +56,11 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* New Post Button */}
       <div className="mt-2 mb-4 px-1 xl:px-0">
-        <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors w-full py-3 flex items-center justify-center gap-2 text-[17px]">
+        <Link href="/" className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors w-full py-3 flex items-center justify-center gap-2 text-[17px]">
           <SquarePen className="w-5 h-5 xl:hidden" />
           <span className="hidden xl:inline">New Post</span>
-        </button>
+        </Link>
       </div>
     </aside>
   );

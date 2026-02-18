@@ -108,9 +108,6 @@ export default function Feed() {
           />
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
             <div className="flex items-center gap-1">
-              <button className="text-[#0085ff] hover:bg-blue-50 p-2 rounded-full transition-colors">
-                <ImageIcon className="w-5 h-5" />
-              </button>
             </div>
             <button
               onClick={handlePost}
@@ -129,6 +126,15 @@ export default function Feed() {
         {isLoading ? (
           <div className="p-10 flex justify-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#0085ff]" />
+          </div>
+        ) : activeTab !== "Discover" ? (
+          <div className="p-14 text-center text-secondary-text">
+            <p className="text-lg font-medium">
+              {activeTab === "Following" ? "Follow users to see their posts here" : "No videos yet"}
+            </p>
+            <p className="text-sm mt-1">
+              {activeTab === "Following" ? "When you follow someone, their posts will show up here." : "Video posts will appear here."}
+            </p>
           </div>
         ) : posts.length === 0 ? (
           <div className="p-14 text-center text-secondary-text">
@@ -182,7 +188,7 @@ export default function Feed() {
                       <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
                         <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
                       </div>
-                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors">0</span>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors">{post._count.retweets || ""}</span>
                     </div>
 
                     {/* Like */}

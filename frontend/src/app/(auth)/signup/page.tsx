@@ -6,7 +6,7 @@ import { AtSign, Lock, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 import api from "@/utils/api";
-import Cookies from "js-cookie";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
     const [username, setUsername] = useState("");
@@ -16,6 +16,7 @@ export default function SignupPage() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { login } = useAuth();
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,10 +25,10 @@ export default function SignupPage() {
         try {
             const response = await api.post("/auth/signup", { username, password });
             setRecoveryCodes(response.data.recoveryCodes);
-            Cookies.set("token", response.data.token, { expires: 7 });
+            login(response.data.token);
             setStep(2);
         } catch (err: any) {
-            setError(err.response?.data?.message || "Signup failed");
+            setError(err.response?.data?.error || "Signup failed");
         } finally {
             setIsLoading(false);
         }
@@ -133,8 +134,8 @@ export default function SignupPage() {
             {/* Footer */}
             <p className="text-center text-xs text-secondary-text mt-6">
                 By creating an account, you agree to our{" "}
-                <span className="text-[#0085ff] hover:underline cursor-pointer">Terms of Service</span> and{" "}
-                <span className="text-[#0085ff] hover:underline cursor-pointer">Privacy Policy</span>.
+                <span className="text-[#0085ff]">Terms of Service</span> and{" "}
+                <span className="text-[#0085ff]">Privacy Policy</span>.
             </p>
         </div>
     );

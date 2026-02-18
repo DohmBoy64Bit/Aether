@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Calendar, Link as LinkIcon, MapPin, Loader2, MoreHorizontal, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Loader2, MoreHorizontal, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, use } from "react";
 import api from "@/utils/api";
@@ -81,18 +81,18 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {/* Action buttons */}
                 <div className="flex justify-end gap-2 -mt-2 mb-3">
                     {currentUser?.id === profile.id ? (
-                        <button className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-1.5 px-5 text-sm">
+                        <button onClick={() => alert('Edit Profile coming soon!')} className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-1.5 px-5 text-sm">
                             Edit Profile
                         </button>
                     ) : (
                         <>
-                            <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                            <button onClick={() => alert('Coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                                 <MoreHorizontal className="w-4 h-4 text-heading" />
                             </button>
-                            <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                            <button onClick={() => alert('Messaging coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                                 <MessageCircle className="w-4 h-4 text-heading" />
                             </button>
-                            <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors py-1.5 px-5 text-sm">
+                            <button onClick={() => alert('Follow feature coming soon!')} className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors py-1.5 px-5 text-sm">
                                 Follow
                             </button>
                         </>
@@ -118,14 +118,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {/* Metadata */}
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-secondary-text text-sm mb-3">
                     <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>Cyberspace</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <LinkIcon className="w-4 h-4" />
-                        <a href="#" className="text-[#0085ff] hover:underline">aether.social</a>
-                    </div>
-                    <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
                         <span>Joined {format(new Date(profile.createdAt), "MMMM yyyy")}</span>
                     </div>
@@ -133,14 +125,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
                 {/* Stats */}
                 <div className="flex gap-4 text-sm">
-                    <div className="flex gap-1 hover:underline cursor-pointer">
-                        <span className="font-bold text-heading">0</span>
-                        <span className="text-secondary-text">followers</span>
-                    </div>
-                    <div className="flex gap-1 hover:underline cursor-pointer">
-                        <span className="font-bold text-heading">0</span>
-                        <span className="text-secondary-text">following</span>
-                    </div>
                     <div className="flex gap-1">
                         <span className="font-bold text-heading">{profile._count.posts}</span>
                         <span className="text-secondary-text">posts</span>
@@ -170,7 +154,12 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {/* Tab Content */}
             <div className="flex flex-col min-h-[200px]">
                 <div className="p-12 text-center text-secondary-text">
-                    <p className="text-base">No posts to show yet.</p>
+                    <p className="text-base">
+                        {activeTab === "Posts" && "No posts to show yet."}
+                        {activeTab === "Replies" && "No replies yet."}
+                        {activeTab === "Media" && "No media posts yet."}
+                        {activeTab === "Likes" && "No liked posts yet."}
+                    </p>
                 </div>
             </div>
         </div>

@@ -37,9 +37,6 @@ export default function RightSidebar() {
             </div>
           ))}
         </div>
-        <div className="px-4 py-3 text-[#0085ff] text-sm hover:bg-gray-50 transition-colors cursor-pointer">
-          Show more
-        </div>
       </div>
 
       {/* Who to follow */}
@@ -64,14 +61,11 @@ export default function RightSidebar() {
                   <span className="text-xs text-secondary-text">{item.handle}</span>
                 </div>
               </div>
-              <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4">
+              <button onClick={() => alert('Follow feature coming soon!')} className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4">
                 Follow
               </button>
             </div>
           ))}
-        </div>
-        <div className="px-4 py-3 text-[#0085ff] text-sm hover:bg-gray-50 transition-colors cursor-pointer">
-          Show more
         </div>
       </div>
 

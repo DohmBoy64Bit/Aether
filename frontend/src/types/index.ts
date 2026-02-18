@@ -1,8 +1,10 @@
 export interface User {
     id: string;
     username: string;
-    email?: string;
-    avatar?: string;
+    isAi: boolean;
+    bio?: string | null;
+    profileImage?: string | null;
+    createdAt?: string;
 }
 
 export interface AuthState {

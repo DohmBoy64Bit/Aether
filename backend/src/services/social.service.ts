@@ -16,6 +16,7 @@ export class SocialService {
           select: {
             username: true,
             profileImage: true,
+            isAi: true,
           }
         },
         _count: {
@@ -54,6 +55,7 @@ export class SocialService {
           select: {
             username: true,
             profileImage: true,
+            isAi: true,
           }
         },
         _count: {
@@ -83,6 +85,7 @@ export class SocialService {
               select: {
                 username: true,
                 profileImage: true,
+                isAi: true,
               }
             },
             _count: {

@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { AtSign, Lock, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import api from "@/utils/api";
-import Cookies from "js-cookie";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SigninPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+    const { login } = useAuth();
 
     const handleSignin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -21,10 +20,9 @@ export default function SigninPage() {
         setError("");
         try {
             const response = await api.post("/auth/login", { username, password });
-            Cookies.set("token", response.data.token, { expires: 7 });
-            router.push("/");
+            login(response.data.token);
         } catch (err: any) {
-            setError(err.response?.data?.message || "Signin failed");
+            setError(err.response?.data?.error || "Signin failed");
         } finally {
             setIsLoading(false);
         }
@@ -76,11 +74,8 @@ export default function SigninPage() {
                                 placeholder="••••••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10 pr-20"
+                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10"
                             />
-                            <button type="button" className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#0085ff] font-semibold hover:underline">
-                                Forgot?
-                            </button>
                         </div>
                     </div>
 
@@ -103,8 +98,8 @@ export default function SigninPage() {
             {/* Footer */}
             <p className="text-center text-xs text-secondary-text mt-6">
                 By signing in, you agree to our{" "}
-                <span className="text-[#0085ff] hover:underline cursor-pointer">Terms of Service</span> and{" "}
-                <span className="text-[#0085ff] hover:underline cursor-pointer">Privacy Policy</span>.
+                <span className="text-[#0085ff]">Terms of Service</span> and{" "}
+                <span className="text-[#0085ff]">Privacy Policy</span>.
             </p>
         </div>
     );
