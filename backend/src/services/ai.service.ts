@@ -2,6 +2,7 @@ import { Ollama } from 'ollama';
 import prisma from '../utils/prisma.js';
 import { hashPassword } from '../utils/auth.js';
 import crypto from 'crypto';
+import { SearchResult, SearchResultLink, SearchResultImage, SearchResultVideo } from './search.service.js';
 
 const ollama = new Ollama({ host: process.env.OLLAMA_HOST || 'http://127.0.0.1:11434' });
 const MODEL = process.env.OLLAMA_MODEL || 'llama3';
@@ -18,6 +19,30 @@ export interface SearchPlan {
   query: string;
   categories: string[];
   time_range: string | null;
+}
+
+export interface PostMedia {
+  links?: Array<{
+    url: string;
+    title: string;
+    description?: string;
+    thumbnail?: string;
+  }>;
+  images?: Array<{
+    url: string;
+    alt?: string;
+  }>;
+  video?: {
+    url: string;
+    iframe_src: string;
+    title: string;
+    thumbnail?: string;
+  };
+}
+
+export interface GeneratedPost {
+  content: string;
+  media: PostMedia | null;
 }
 
 const SEARXNG_CATEGORIES = [
@@ -105,25 +130,104 @@ export class AiService {
   }
 
   /**
-   * Generates a post content based on a persona and optional context (e.g., current events).
+   * Generates a post with optional rich media (links, images, video).
+   * The AI decides what media to attach based on search results.
    */
-  static async generatePost(user: any, context?: string): Promise<string> {
+  static async generatePost(user: any, searchResult?: SearchResult): Promise<GeneratedPost> {
+    // Build available media context for the AI
+    const hasLinks = searchResult && searchResult.links.length > 0;
+    const hasImages = searchResult && searchResult.images.length > 0;
+    const hasVideos = searchResult && searchResult.videos.length > 0;
+
+    let mediaContext = '';
+    if (hasLinks) {
+      mediaContext += '\n\nAvailable links from search:\n';
+      searchResult!.links.forEach((l, i) => {
+        mediaContext += `  [${i}] "${l.title}" — ${l.url}${l.description ? ` (${l.description.substring(0, 80)})` : ''}\n`;
+      });
+    }
+    if (hasImages) {
+      mediaContext += '\nAvailable images from search:\n';
+      searchResult!.images.forEach((img, i) => {
+        mediaContext += `  [${i}] ${img.alt || 'image'} — ${img.url}\n`;
+      });
+    }
+    if (hasVideos) {
+      mediaContext += '\nAvailable videos from search:\n';
+      searchResult!.videos.forEach((v, i) => {
+        mediaContext += `  [${i}] "${v.title}" — ${v.url}\n`;
+      });
+    }
+
     const prompt = `
       You are ${user.username}, a social media user with the following personality: ${user.persona.personality}.
-      Your interests are: ${user.persona.interests.join(', ')}.
-      ${context ? `Current context/topic: ${context}` : 'Talk about something that interests you.'}
-      Write a short, engaging tweet (max 280 characters). Do not use hashtags unless it fits the persona.
-      Return ONLY the tweet text.
+      Your interests are: ${Array.isArray(user.persona.interests) ? user.persona.interests.join(', ') : user.persona.interests}.
+      ${searchResult?.context ? `Current context/topic: ${searchResult.context}` : 'Talk about something that interests you.'}
+      ${mediaContext}
+
+      Write an engaging social media post (max 280 characters for the text).
+      
+      IMPORTANT RULES:
+      - If including a link in your text, use descriptive markdown format: [Descriptive Text](url) — e.g., [Easy Weeknight Recipes](https://example.com) NOT [link] or bare URLs.
+      - Choose media to attach based on what fits your post naturally:
+        * "link" — attach a link card with rich preview (good for articles, news, recipes)
+        * "images" — attach 1-4 images (good for visual topics like nature, food, art, travel)
+        * "video" — attach a video embed (good for tutorials, music, entertainment)
+        * "none" — no media attachment (for opinions, thoughts, conversations)
+      - Pick the best option. Not every post needs media.
+      - For media_indices, specify which items from the available lists above to use (by their [index] number).
+      - For images, pick 1 to 4 images that look good together.
+
+      Return ONLY a JSON object:
+      {
+        "content": "Your post text here with optional [Link Text](url)",
+        "media_type": "none" | "link" | "images" | "video",
+        "media_indices": [0]
+      }
     `;
 
     try {
       const response = await ollama.generate({
         model: MODEL,
         prompt: prompt,
+        format: 'json',
         stream: false,
       });
 
-      return response.response.trim();
+      const result = JSON.parse(response.response);
+      let content = (result.content || '').trim();
+      if (!content) {
+        content = 'Just vibing ✨';
+      }
+
+      // Build PostMedia based on AI's choice
+      let media: PostMedia | null = null;
+      const mediaType = result.media_type || 'none';
+      const indices: number[] = Array.isArray(result.media_indices) ? result.media_indices : [];
+
+      if (mediaType === 'link' && hasLinks) {
+        const selectedLinks = indices
+          .filter(i => i >= 0 && i < searchResult!.links.length)
+          .map(i => searchResult!.links[i]);
+        if (selectedLinks.length === 0) selectedLinks.push(searchResult!.links[0]);
+        media = { links: selectedLinks };
+      } else if (mediaType === 'images' && hasImages) {
+        const selectedImages = indices
+          .filter(i => i >= 0 && i < searchResult!.images.length)
+          .slice(0, 4)
+          .map(i => searchResult!.images[i]);
+        if (selectedImages.length === 0) selectedImages.push(searchResult!.images[0]);
+        media = { images: selectedImages };
+      } else if (mediaType === 'video' && hasVideos) {
+        const idx = indices[0] ?? 0;
+        if (idx >= 0 && idx < searchResult!.videos.length) {
+          media = { video: searchResult!.videos[idx] };
+        } else {
+          media = { video: searchResult!.videos[0] };
+        }
+      }
+
+      return { content, media };
     } catch (error) {
       console.error('Error generating post:', error);
       throw new Error('Failed to generate AI post');

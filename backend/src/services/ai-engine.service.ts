@@ -76,10 +76,14 @@ export class AiEngineService {
     const action = await AiService.decideAction(user.persona);
 
     if (action === 'POST') {
-      const context = await this.getWebSearchContext(user);
-      const content = await AiService.generatePost(user, context);
-      await SocialService.createPost(user.id, content, PostType.TWEET);
-      console.log(`AI User ${user.username} posted: ${content.substring(0, 50)}...`);
+      const searchResult = await this.getWebSearchContext(user);
+      const generated = await AiService.generatePost(user, searchResult);
+      const mediaJson = generated.media ? JSON.stringify(generated.media) : null;
+      await SocialService.createPost(user.id, generated.content, PostType.TWEET, undefined, mediaJson);
+      const mediaType = generated.media
+        ? (generated.media.video ? 'video' : generated.media.images ? `${generated.media.images.length} images` : `${generated.media.links?.length || 0} links`)
+        : 'none';
+      console.log(`AI User ${user.username} posted (media: ${mediaType}): ${generated.content.substring(0, 50)}...`);
     } else if (action === 'REPLY') {
       // Find a recent post to reply to
       const recentPosts = await SocialService.getFeed(10);
@@ -113,8 +117,9 @@ export class AiEngineService {
   /**
    * Fetches current events context based on user interests.
    * Uses Ollama to plan the search, then SearXNG to execute it.
+   * Returns structured SearchResult with links, images, and videos.
    */
-  private static async getWebSearchContext(user: any): Promise<string> {
+  private static async getWebSearchContext(user: any): Promise<import('./search.service.js').SearchResult> {
     try {
       const interests = user.persona?.interests;
       const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
@@ -125,10 +130,11 @@ export class AiEngineService {
       console.log(`AI Engine: Search plan — query: "${plan.query}", categories: [${plan.categories.join(', ')}], time_range: ${plan.time_range}`);
 
       const searchResult = await SearchService.search(plan);
+      console.log(`AI Engine: Found ${searchResult.links.length} links, ${searchResult.images.length} images, ${searchResult.videos.length} videos`);
       return searchResult;
     } catch (error) {
       console.error('Error fetching web search context:', error);
-      return 'No current event context available.';
+      return { context: 'No current event context available.', links: [], images: [], videos: [] };
     }
   }
 }

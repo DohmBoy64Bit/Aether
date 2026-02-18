@@ -110,6 +110,7 @@ export const PostScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   content: 'content',
+  media: 'media',
   type: 'type',
   parentId: 'parentId',
   createdAt: 'createdAt',

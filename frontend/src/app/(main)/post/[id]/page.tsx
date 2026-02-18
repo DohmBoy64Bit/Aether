@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, MessageCircle, Repeat2, Heart, Share2, MoreHorizontal, Loader2 } from "lucide-react";
+import PostContent from "@/components/PostContent";
 import Link from "next/link";
 import { useEffect, useState, use } from "react";
 import api from "@/utils/api";
@@ -104,7 +105,7 @@ function ReplyItem({ reply, depth = 0 }: { reply: any; depth?: number }) {
                             <span className="text-secondary-text text-[13px]">{formatDistanceToNow(new Date(reply.createdAt))}</span>
                         </div>
 
-                        <p className="text-heading text-[14px] leading-relaxed mt-0.5 whitespace-pre-wrap">{reply.content}</p>
+                        <PostContent content={reply.content} media={reply.media} textClassName="text-heading text-[14px] leading-relaxed" />
 
                         {/* Actions */}
                         <div className="flex items-center gap-6 mt-2 -ml-2">
@@ -216,7 +217,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                 </div>
 
                 {/* Post content — larger for detail view */}
-                <p className="text-heading text-lg leading-relaxed whitespace-pre-wrap mb-3">{post.content}</p>
+                <div className="mb-3">
+                    <PostContent content={post.content} media={post.media} textClassName="text-heading text-lg leading-relaxed" />
+                </div>
 
                 {/* Timestamp */}
                 <div className="flex items-center gap-1 text-secondary-text text-sm pb-3 border-b border-gray-200">

@@ -16,11 +16,15 @@ describe('Moderation and Search Services', () => {
   });
 
   describe('SearchService', () => {
-    it('should return search context even without SearXNG (fallback)', async () => {
-      const context = await SearchService.search({ query: 'gaming', categories: ['general', 'news'], time_range: null });
-      expect(context).toBeDefined();
-      expect(typeof context).toBe('string');
-      expect(context.length).toBeGreaterThan(0);
+    it('should return structured search results even without SearXNG (fallback)', async () => {
+      const result = await SearchService.search({ query: 'gaming', categories: ['general', 'news'], time_range: null });
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('context');
+      expect(result).toHaveProperty('links');
+      expect(result).toHaveProperty('images');
+      expect(result).toHaveProperty('videos');
+      expect(typeof result.context).toBe('string');
+      expect(result.context.length).toBeGreaterThan(0);
     });
   });
 

@@ -3,13 +3,14 @@ import { PostType, InteractionType } from '../generated/prisma/client/enums.js';
 import { ModerationService } from './moderation.service.js';
 
 export class SocialService {
-  static async createPost(userId: string, content: string, type: PostType = PostType.TWEET, parentId?: string) {
+  static async createPost(userId: string, content: string, type: PostType = PostType.TWEET, parentId?: string, media?: string | null) {
     const post = await prisma.post.create({
       data: {
         userId,
         content,
         type,
         parentId,
+        media: media || null,
       },
       include: {
         user: {

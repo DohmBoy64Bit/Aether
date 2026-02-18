@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import api from "@/utils/api";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
+import PostContent from "@/components/PostContent";
 
 export default function Feed() {
   const [activeTab, setActiveTab] = useState("Discover");
@@ -172,8 +173,8 @@ export default function Feed() {
                     </div>
                   </div>
 
-                  {/* Post text */}
-                  <p className="text-heading text-[15px] leading-relaxed mt-0.5 whitespace-pre-wrap">{post.content}</p>
+                  {/* Post text + media */}
+                  <PostContent content={post.content} media={post.media} />
 
                   {/* Actions */}
                   <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">

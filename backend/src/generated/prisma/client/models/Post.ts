@@ -28,6 +28,7 @@ export type PostMinAggregateOutputType = {
   id: string | null
   userId: string | null
   content: string | null
+  media: string | null
   type: $Enums.PostType | null
   parentId: string | null
   createdAt: Date | null
@@ -39,6 +40,7 @@ export type PostMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   content: string | null
+  media: string | null
   type: $Enums.PostType | null
   parentId: string | null
   createdAt: Date | null
@@ -50,6 +52,7 @@ export type PostCountAggregateOutputType = {
   id: number
   userId: number
   content: number
+  media: number
   type: number
   parentId: number
   createdAt: number
@@ -63,6 +66,7 @@ export type PostMinAggregateInputType = {
   id?: true
   userId?: true
   content?: true
+  media?: true
   type?: true
   parentId?: true
   createdAt?: true
@@ -74,6 +78,7 @@ export type PostMaxAggregateInputType = {
   id?: true
   userId?: true
   content?: true
+  media?: true
   type?: true
   parentId?: true
   createdAt?: true
@@ -85,6 +90,7 @@ export type PostCountAggregateInputType = {
   id?: true
   userId?: true
   content?: true
+  media?: true
   type?: true
   parentId?: true
   createdAt?: true
@@ -169,6 +175,7 @@ export type PostGroupByOutputType = {
   id: string
   userId: string
   content: string
+  media: string | null
   type: $Enums.PostType
   parentId: string | null
   createdAt: Date
@@ -201,6 +208,7 @@ export type PostWhereInput = {
   id?: Prisma.StringFilter<"Post"> | string
   userId?: Prisma.StringFilter<"Post"> | string
   content?: Prisma.StringFilter<"Post"> | string
+  media?: Prisma.StringNullableFilter<"Post"> | string | null
   type?: Prisma.EnumPostTypeFilter<"Post"> | $Enums.PostType
   parentId?: Prisma.StringNullableFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -216,6 +224,7 @@ export type PostOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  media?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -234,6 +243,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[]
   userId?: Prisma.StringFilter<"Post"> | string
   content?: Prisma.StringFilter<"Post"> | string
+  media?: Prisma.StringNullableFilter<"Post"> | string | null
   type?: Prisma.EnumPostTypeFilter<"Post"> | $Enums.PostType
   parentId?: Prisma.StringNullableFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -249,6 +259,7 @@ export type PostOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  media?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -266,6 +277,7 @@ export type PostScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Post"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Post"> | string
   content?: Prisma.StringWithAggregatesFilter<"Post"> | string
+  media?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   type?: Prisma.EnumPostTypeWithAggregatesFilter<"Post"> | $Enums.PostType
   parentId?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
@@ -276,6 +288,7 @@ export type PostScalarWhereWithAggregatesInput = {
 export type PostCreateInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -290,6 +303,7 @@ export type PostUncheckedCreateInput = {
   id?: string
   userId: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   parentId?: string | null
   createdAt?: Date | string
@@ -302,6 +316,7 @@ export type PostUncheckedCreateInput = {
 export type PostUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -316,6 +331,7 @@ export type PostUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -329,6 +345,7 @@ export type PostCreateManyInput = {
   id?: string
   userId: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   parentId?: string | null
   createdAt?: Date | string
@@ -339,6 +356,7 @@ export type PostCreateManyInput = {
 export type PostUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -349,6 +367,7 @@ export type PostUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -375,6 +394,7 @@ export type PostCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  media?: Prisma.SortOrder
   type?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -386,6 +406,7 @@ export type PostMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  media?: Prisma.SortOrder
   type?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -397,6 +418,7 @@ export type PostMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  media?: Prisma.SortOrder
   type?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -530,6 +552,7 @@ export type PostUpdateOneRequiredWithoutInteractionsNestedInput = {
 export type PostCreateWithoutUserInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -542,6 +565,7 @@ export type PostCreateWithoutUserInput = {
 export type PostUncheckedCreateWithoutUserInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   parentId?: string | null
   createdAt?: Date | string
@@ -583,6 +607,7 @@ export type PostScalarWhereInput = {
   id?: Prisma.StringFilter<"Post"> | string
   userId?: Prisma.StringFilter<"Post"> | string
   content?: Prisma.StringFilter<"Post"> | string
+  media?: Prisma.StringNullableFilter<"Post"> | string | null
   type?: Prisma.EnumPostTypeFilter<"Post"> | $Enums.PostType
   parentId?: Prisma.StringNullableFilter<"Post"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -593,6 +618,7 @@ export type PostScalarWhereInput = {
 export type PostCreateWithoutChildrenInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -606,6 +632,7 @@ export type PostUncheckedCreateWithoutChildrenInput = {
   id?: string
   userId: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   parentId?: string | null
   createdAt?: Date | string
@@ -622,6 +649,7 @@ export type PostCreateOrConnectWithoutChildrenInput = {
 export type PostCreateWithoutParentInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -635,6 +663,7 @@ export type PostUncheckedCreateWithoutParentInput = {
   id?: string
   userId: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -666,6 +695,7 @@ export type PostUpdateToOneWithWhereWithoutChildrenInput = {
 export type PostUpdateWithoutChildrenInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -679,6 +709,7 @@ export type PostUncheckedUpdateWithoutChildrenInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -706,6 +737,7 @@ export type PostUpdateManyWithWhereWithoutParentInput = {
 export type PostCreateWithoutInteractionsInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -719,6 +751,7 @@ export type PostUncheckedCreateWithoutInteractionsInput = {
   id?: string
   userId: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   parentId?: string | null
   createdAt?: Date | string
@@ -746,6 +779,7 @@ export type PostUpdateToOneWithWhereWithoutInteractionsInput = {
 export type PostUpdateWithoutInteractionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -759,6 +793,7 @@ export type PostUncheckedUpdateWithoutInteractionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -770,6 +805,7 @@ export type PostUncheckedUpdateWithoutInteractionsInput = {
 export type PostCreateManyUserInput = {
   id?: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   parentId?: string | null
   createdAt?: Date | string
@@ -780,6 +816,7 @@ export type PostCreateManyUserInput = {
 export type PostUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -792,6 +829,7 @@ export type PostUpdateWithoutUserInput = {
 export type PostUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -804,6 +842,7 @@ export type PostUncheckedUpdateWithoutUserInput = {
 export type PostUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -815,6 +854,7 @@ export type PostCreateManyParentInput = {
   id?: string
   userId: string
   content: string
+  media?: string | null
   type: $Enums.PostType
   createdAt?: Date | string
   flagged?: boolean
@@ -824,6 +864,7 @@ export type PostCreateManyParentInput = {
 export type PostUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -837,6 +878,7 @@ export type PostUncheckedUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -849,6 +891,7 @@ export type PostUncheckedUpdateManyWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  media?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   flagged?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -899,6 +942,7 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   userId?: boolean
   content?: boolean
+  media?: boolean
   type?: boolean
   parentId?: boolean
   createdAt?: boolean
@@ -915,6 +959,7 @@ export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   userId?: boolean
   content?: boolean
+  media?: boolean
   type?: boolean
   parentId?: boolean
   createdAt?: boolean
@@ -928,6 +973,7 @@ export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   userId?: boolean
   content?: boolean
+  media?: boolean
   type?: boolean
   parentId?: boolean
   createdAt?: boolean
@@ -941,6 +987,7 @@ export type PostSelectScalar = {
   id?: boolean
   userId?: boolean
   content?: boolean
+  media?: boolean
   type?: boolean
   parentId?: boolean
   createdAt?: boolean
@@ -948,7 +995,7 @@ export type PostSelectScalar = {
   flagReason?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "content" | "type" | "parentId" | "createdAt" | "flagged" | "flagReason", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "content" | "media" | "type" | "parentId" | "createdAt" | "flagged" | "flagReason", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parent?: boolean | Prisma.Post$parentArgs<ExtArgs>
@@ -977,6 +1024,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     userId: string
     content: string
+    media: string | null
     type: $Enums.PostType
     parentId: string | null
     createdAt: Date
@@ -1412,6 +1460,7 @@ export interface PostFieldRefs {
   readonly id: Prisma.FieldRef<"Post", 'String'>
   readonly userId: Prisma.FieldRef<"Post", 'String'>
   readonly content: Prisma.FieldRef<"Post", 'String'>
+  readonly media: Prisma.FieldRef<"Post", 'String'>
   readonly type: Prisma.FieldRef<"Post", 'PostType'>
   readonly parentId: Prisma.FieldRef<"Post", 'String'>
   readonly createdAt: Prisma.FieldRef<"Post", 'DateTime'>
