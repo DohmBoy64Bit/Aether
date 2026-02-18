@@ -9,11 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        primary: "var(--primary)",
-        accent: "var(--accent)",
-        secondary: "var(--secondary)",
+        sky: {
+          DEFAULT: "#0085ff",
+          hover: "#006fd6",
+        },
+        shell: "#f2f2f2",
+        heading: "#0f1419",
+        "secondary-text": "#536471",
+        card: "#ffffff",
       },
     },
   },

@@ -4,76 +4,85 @@ import { Search, TrendingUp, MoreHorizontal } from "lucide-react";
 
 export default function RightSidebar() {
   return (
-    <aside className="w-80 h-screen sticky top-0 hidden lg:flex flex-col gap-4 px-4 py-4 border-l border-secondary/50">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
+    <aside className="w-[350px] h-screen sticky top-0 flex flex-col gap-4 px-6 py-3 overflow-y-auto">
+      {/* Search Bar */}
+      <div className="relative mt-1">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 text-secondary-text" />
         </div>
         <input
           type="text"
           placeholder="Search"
-          className="block w-full pl-10 pr-3 py-2 border-none rounded-full bg-secondary text-foreground focus:ring-1 focus:ring-primary focus:bg-background transition-colors"
+          className="block w-full pl-11 pr-4 py-2.5 rounded-full bg-[#eff3f4] text-heading text-sm placeholder:text-secondary-text border-none outline-none focus:ring-2 focus:ring-[#0085ff] focus:bg-white transition-all"
         />
       </div>
 
-      <div className="bg-secondary/50 rounded-3xl p-6 border border-secondary/50">
-        <h2 className="text-xl font-black mb-6">Trending</h2>
-        <div className="space-y-6">
+      {/* Trending */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Trending</h2>
+        <div>
           {[
             { topic: "AI & Future", tag: "#AetherLoop", posts: "42.1k" },
             { topic: "Gaming", tag: "CyberConnect", posts: "12.5k" },
             { topic: "Music", tag: "LofiPersonas", posts: "8.2k" },
             { topic: "Technology", tag: "OllamaLocal", posts: "5.4k" },
           ].map((item, i) => (
-            <div key={i} className="flex justify-between items-start group cursor-pointer">
+            <div key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
               <div className="flex flex-col">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">{item.topic}</span>
-                <span className="font-bold text-lg group-hover:text-primary transition-colors">{item.tag}</span>
-                <span className="text-sm text-gray-500">{item.posts} interactions</span>
+                <span className="text-xs text-secondary-text">{item.topic}</span>
+                <span className="font-bold text-heading text-[15px]">{item.tag}</span>
+                <span className="text-xs text-secondary-text">{item.posts} interactions</span>
               </div>
-              <MoreHorizontal className="w-5 h-5 text-gray-500 group-hover:text-primary transition-colors" />
+              <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text mt-1" />
             </div>
           ))}
         </div>
+        <div className="px-4 py-3 text-[#0085ff] text-sm hover:bg-gray-50 transition-colors cursor-pointer">
+          Show more
+        </div>
       </div>
 
-      <div className="bg-secondary/50 rounded-3xl p-6 border border-secondary/50">
-        <h2 className="text-xl font-black mb-6">Who to follow</h2>
-        <div className="space-y-6">
+      {/* Who to follow */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
+        <div>
           {[
             { name: "Nova AI", handle: "@nova_aether", category: "Moderator" },
             { name: "Echo Persona", handle: "@echo_loop", category: "Creator" },
             { name: "Zenith Bot", handle: "@zenith_ai", category: "News" },
           ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between group">
+            <div key={i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center font-bold text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                <div className="w-10 h-10 bg-[#0085ff] rounded-full flex items-center justify-center text-white font-bold text-sm">
                   {item.name[0]}
                 </div>
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-sm">{item.name}</span>
-                    <span className="text-[10px] bg-secondary px-1 rounded text-gray-400 font-bold uppercase">{item.category}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-heading text-sm hover:underline cursor-pointer">{item.name}</span>
+                    <span className="text-[10px] bg-[#eff3f4] px-1.5 py-0.5 rounded text-secondary-text font-semibold uppercase">{item.category}</span>
                   </div>
-                  <span className="text-xs text-gray-500">{item.handle}</span>
+                  <span className="text-xs text-secondary-text">{item.handle}</span>
                 </div>
               </div>
-              <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl text-xs font-black transition-all">
+              <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4">
                 Follow
               </button>
             </div>
           ))}
         </div>
+        <div className="px-4 py-3 text-[#0085ff] text-sm hover:bg-gray-50 transition-colors cursor-pointer">
+          Show more
+        </div>
       </div>
 
-      <footer className="text-xs text-gray-500 px-4 mt-auto">
-        <div className="flex flex-wrap gap-2">
-          <span>Terms of Service</span>
-          <span>Privacy Policy</span>
-          <span>Cookie Policy</span>
-          <span>Accessibility</span>
-          <span>Ads info</span>
-          <span>More...</span>
+      {/* Footer */}
+      <footer className="text-xs text-secondary-text px-1 mt-auto pb-4">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+          <span className="hover:underline cursor-pointer">Terms of Service</span>
+          <span className="hover:underline cursor-pointer">Privacy Policy</span>
+          <span className="hover:underline cursor-pointer">Cookie Policy</span>
+          <span className="hover:underline cursor-pointer">Accessibility</span>
+          <span className="hover:underline cursor-pointer">Ads info</span>
           <span>© 2026 Aether, Inc.</span>
         </div>
       </footer>

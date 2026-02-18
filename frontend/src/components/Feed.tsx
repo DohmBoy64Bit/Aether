@@ -50,7 +50,6 @@ export default function Feed() {
   const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
     try {
       await api.post("/social/interact", { postId, type });
-      // Update local state or re-fetch
       setPosts(prev => prev.map(post => {
         if (post.id === postId) {
           return {
@@ -69,48 +68,54 @@ export default function Feed() {
   };
 
   return (
-    <div className="flex-1 max-w-2xl border-r border-secondary/50">
-      <header className="sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-secondary/50">
-        <div className="flex items-center justify-around h-14">
+    <div className="flex flex-col">
+      {/* Tab Header */}
+      <header className="sticky top-0 bg-white/85 backdrop-blur-md z-10 border-b border-gray-200">
+        <div className="flex items-center justify-around h-[53px]">
           {["Discover", "Following", "Video"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 flex items-center justify-center font-bold text-sm h-full border-b-4 transition-colors ${
-                activeTab === tab ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-foreground"
-              }`}
+              className={`flex-1 flex items-center justify-center text-sm h-full transition-colors relative ${activeTab === tab
+                ? "font-bold text-heading"
+                : "font-medium text-secondary-text hover:text-heading hover:bg-gray-50"
+                }`}
             >
               {tab}
+              {activeTab === tab && (
+                <div className="absolute bottom-0 w-14 h-1 bg-[#0085ff] rounded-full" />
+              )}
             </button>
           ))}
         </div>
       </header>
 
-      <div className="p-4 flex gap-4 border-b border-secondary/50">
-        <div className="w-12 h-12 bg-secondary rounded-2xl flex-shrink-0 flex items-center justify-center font-bold overflow-hidden shadow-sm">
+      {/* Compose Area */}
+      <div className="px-4 py-3 flex gap-3 border-b border-gray-200">
+        <div className="w-11 h-11 bg-[#0085ff] rounded-full flex-shrink-0 flex items-center justify-center font-bold text-white text-sm overflow-hidden">
           {currentUser?.profileImage ? (
             <img src={currentUser.profileImage} alt={currentUser.username} className="w-full h-full object-cover" />
           ) : (
-            <span>{currentUser?.username?.[0] || "@"}</span>
+            <span>{currentUser?.username?.[0]?.toUpperCase() || "@"}</span>
           )}
         </div>
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-col">
           <textarea
             placeholder="What's up?"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="bg-transparent border-none text-xl resize-none outline-none focus:ring-0 placeholder:text-gray-600 min-h-[100px]"
+            className="bg-transparent text-lg resize-none outline-none border-none placeholder:text-secondary-text min-h-[80px] py-2 text-heading"
           />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button className="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors">
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-1">
+              <button className="text-[#0085ff] hover:bg-blue-50 p-2 rounded-full transition-colors">
                 <ImageIcon className="w-5 h-5" />
               </button>
             </div>
             <button
               onClick={handlePost}
               disabled={isPosting || !content.trim()}
-              className="bg-primary text-white font-bold py-2 px-6 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors disabled:opacity-50 text-sm py-1.5 px-5 flex items-center gap-2"
             >
               {isPosting && <Loader2 className="w-4 h-4 animate-spin" />}
               Post
@@ -119,64 +124,85 @@ export default function Feed() {
         </div>
       </div>
 
+      {/* Posts Feed */}
       <div className="flex flex-col">
         {isLoading ? (
           <div className="p-10 flex justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#0085ff]" />
           </div>
         ) : posts.length === 0 ? (
-          <div className="p-10 text-center text-gray-500">
-            No posts found. Start the conversation!
+          <div className="p-14 text-center text-secondary-text">
+            <p className="text-lg font-medium">No posts yet</p>
+            <p className="text-sm mt-1">Start the conversation!</p>
           </div>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="p-4 border-b border-secondary/50 hover:bg-secondary/10 transition-colors cursor-pointer group">
-              <div className="flex gap-4">
-                <div className="w-12 h-12 bg-secondary rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
+            <article key={post.id} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
+              <div className="flex gap-3">
+                {/* Avatar */}
+                <div className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">
                   {post.user.profileImage ? (
                     <img src={post.user.profileImage} alt={post.user.username} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="font-bold uppercase text-primary">{post.user.username[0]}</span>
+                    <span className="font-bold uppercase text-[#0085ff] text-sm">{post.user.username[0]}</span>
                   )}
                 </div>
-                <div className="flex-1 flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="font-bold hover:underline">{post.user.username}</span>
-                      <span className="text-gray-500 text-sm">@{post.user.username}</span>
-                      <span className="text-gray-500 text-sm">· {formatDistanceToNow(new Date(post.createdAt))}</span>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  {/* Header */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="font-bold text-heading text-[15px] hover:underline">{post.user.username}</span>
+                    {post.user.isAi && (
+                      <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
+                    )}
+                    <span className="text-secondary-text text-[15px]">@{post.user.username}</span>
+                    <span className="text-secondary-text text-[15px]">·</span>
+                    <span className="text-secondary-text text-[15px] hover:underline">{formatDistanceToNow(new Date(post.createdAt))}</span>
+                    <div className="ml-auto">
+                      <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <MoreHorizontal className="w-5 h-5 text-gray-500" />
                   </div>
-                  <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
-                  <div className="flex items-center justify-between mt-4 text-gray-500 max-w-md">
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-primary transition-colors">
-                      <div className="p-2 rounded-full group-hover/icon:bg-primary/10">
-                        <MessageCircle className="w-5 h-5" />
+
+                  {/* Post text */}
+                  <p className="text-heading text-[15px] leading-relaxed mt-0.5 whitespace-pre-wrap">{post.content}</p>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
+                    {/* Reply */}
+                    <div className="flex items-center gap-0.5 group/action cursor-pointer">
+                      <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                        <MessageCircle className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
                       </div>
-                      <span className="text-sm">{post._count.children}</span>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors">{post._count.children || ""}</span>
                     </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-green-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}>
-                      <div className="p-2 rounded-full group-hover/icon:bg-green-500/10">
-                        <Repeat2 className="w-5 h-5" />
+
+                    {/* Retweet */}
+                    <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}>
+                      <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
+                        <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
                       </div>
-                      <span className="text-sm">0</span>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors">0</span>
                     </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-red-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}>
-                      <div className="p-2 rounded-full group-hover/icon:bg-red-500/10">
-                        <Heart className="w-5 h-5" />
+
+                    {/* Like */}
+                    <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}>
+                      <div className="p-2 rounded-full group-hover/action:bg-pink-50 transition-colors">
+                        <Heart className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
                       </div>
-                      <span className="text-sm">{post._count.interactions}</span>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{post._count.interactions || ""}</span>
                     </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-primary transition-colors">
-                      <div className="p-2 rounded-full group-hover/icon:bg-primary/10">
-                        <Share2 className="w-5 h-5" />
+
+                    {/* Share */}
+                    <div className="flex items-center group/action cursor-pointer">
+                      <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                        <Share2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
           ))
         )}
       </div>
