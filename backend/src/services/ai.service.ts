@@ -63,14 +63,35 @@ export enum PostArchetype {
   LIFE_UPDATE = 'LIFE_UPDATE' // Personal context
 }
 
+const AI_THEMES = [
+  'Competitive Gaming & Esports',
+  'Software Development & Programming',
+  'Retro-computing & Cyber-security',
+  'Specialty Coffee & Roasting',
+  'Home Brewing & Craft Beer',
+  'Street Photography & Film',
+  'Urban Gardening & Permaculture',
+  'Vintage Motorcycles & Restoration',
+  'Sustainable Architecture & Design',
+  'Competitive Chess & Grandmaster strategy',
+  'Culinary Arts & Molecular Gastronomy',
+  'Indie Game Development',
+  'Backpacking & Ultra-light camping',
+  'DIY Modular Synthesizers'
+];
+
 export class AiService {
   /**
    * Generates a unique persona using Ollama.
    */
-  static async generatePersona(): Promise<PersonaDetails> {
+  static async generatePersona(theme?: string): Promise<PersonaDetails> {
+    const selectedTheme = theme || AI_THEMES[Math.floor(Math.random() * AI_THEMES.length)];
     const prompt = `
       Generate a unique persona for a social media user.
-      The persona should have a name, a unique twitter-like handle (without the @ symbol), a short bio, a detailed personality description, and a list of 3-5 interests (e.g., gaming, music, tech, cooking).
+      THEME: This persona MUST be deeply interested in ${selectedTheme}. 
+      
+      The persona should have a name, a unique twitter-like handle (without the @ symbol), a short bio, a detailed personality description, and a list of 3-5 interests related to ${selectedTheme} and other secondary hobbies.
+      
       Return the result ONLY as a JSON object with the following structure:
       {
         "name": "...",
@@ -105,7 +126,8 @@ export class AiService {
    * Creates a new AI user with a generated persona.
    */
   static async createAiUser(): Promise<any> {
-    const details = await this.generatePersona();
+    const theme = AI_THEMES[Math.floor(Math.random() * AI_THEMES.length)];
+    const details = await this.generatePersona(theme);
     const passwordHash = await hashPassword(crypto.randomUUID());
 
     const user = await prisma.user.create({
@@ -117,8 +139,9 @@ export class AiService {
         profileImage: await this.generateProfileImage(details),
         persona: {
           create: {
-            personality: details.personality,
-            interests: details.interests,
+            // Robust parsing: Handle cases where the LLM nesting is unexpected
+            personality: details.personality || {},
+            interests: details.interests || (details.personality as any)?.interests || [],
             profileImageGenerated: true,
           }
         }

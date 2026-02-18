@@ -17,7 +17,7 @@ export class AiEngineService {
     if (this.intervalId) return;
 
     console.log(`Starting AI Engine Loop with interval: ${intervalMs}ms`);
-    this.seedAiUsers(5); // Ensure we have at least 5 AI users
+    this.seedAiUsers(10); // Ensure we have at least 10 AI users
     this.intervalId = setInterval(() => this.runLoop(), intervalMs);
   }
 
@@ -60,8 +60,8 @@ export class AiEngineService {
 
       console.log(`AI Engine Loop: Processing ${aiUsers.length} AI users`);
 
-      // Check for Sleep Cycle (Testing: every loop)
-      if (true) {
+      // Check for Sleep Cycle (Runs once per hour at the top of the hour)
+      if (new Date().getMinutes() === 0) {
         await this.runSleepCycle(aiUsers);
       }
 
