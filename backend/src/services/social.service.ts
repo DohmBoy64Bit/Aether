@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { PostType, InteractionType } from '../generated/prisma/client/enums.js';
+import { PostType, InteractionType } from '../generated/prisma/client/index.js';
 import { ModerationService } from './moderation.service.js';
 
 export class SocialService {
@@ -152,8 +152,8 @@ export class SocialService {
     });
   }
 
-  static async getProfile(username: string) {
-    return prisma.user.findUnique({
+  static async getProfile(username: string, requesterId?: string) {
+    const profile: any = await prisma.user.findUnique({
       where: { username },
       select: {
         id: true,
@@ -171,11 +171,26 @@ export class SocialService {
         _count: {
           select: {
             posts: true,
-            interactions: true,
+            followers: true,
+            following: true,
           }
         }
       }
     });
+
+    if (profile && requesterId) {
+      const follow = await (prisma as any).follow.findUnique({
+        where: {
+          followerId_followingId: {
+            followerId: requesterId,
+            followingId: profile.id,
+          }
+        }
+      });
+      profile.isFollowing = !!follow;
+    }
+
+    return profile;
   }
 
   static async updatePersona(userId: string, personality: any, interests: any) {
@@ -189,6 +204,100 @@ export class SocialService {
         userId,
         personality,
         interests,
+      }
+    });
+  }
+
+  static async followUser(followerId: string, followingId: string) {
+    return prisma.follow.upsert({
+      where: {
+        followerId_followingId: {
+          followerId,
+          followingId,
+        }
+      },
+      update: {},
+      create: {
+        followerId,
+        followingId,
+      }
+    });
+  }
+
+  static async unfollowUser(followerId: string, followingId: string) {
+    return prisma.follow.deleteMany({
+      where: {
+        followerId,
+        followingId,
+      }
+    });
+  }
+
+  static async getFollowers(userId: string) {
+    return prisma.follow.findMany({
+      where: { followingId: userId },
+      include: {
+        follower: {
+          select: {
+            id: true,
+            username: true,
+            profileImage: true,
+          }
+        }
+      }
+    });
+  }
+
+  static async getFollowing(userId: string) {
+    return prisma.follow.findMany({
+      where: { followerId: userId },
+      include: {
+        following: {
+          select: {
+            id: true,
+            username: true,
+            profileImage: true,
+          }
+        }
+      }
+    });
+  }
+
+  static async getFollowingFeed(userId: string, limit: number = 20, offset: number = 0) {
+    const following = await prisma.follow.findMany({
+      where: { followerId: userId },
+      select: { followingId: true }
+    });
+
+    const followingIds = following.map((f: any) => f.followingId);
+
+    // Include user's own posts in the following feed? 
+    // Usually yes on Bluesky/Twitter.
+    followingIds.push(userId);
+
+    return prisma.post.findMany({
+      where: {
+        userId: { in: followingIds },
+        type: { in: [PostType.TWEET, PostType.RETWEET] } // Optional: decide if replies show in main feed
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            profileImage: true,
+            isAi: true
+          }
+        },
+        _count: {
+          select: {
+            children: true,
+            interactions: true,
+          }
+        }
       }
     });
   }

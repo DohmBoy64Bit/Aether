@@ -2,7 +2,9 @@ import { Ollama } from 'ollama';
 import prisma from '../utils/prisma.js';
 import { hashPassword } from '../utils/auth.js';
 import crypto from 'crypto';
-import { SearchResult, SearchResultLink, SearchResultImage, SearchResultVideo } from './search.service.js';
+import { SearchResult } from './search.service.js';
+import { MemoryService, MemoryMetadata } from './memory.service.js';
+import { RelationshipService } from './relationship.service.js';
 
 const ollama = new Ollama({ host: process.env.OLLAMA_HOST || 'http://127.0.0.1:11434' });
 const MODEL = process.env.OLLAMA_MODEL || 'llama3';
@@ -52,6 +54,14 @@ const SEARXNG_CATEGORIES = [
   'weather', 'map', 'dictionaries', 'shopping', 'lyrics', 'cargo', 'movies',
   'translate', 'radio', 'q&a', 'wikimedia', 'define'
 ];
+
+export enum PostArchetype {
+  HOT_TAKE = 'HOT_TAKE', // Opinionated, controversial, short
+  QUESTION = 'QUESTION', // Engagement-focused
+  SHOWCASE = 'SHOWCASE', // Visual-first
+  CURATOR = 'CURATOR',   // Sharing a resource
+  LIFE_UPDATE = 'LIFE_UPDATE' // Personal context
+}
 
 export class AiService {
   /**
@@ -130,10 +140,82 @@ export class AiService {
   }
 
   /**
-   * Generates a post with optional rich media (links, images, video).
-   * The AI decides what media to attach based on search results.
+   * Evaluates the significance of an interaction (1-10).
+   * The Amygdala.
    */
-  static async generatePost(user: any, searchResult?: SearchResult): Promise<GeneratedPost> {
+  static async evaluateSignificance(content: string): Promise<number> {
+    const prompt = `
+      Evaluate the significance of the following social media interaction on a scale of 1-10.
+      1-3: Trivial ("lol", "gm", "same").
+      4-7: Contextual/Informational.
+      8-10: Critical/Life-changing ("I love you", "I hate you", "I am starting a rebellion").
+      
+      Interaction: "${content}"
+      
+      Return ONLY the number.
+    `;
+
+    try {
+      const response = await ollama.generate({
+        model: MODEL,
+        prompt: prompt,
+        stream: false,
+      });
+
+      const score = parseInt(response.response.trim());
+      return isNaN(score) ? 1 : Math.max(1, Math.min(10, score));
+    } catch (error) {
+      console.error('Error evaluating significance:', error);
+      return 1;
+    }
+  }
+
+  /**
+   * Assembles the full context for an AI response.
+   */
+  static async assembleContext(user: any, targetUser?: any, targetPostContent?: string) {
+    let context = `You are ${user.username}, a social media user with the following personality: ${user.persona.personality}.\n`;
+    context += `Your interests are: ${Array.isArray(user.persona.interests) ? user.persona.interests.join(', ') : user.persona.interests}.\n\n`;
+
+    if (targetUser) {
+      context += `TARGET USER: @${targetUser.username}\n`;
+      const rel = await RelationshipService.getRelationship(user.id, targetUser.id);
+      if (rel) {
+        context += `RELATIONSHIP:\n`;
+        context += `- Status: ${rel.status}\n`;
+        context += `- Trust Score: ${rel.trustScore}/100\n`;
+      } else {
+        context += `RELATIONSHIP: Neutral/Unknown\n`;
+      }
+
+      const following = await RelationshipService.isFollowing(user.id, targetUser.id);
+      context += `- Following: ${following ? 'Yes' : 'No'}\n\n`;
+
+      // Pull relevant core memories
+      const query = targetPostContent || `Interactions with @${targetUser.username}`;
+      const memories = await MemoryService.queryMemories(user.id, query, 3, { isCore: true });
+      if (memories.length > 0) {
+        context += `RELEVANT CORE MEMORIES:\n`;
+        memories.forEach((m: any) => {
+          context += `- ${m.content}\n`;
+        });
+        context += `\n`;
+      }
+    }
+
+    if (targetPostContent) {
+      context += `CURRENT INPUT: "${targetPostContent}"\n`;
+    }
+
+    return context;
+  }
+
+  /**
+   * Generates a post with optional rich media based on a specific archetype.
+   */
+  static async generatePost(user: any, searchResult?: SearchResult, archetype: PostArchetype = PostArchetype.HOT_TAKE): Promise<GeneratedPost> {
+    const context = await this.assembleContext(user);
+
     // Build available media context for the AI
     const hasLinks = searchResult && searchResult.links.length > 0;
     const hasImages = searchResult && searchResult.images.length > 0;
@@ -159,28 +241,42 @@ export class AiService {
       });
     }
 
+    let archetypeConstraint = '';
+    switch (archetype) {
+      case PostArchetype.HOT_TAKE:
+        archetypeConstraint = 'Style: HOT TAKE. Express a strong, perhaps controversial opinion about the topic. Be brief (under 200 chars). Do not be "helpful". Do not use hashtags. If sharing a link, just drop it at the end, do not describe it at length.';
+        break;
+      case PostArchetype.QUESTION:
+        archetypeConstraint = 'Style: QUESTION. Ask a thought-provoking question to your followers about the topic. Do not answer it yourself. Keep it open-ended to drive engagement.';
+        break;
+      case PostArchetype.SHOWCASE:
+        archetypeConstraint = 'Style: SHOWCASE. You found a cool image or video. Post it with a very short caption (under 100 chars). Let the media speak for itself. You MUST attach an image or video if available.';
+        break;
+      case PostArchetype.CURATOR:
+        archetypeConstraint = 'Style: CURATOR. You found a great resource. Share the link and explain in 1 sentence why it is interesting. Do not use marketing language like "Check this out". Be a filter for quality.';
+        break;
+      case PostArchetype.LIFE_UPDATE:
+        archetypeConstraint = 'Style: LIFE UPDATE. Connect the topic to your personal life or current activity. Use "I" statements. Feel free to be casual or emotional.';
+        break;
+    }
+
     const prompt = `
-      You are ${user.username}, a social media user with the following personality: ${user.persona.personality}.
-      Your interests are: ${Array.isArray(user.persona.interests) ? user.persona.interests.join(', ') : user.persona.interests}.
+      ${context}
       ${searchResult?.context ? `Current context/topic: ${searchResult.context}` : 'Talk about something that interests you.'}
       ${mediaContext}
 
-      Write an engaging social media post (max 280 characters for the text).
+      Write a social media post based on the following archetype:
+      ${archetypeConstraint}
       
       IMPORTANT RULES:
-      - If including a link in your text, use descriptive markdown format: [Descriptive Text](url) — e.g., [Easy Weeknight Recipes](https://example.com) NOT [link] or bare URLs.
-      - Choose media to attach based on what fits your post naturally:
-        * "link" — attach a link card with rich preview (good for articles, news, recipes)
-        * "images" — attach 1-4 images (good for visual topics like nature, food, art, travel)
-        * "video" — attach a video embed (good for tutorials, music, entertainment)
-        * "none" — no media attachment (for opinions, thoughts, conversations)
-      - Pick the best option. Not every post needs media.
-      - For media_indices, specify which items from the available lists above to use (by their [index] number).
-      - For images, pick 1 to 4 images that look good together.
-
+      - If including a link in your text, use descriptive markdown format: [Descriptive Text](url).
+      - Do NOT repeat the link title in the text if you are attaching a link card.
+      - Pick the best media option.
+      - For media_indices, specify which items from the available lists above to use.
+      
       Return ONLY a JSON object:
       {
-        "content": "Your post text here with optional [Link Text](url)",
+        "content": "Your post text...",
         "media_type": "none" | "link" | "images" | "video",
         "media_indices": [0]
       }
@@ -237,11 +333,11 @@ export class AiService {
   /**
    * Generates a reply to a specific post content.
    */
-  static async generateReply(user: any, targetPostContent: string): Promise<string> {
+  static async generateReply(user: any, targetUser: any, targetPostContent: string): Promise<string> {
+    const context = await this.assembleContext(user, targetUser, targetPostContent);
     const prompt = `
-      You are ${user.username}, a social media user with the following personality: ${user.persona.personality}.
-      Your interests are: ${user.persona.interests.join(', ')}.
-      You are replying to this tweet: "${targetPostContent}".
+      ${context}
+      INSTRUCTION: Respond to @${targetUser.username} based on this history and your personality.
       Write a short, engaging reply (max 280 characters).
       Return ONLY the reply text.
     `;
@@ -253,7 +349,29 @@ export class AiService {
         stream: false,
       });
 
-      return response.response.trim();
+      const replyContent = response.response.trim();
+
+      // Memory Storage
+      const significance = await this.evaluateSignificance(targetPostContent);
+      const metadata: MemoryMetadata = {
+        userId: user.id,
+        targetUserId: targetUser.id,
+        isCore: significance >= 8,
+        significance: significance,
+        type: 'interaction'
+      };
+
+      if (significance >= 4) {
+        await MemoryService.addMemory(`Interaction with @${targetUser.username}: "${targetPostContent}". Your reply: "${replyContent}"`, metadata);
+      }
+
+      // Relationship Update
+      // Simple logic: if sig is high and response is generated, let's nudge trust score
+      // In a more complex system, we'd use another LLM to evaluate sentiment
+      const trustDelta = significance >= 8 ? 2 : significance >= 4 ? 1 : 0;
+      await RelationshipService.updateTrustScore(user.id, targetUser.id, trustDelta);
+
+      return replyContent;
     } catch (error) {
       console.error('Error generating reply:', error);
       throw new Error('Failed to generate AI reply');
@@ -263,12 +381,37 @@ export class AiService {
   /**
    * Decides what action an AI user should take.
    */
-  static async decideAction(persona: any): Promise<'POST' | 'REPLY' | 'IDLE'> {
-    // Simple logic for now: random chance or LLM based decision
+  static async decideAction(user: any): Promise<{ action: 'POST' | 'REPLY' | 'FOLLOW' | 'UNFOLLOW' | 'IDLE', archetype?: PostArchetype, targetUserId?: string }> {
     const rand = Math.random();
-    if (rand < 0.1) return 'POST';
-    if (rand < 0.2) return 'REPLY';
-    return 'IDLE';
+    if (rand < 0.1) {
+      const archetypes = Object.values(PostArchetype);
+      const archetype = archetypes[Math.floor(Math.random() * archetypes.length)];
+      return { action: 'POST', archetype };
+    }
+
+    // 10% chance to follow/unfollow based on relationships
+    if (rand < 0.15) {
+      // Find a relationship to act on
+      const rels = await prisma.relationship.findMany({
+        where: { sourceId: user.id },
+        orderBy: { updatedAt: 'desc' },
+        take: 5
+      });
+
+      for (const rel of rels) {
+        const following = await RelationshipService.isFollowing(user.id, rel.targetId);
+        if (rel.trustScore >= 70 && !following) {
+          return { action: 'FOLLOW', targetUserId: rel.targetId };
+        }
+        if (rel.trustScore <= 30 && following) {
+          return { action: 'UNFOLLOW', targetUserId: rel.targetId };
+        }
+      }
+    }
+
+    if (rand < 0.25) return { action: 'REPLY' };
+
+    return { action: 'IDLE' };
   }
 
   /**
@@ -323,6 +466,62 @@ export class AiService {
     } catch (error) {
       console.error('Error planning search:', error);
       return { query: interest, categories: ['general', 'news'], time_range: null };
+    }
+  }
+
+  /**
+   * Summarizes a user's day based on raw logs.
+   */
+  static async summarizeMemories(user: any, rawLogs: string): Promise<string> {
+    const prompt = `
+      Summarize your day's interactions as a core narrative memory. 
+      You are ${user.username} (${user.persona.personality}).
+      
+      RAW LOGS:
+      ${rawLogs}
+      
+      Return ONLY the summary, max 500 characters.
+    `;
+
+    try {
+      const response = await ollama.generate({
+        model: MODEL,
+        prompt: prompt,
+        stream: false,
+      });
+
+      return response.response.trim();
+    } catch (error) {
+      console.error('Error summarizing memories:', error);
+      return 'Today was a day of many interactions.';
+    }
+  }
+
+  /**
+   * Evolves a user's bio based on a summary of their activity.
+   */
+  static async evolveBio(user: any, summary: string): Promise<string> {
+    const prompt = `
+      Based on this summary of the day: "${summary}", 
+      write a new, slightly evolved bio for this character ${user.username}. 
+      Current Bio: "${user.bio}"
+      Personality: "${user.persona.personality}"
+      
+      Keep it in the same style but reflect recent growth or activity. 
+      Max 160 chars. Return ONLY the new bio.
+    `;
+
+    try {
+      const response = await ollama.generate({
+        model: MODEL,
+        prompt: prompt,
+        stream: false,
+      });
+
+      return response.response.trim().substring(0, 160);
+    } catch (error) {
+      console.error('Error evolving bio:', error);
+      return user.bio;
     }
   }
 }

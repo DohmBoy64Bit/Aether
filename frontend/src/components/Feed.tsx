@@ -6,6 +6,7 @@ import api from "@/utils/api";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import PostContent from "@/components/PostContent";
+import { getMediaUrl } from "@/utils/media";
 
 // Move debouncing helper outside
 function useDebounce<T>(value: T, delay: number): T {
@@ -40,8 +41,9 @@ export default function Feed() {
   const fetchFeed = async () => {
     setIsLoading(true);
     try {
+      const endpoint = activeTab === "Following" ? "/social/posts/following" : "/social/posts";
       const [postsRes, userRes] = await Promise.all([
-        api.get("/social/posts"),
+        api.get(endpoint),
         api.get("/auth/me").catch(() => ({ data: null }))
       ]);
       setPosts(postsRes.data);
@@ -55,7 +57,7 @@ export default function Feed() {
 
   useEffect(() => {
     fetchFeed();
-  }, []);
+  }, [activeTab]);
 
   // Auto-detect links and fetch previews
   useEffect(() => {
@@ -75,14 +77,38 @@ export default function Feed() {
         else if (url.includes("youtu.be/")) videoId = url.split("youtu.be/")[1]?.split("?")[0];
 
         if (videoId) {
-          setVideoEmbed({
-            url,
-            iframe_src: `https://www.youtube.com/embed/${videoId}`,
-            title: "YouTube Video" // We could fetch title via oEmbed but keep simple for now
-          });
-          setLinkPreview(null);
+          // Fetch preview first to get title/thumbnail
+          api.get(`/media/preview?url=${encodeURIComponent(url)}`)
+            .then(res => {
+              setVideoEmbed({
+                url,
+                iframe_src: `https://www.youtube.com/embed/${videoId}`,
+                title: res.data.title || "YouTube Video",
+                thumbnail: res.data.image
+              });
+              setLinkPreview(null);
+            })
+            .catch(() => {
+              // Fallback if preview fails
+              setVideoEmbed({
+                url,
+                iframe_src: `https://www.youtube.com/embed/${videoId}`,
+                title: "YouTube Video"
+              });
+              setLinkPreview(null);
+            });
           return;
         }
+      }
+
+      // Check for direct image URLs
+      if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+        if (!mediaImages.includes(url)) {
+          setMediaImages(prev => [...prev, url].slice(0, 4));
+          setLinkPreview(null);
+          setVideoEmbed(null);
+        }
+        return;
       }
 
       // Otherwise fetch link preview
@@ -137,7 +163,7 @@ export default function Feed() {
       if (mediaImages.length > 0) {
         media = { images: mediaImages.map(url => ({ url })) };
       } else if (videoEmbed) {
-        media = { video: videoEmbed };
+        media = { video: videoEmbed }; // videoEmbed now includes thumbnail/title
       } else if (linkPreview) {
         media = { links: [{ ...linkPreview, thumbnail: linkPreview.image }] };
       }
@@ -206,7 +232,7 @@ export default function Feed() {
       <div className="px-4 py-3 flex gap-3 border-b border-gray-200">
         <div className="w-11 h-11 bg-[#0085ff] rounded-full flex-shrink-0 flex items-center justify-center font-bold text-white text-sm overflow-hidden">
           {currentUser?.profileImage ? (
-            <img src={currentUser.profileImage} alt={currentUser.username} className="w-full h-full object-cover" />
+            <img src={getMediaUrl(currentUser.profileImage)} alt={currentUser.username} className="w-full h-full object-cover" />
           ) : (
             <span>{currentUser?.username?.[0]?.toUpperCase() || "@"}</span>
           )}
@@ -225,7 +251,7 @@ export default function Feed() {
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {mediaImages.map((img, i) => (
                   <div key={i} className="relative w-32 h-32 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
-                    <img src={img} alt="Upload" className="w-full h-full object-cover" />
+                    <img src={getMediaUrl(img)} alt="Upload" className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
@@ -254,14 +280,25 @@ export default function Feed() {
           )}
 
           {videoEmbed && (
-            <div className="mb-3 relative rounded-xl overflow-hidden border border-gray-200 max-w-sm">
+            <div className="mb-3 relative rounded-xl overflow-hidden border border-gray-200 max-w-sm group">
               <button onClick={removeMedia} className="absolute top-2 right-2 bg-gray-900/80 text-white rounded-full p-1 hover:bg-black z-10">
                 <X className="w-4 h-4" />
               </button>
-              <div className="aspect-video bg-black flex items-center justify-center">
-                <Play className="w-12 h-12 text-white/80" fill="currentColor" />
+              <div className="aspect-video bg-black flex items-center justify-center relative">
+                {videoEmbed.thumbnail ? (
+                  <img src={videoEmbed.thumbnail} alt={videoEmbed.title} className="w-full h-full object-cover opacity-80" />
+                ) : (
+                  <div className="absolute inset-0 bg-neutral-800" />
+                )}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-black/70 transition-colors">
+                    <Play className="w-6 h-6 text-white" fill="currentColor" />
+                  </div>
+                </div>
               </div>
-              <div className="p-2 bg-gray-50 text-xs text-secondary-text">Video Embed will appear in post</div>
+              <div className="p-2 bg-gray-50 text-xs font-medium text-gray-900 line-clamp-1">
+                {videoEmbed.title}
+              </div>
             </div>
           )}
 
@@ -321,7 +358,7 @@ export default function Feed() {
                 {/* Avatar */}
                 <div className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">
                   {post.user.profileImage ? (
-                    <img src={post.user.profileImage} alt={post.user.username} className="w-full h-full object-cover" />
+                    <img src={getMediaUrl(post.user.profileImage)} alt={post.user.username} className="w-full h-full object-cover" />
                   ) : (
                     <span className="font-bold uppercase text-[#0085ff] text-sm">{post.user.username[0]}</span>
                   )}

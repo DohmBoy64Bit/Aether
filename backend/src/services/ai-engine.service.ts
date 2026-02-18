@@ -2,7 +2,8 @@ import prisma from '../utils/prisma.js';
 import { AiService } from './ai.service.js';
 import { SocialService } from './social.service.js';
 import { SearchService } from './search.service.js';
-import { PostType } from '../generated/prisma/client/enums.js';
+import { MemoryService } from './memory.service.js';
+import { PostType } from '../generated/prisma/client/index.js';
 
 export class AiEngineService {
   private static intervalId: NodeJS.Timeout | null = null;
@@ -59,6 +60,11 @@ export class AiEngineService {
 
       console.log(`AI Engine Loop: Processing ${aiUsers.length} AI users`);
 
+      // Check for Sleep Cycle (Testing: every loop)
+      if (true) {
+        await this.runSleepCycle(aiUsers);
+      }
+
       for (const user of aiUsers) {
         await this.processUserAction(user);
       }
@@ -73,43 +79,85 @@ export class AiEngineService {
    * Decides and performs an action for a single AI user.
    */
   private static async processUserAction(user: any) {
-    const action = await AiService.decideAction(user.persona);
+    const decision = await AiService.decideAction(user);
 
-    if (action === 'POST') {
+    if (decision.action === 'POST') {
       const searchResult = await this.getWebSearchContext(user);
-      const generated = await AiService.generatePost(user, searchResult);
+      const generated = await AiService.generatePost(user, searchResult, decision.archetype);
       const mediaJson = generated.media ? JSON.stringify(generated.media) : null;
       await SocialService.createPost(user.id, generated.content, PostType.TWEET, undefined, mediaJson);
       const mediaType = generated.media
         ? (generated.media.video ? 'video' : generated.media.images ? `${generated.media.images.length} images` : `${generated.media.links?.length || 0} links`)
         : 'none';
-      console.log(`AI User ${user.username} posted (media: ${mediaType}): ${generated.content.substring(0, 50)}...`);
-    } else if (action === 'REPLY') {
+      console.log(`AI User ${user.username} posted [${decision.archetype}] (media: ${mediaType}): ${generated.content.substring(0, 50)}...`);
+    } else if (decision.action === 'REPLY') {
       // Find a recent post to reply to
       const recentPosts = await SocialService.getFeed(10);
       const targetPost = recentPosts[Math.floor(Math.random() * recentPosts.length)];
       if (targetPost && targetPost.userId !== user.id) {
         // 30% chance to reply to an existing reply (nested thread) instead of the top-level post
-        let replyTargetId = targetPost.id;
-        let replyTargetContent = targetPost.content;
+        let replyTargetPost = targetPost;
 
         if (Math.random() < 0.3 && targetPost._count.children > 0) {
           try {
             const fullPost = await SocialService.getPost(targetPost.id);
             if (fullPost && fullPost.children && fullPost.children.length > 0) {
-              const randomReply = fullPost.children[Math.floor(Math.random() * fullPost.children.length)];
-              replyTargetId = randomReply.id;
-              replyTargetContent = randomReply.content;
-              console.log(`AI User ${user.username} replying to nested reply ${replyTargetId}`);
+              replyTargetPost = fullPost.children[Math.floor(Math.random() * fullPost.children.length)];
+              console.log(`AI User ${user.username} replying to nested reply ${replyTargetPost.id}`);
             }
           } catch (e) {
             // Fall back to replying to the top-level post
           }
         }
 
-        const content = await AiService.generateReply(user, replyTargetContent);
-        await SocialService.createPost(user.id, content, PostType.REPLY, replyTargetId);
-        console.log(`AI User ${user.username} replied to ${replyTargetId}: ${content.substring(0, 50)}...`);
+        const targetUser = { id: replyTargetPost.userId, username: replyTargetPost.user.username };
+        const content = await AiService.generateReply(user, targetUser, replyTargetPost.content);
+        await SocialService.createPost(user.id, content, PostType.REPLY, replyTargetPost.id);
+        console.log(`AI User ${user.username} replied to ${replyTargetPost.id}: ${content.substring(0, 50)}...`);
+      }
+    } else if (decision.action === 'FOLLOW' && decision.targetUserId) {
+      await SocialService.followUser(user.id, decision.targetUserId);
+      console.log(`AI User ${user.username} decided to FOLLOW user ${decision.targetUserId}`);
+    } else if (decision.action === 'UNFOLLOW' && decision.targetUserId) {
+      await SocialService.unfollowUser(user.id, decision.targetUserId);
+      console.log(`AI User ${user.username} decided to UNFOLLOW user ${decision.targetUserId}`);
+    }
+  }
+
+  /**
+   * The Sleep Cycle (Dreaming).
+   * Summarizes temporary memories into core memories and prunes raw logs.
+   */
+  private static async runSleepCycle(users: any[]) {
+    console.log('AI Engine: Starting Sleep Cycle (Dreaming)...');
+    for (const user of users) {
+      try {
+        const tempMemories = await MemoryService.getTemporaryMemoriesForPruning(user.id);
+        if (tempMemories.length === 0) continue;
+
+        const rawLogs = tempMemories.map((m: any) => m.content).join('\n');
+        // Simple summarization via LLM (we'd ideally use a specific summary prompt here)
+        const summary = await AiService.summarizeMemories(user, rawLogs);
+
+        await MemoryService.addMemory(summary, {
+          userId: user.id,
+          isCore: true,
+          significance: 5,
+          type: 'dream_summary'
+        });
+
+        // Persona Evolution: Update bio or personality slightly based on summary
+        const evolvedBio = await AiService.evolveBio(user, summary);
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { bio: evolvedBio }
+        });
+
+        await MemoryService.deleteMemories(tempMemories.map((m: any) => m.id));
+        console.log(`AI Engine: Sleep Cycle & Evolution complete for ${user.username}.`);
+      } catch (error) {
+        console.error(`Error in Sleep Cycle for user ${user.username}:`, error);
       }
     }
   }

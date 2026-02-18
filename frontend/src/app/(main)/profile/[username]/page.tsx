@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowLeft, Calendar, Loader2, MoreHorizontal, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Loader2, MoreHorizontal, MessageCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, use } from "react";
 import api from "@/utils/api";
 import { format } from "date-fns";
+import { getMediaUrl } from "@/utils/media";
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
     const { username } = use(params);
@@ -12,6 +13,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("Posts");
+
+    const [isFollowing, setIsFollowing] = useState(false);
+
+    const [showUserList, setShowUserList] = useState(false);
+    const [listType, setListType] = useState<'followers' | 'following'>('followers');
+    const [userList, setUserList] = useState<any[]>([]);
+    const [isListLoading, setIsListLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -23,6 +31,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 ]);
                 setProfile(profileRes.data);
                 setCurrentUser(userRes.data);
+                setIsFollowing(profileRes.data.isFollowing || false);
             } catch (err) {
                 console.error("Failed to fetch data", err);
             } finally {
@@ -31,6 +40,43 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         };
         fetchData();
     }, [username]);
+
+    const openUserList = async (type: 'followers' | 'following') => {
+        setListType(type);
+        setShowUserList(true);
+        setIsListLoading(true);
+        try {
+            const res = await api.get(`/social/profiles/${username}/${type}`);
+            setUserList(res.data);
+        } catch (err) {
+            console.error(`Failed to fetch ${type}`, err);
+        } finally {
+            setIsListLoading(false);
+        }
+    };
+
+    const handleFollowToggle = async () => {
+        if (!currentUser) {
+            alert("Please sign in to follow others!");
+            return;
+        }
+
+        const endpoint = isFollowing ? `/social/unfollow/${profile.id}` : `/social/follow/${profile.id}`;
+        try {
+            await api.post(endpoint);
+            setIsFollowing(!isFollowing);
+            // Optimistically update counts
+            setProfile((prev: any) => ({
+                ...prev,
+                _count: {
+                    ...prev._count,
+                    followers: prev._count.followers + (isFollowing ? -1 : 1)
+                }
+            }));
+        } catch (err) {
+            console.error("Follow/unfollow failed", err);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -68,7 +114,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 <div className="absolute -bottom-12 left-4">
                     <div className="w-[84px] h-[84px] rounded-full border-4 border-white bg-[#eff3f4] flex items-center justify-center text-3xl font-bold text-[#0085ff] overflow-hidden shadow-sm">
                         {profile.profileImage ? (
-                            <img src={profile.profileImage} alt={profile.username} className="w-full h-full object-cover" />
+                            <img src={getMediaUrl(profile.profileImage)} alt={profile.username} className="w-full h-full object-cover" />
                         ) : (
                             <span>{profile.username[0].toUpperCase()}</span>
                         )}
@@ -92,8 +138,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                             <button onClick={() => alert('Messaging coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                                 <MessageCircle className="w-4 h-4 text-heading" />
                             </button>
-                            <button onClick={() => alert('Follow feature coming soon!')} className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors py-1.5 px-5 text-sm">
-                                Follow
+                            <button
+                                onClick={handleFollowToggle}
+                                className={`${isFollowing
+                                    ? "bg-transparent border border-gray-300 text-heading hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                                    : "bg-heading text-white hover:bg-opacity-90"
+                                    } font-bold rounded-full transition-colors py-1.5 px-5 text-sm min-w-[100px]`}
+                            >
+                                {isFollowing ? "Following" : "Follow"}
                             </button>
                         </>
                     )}
@@ -125,12 +177,71 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
                 {/* Stats */}
                 <div className="flex gap-4 text-sm">
-                    <div className="flex gap-1">
-                        <span className="font-bold text-heading">{profile._count.posts}</span>
-                        <span className="text-secondary-text">posts</span>
+                    <div
+                        onClick={() => openUserList('following')}
+                        className="flex gap-1 items-center hover:underline cursor-pointer"
+                    >
+                        <span className="font-bold text-heading">{profile._count.following}</span>
+                        <span className="text-secondary-text">Following</span>
+                    </div>
+                    <div
+                        onClick={() => openUserList('followers')}
+                        className="flex gap-1 items-center hover:underline cursor-pointer"
+                    >
+                        <span className="font-bold text-heading">{profile._count.followers}</span>
+                        <span className="text-secondary-text">Followers</span>
                     </div>
                 </div>
             </div>
+
+            {/* User List Modal */}
+            {showUserList && (
+                <div className="fixed inset-0 bg-black/40 z-[99] flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+                        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-heading">{listType === 'followers' ? 'Followers' : 'Following'}</h3>
+                            <button onClick={() => setShowUserList(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                                <X className="w-5 h-5 text-heading" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2">
+                            {isListLoading ? (
+                                <div className="p-8 flex justify-center">
+                                    <Loader2 className="w-6 h-6 animate-spin text-[#0085ff]" />
+                                </div>
+                            ) : userList.length === 0 ? (
+                                <div className="p-8 text-center text-secondary-text">
+                                    No users found.
+                                </div>
+                            ) : (
+                                userList.map((item: any) => {
+                                    const user = item.follower || item.following;
+                                    return (
+                                        <Link
+                                            key={user.id}
+                                            href={`/profile/${user.username}`}
+                                            onClick={() => setShowUserList(false)}
+                                            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+                                        >
+                                            <div className="w-10 h-10 rounded-full bg-[#eff3f4] flex items-center justify-center overflow-hidden">
+                                                {user.profileImage ? (
+                                                    <img src={getMediaUrl(user.profileImage)} alt={user.username} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <span className="text-[#0085ff] font-bold">{user.username[0].toUpperCase()}</span>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-heading text-[15px]">{user.username}</span>
+                                                <span className="text-secondary-text text-sm">@{user.username}</span>
+                                            </div>
+                                        </Link>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Tabs */}
             <div className="sticky top-[53px] bg-white z-[5] border-b border-gray-200 flex">

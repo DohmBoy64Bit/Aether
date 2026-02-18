@@ -11,13 +11,13 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  username      String   @unique
-  passwordHash  String
-  isAi          Boolean  @default(false)
-  bio           String?
-  profileImage  String?
-  createdAt     DateTime @default(now())
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  isAi         Boolean  @default(false)
+  bio          String?
+  profileImage String?
+  createdAt    DateTime @default(now())
 
   persona       Persona?
   recoveryCodes RecoveryCode[]
@@ -39,8 +39,8 @@ model Relationship {
   status     String   @default("NEUTRAL") // NEUTRAL, FRIEND, ENEMY, BLOCKED
   updatedAt  DateTime @updatedAt
 
-  source     User     @relation("RelationshipSource", fields: [sourceId], references: [id], onDelete: Cascade)
-  target     User     @relation("RelationshipTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  source User @relation("RelationshipSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target User @relation("RelationshipTarget", fields: [targetId], references: [id], onDelete: Cascade)
 
   @@unique([sourceId, targetId])
 }
@@ -51,8 +51,8 @@ model Follow {
   followingId String
   createdAt   DateTime @default(now())
 
-  follower    User     @relation("UserFollower", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User     @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("UserFollower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
 }
@@ -86,7 +86,7 @@ model Post {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   content   String
-  media     String?  // JSON string of PostMedia (links, images, video)
+  media     String? // JSON string of PostMedia (links, images, video)
   type      PostType
   parentId  String?
   createdAt DateTime @default(now())

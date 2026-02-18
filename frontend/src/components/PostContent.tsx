@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink, Play } from "lucide-react";
+import { getMediaUrl } from "@/utils/media";
 
 // Types matching backend PostMedia
 interface PostMediaLink {
@@ -95,7 +96,7 @@ function LinkCard({ link }: { link: PostMediaLink }) {
             {link.thumbnail && (
                 <div className="w-full aspect-[2/1] bg-gray-100 overflow-hidden">
                     <img
-                        src={link.thumbnail}
+                        src={getMediaUrl(link.thumbnail)}
                         alt={link.title}
                         className="w-full h-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -131,7 +132,7 @@ function ImageGrid({ images }: { images: PostMediaImage[] }) {
         return (
             <div className="mt-3 rounded-2xl overflow-hidden border border-gray-200">
                 <img
-                    src={displayed[0].url}
+                    src={getMediaUrl(displayed[0].url)}
                     alt={displayed[0].alt || 'Post image'}
                     className="w-full max-h-[400px] object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
@@ -146,7 +147,7 @@ function ImageGrid({ images }: { images: PostMediaImage[] }) {
                 {displayed.map((img, i) => (
                     <img
                         key={i}
-                        src={img.url}
+                        src={getMediaUrl(img.url)}
                         alt={img.alt || `Image ${i + 1}`}
                         className="w-full h-[200px] object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -160,19 +161,19 @@ function ImageGrid({ images }: { images: PostMediaImage[] }) {
         return (
             <div className="mt-3 rounded-2xl overflow-hidden border border-gray-200 grid grid-cols-2 gap-[2px] h-[300px]">
                 <img
-                    src={displayed[0].url}
+                    src={getMediaUrl(displayed[0].url)}
                     alt={displayed[0].alt || 'Image 1'}
                     className="w-full h-full object-cover row-span-2"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <img
-                    src={displayed[1].url}
+                    src={getMediaUrl(displayed[1].url)}
                     alt={displayed[1].alt || 'Image 2'}
                     className="w-full h-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <img
-                    src={displayed[2].url}
+                    src={getMediaUrl(displayed[2].url)}
                     alt={displayed[2].alt || 'Image 3'}
                     className="w-full h-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -187,7 +188,7 @@ function ImageGrid({ images }: { images: PostMediaImage[] }) {
             {displayed.map((img, i) => (
                 <img
                     key={i}
-                    src={img.url}
+                    src={getMediaUrl(img.url)}
                     alt={img.alt || `Image ${i + 1}`}
                     className="w-full h-[180px] object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -211,7 +212,7 @@ function VideoEmbed({ video }: { video: PostMediaVideo }) {
             >
                 {video.thumbnail ? (
                     <img
-                        src={video.thumbnail}
+                        src={getMediaUrl(video.thumbnail)}
                         alt={video.title}
                         className="w-full aspect-video object-cover"
                     />

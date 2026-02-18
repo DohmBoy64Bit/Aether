@@ -3,7 +3,7 @@ import prisma from '../utils/prisma.js';
 import { SearchService } from '../services/search.service.js';
 import { ModerationService } from '../services/moderation.service.js';
 import { SocialService } from '../services/social.service.js';
-import { PostType } from '../generated/prisma/client/enums.js';
+import { PostType } from '../generated/prisma/client/index.js';
 
 describe('Moderation and Search Services', () => {
   beforeAll(async () => {
