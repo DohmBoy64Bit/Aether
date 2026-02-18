@@ -179,4 +179,26 @@ export class SocialController {
       res.status(500).json({ error: 'Failed to fetch following' });
     }
   }
+
+  static async updateProfile(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+      const { bio, profileImage } = req.body;
+      const user = await SocialService.updateProfile(req.user.userId, { bio, profileImage });
+      res.json(user);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  }
+
+  static async search(req: Request, res: Response) {
+    try {
+      const { q } = req.query;
+      if (!q) return res.json([]);
+      const users = await SocialService.searchUsers(q as string);
+      res.json(users);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Search failed' });
+    }
+  }
 }

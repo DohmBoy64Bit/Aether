@@ -6,6 +6,7 @@ import { useEffect, useState, use } from "react";
 import api from "@/utils/api";
 import { format } from "date-fns";
 import { getMediaUrl } from "@/utils/media";
+import EditProfileModal from "@/components/EditProfileModal";
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
     const { username } = use(params);
@@ -15,29 +16,31 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     const [activeTab, setActiveTab] = useState("Posts");
 
     const [isFollowing, setIsFollowing] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const [showUserList, setShowUserList] = useState(false);
     const [listType, setListType] = useState<'followers' | 'following'>('followers');
     const [userList, setUserList] = useState<any[]>([]);
     const [isListLoading, setIsListLoading] = useState(false);
 
+    const fetchData = async () => {
+        setIsLoading(true);
+        try {
+            const [profileRes, userRes] = await Promise.all([
+                api.get(`/social/profiles/${username}`),
+                api.get("/auth/me").catch(() => ({ data: null }))
+            ]);
+            setProfile(profileRes.data);
+            setCurrentUser(userRes.data);
+            setIsFollowing(profileRes.data.isFollowing || false);
+        } catch (err) {
+            console.error("Failed to fetch data", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                const [profileRes, userRes] = await Promise.all([
-                    api.get(`/social/profiles/${username}`),
-                    api.get("/auth/me").catch(() => ({ data: null }))
-                ]);
-                setProfile(profileRes.data);
-                setCurrentUser(userRes.data);
-                setIsFollowing(profileRes.data.isFollowing || false);
-            } catch (err) {
-                console.error("Failed to fetch data", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
         fetchData();
     }, [username]);
 
@@ -127,12 +130,12 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {/* Action buttons */}
                 <div className="flex justify-end gap-2 -mt-2 mb-3">
                     {currentUser?.id === profile.id ? (
-                        <button onClick={() => alert('Edit Profile coming soon!')} className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-1.5 px-5 text-sm">
+                        <button onClick={() => setShowEditModal(true)} className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-1.5 px-5 text-sm">
                             Edit Profile
                         </button>
                     ) : (
                         <>
-                            <button onClick={() => alert('Coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                            <button onClick={() => alert('Extra options coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
                                 <MoreHorizontal className="w-4 h-4 text-heading" />
                             </button>
                             <button onClick={() => alert('Messaging coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
@@ -150,6 +153,15 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                         </>
                     )}
                 </div>
+
+                {/* Edit Profile Modal */}
+                {showEditModal && (
+                    <EditProfileModal
+                        user={profile}
+                        onClose={() => setShowEditModal(false)}
+                        onUpdate={fetchData}
+                    />
+                )}
 
                 {/* Name & Handle */}
                 <div className="mb-3">

@@ -48,12 +48,11 @@ export default function SettingsPage() {
                 {settingsItems.map((item) => (
                     <button
                         key={item.label}
-                        onClick={() => alert(`${item.label} settings coming soon!`)}
-                        className="flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                        className="flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors border-b border-gray-100 group w-full text-left"
                     >
                         <div className="flex items-center gap-3">
-                            <item.icon className="w-5 h-5 text-secondary-text" />
-                            <span className="text-[15px] text-heading">{item.label}</span>
+                            <item.icon className="w-5 h-5 text-secondary-text group-hover:text-heading transition-colors" />
+                            <span className="text-[15px] text-heading font-medium">{item.label}</span>
                         </div>
                         <ChevronRight className="w-4 h-4 text-secondary-text" />
                     </button>

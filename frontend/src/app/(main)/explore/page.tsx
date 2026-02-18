@@ -1,8 +1,9 @@
 "use client";
 
-import { Search, TrendingUp, Sparkles, X, ArrowLeft } from "lucide-react";
+import { Search, TrendingUp, Sparkles, X, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "@/utils/api";
 
 const interests = [
     { label: "AI & Machine Learning", emoji: "🤖" },
@@ -23,7 +24,30 @@ const trending = [
 
 export default function ExplorePage() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
     const [showInterests, setShowInterests] = useState(true);
+
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        const timeoutId = setTimeout(async () => {
+            setIsSearching(true);
+            try {
+                const res = await api.get(`/social/search?q=${encodeURIComponent(searchQuery)}`);
+                setSearchResults(res.data);
+            } catch (err) {
+                console.error("Search failed", err);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery]);
 
     return (
         <div className="flex flex-col">
@@ -39,68 +63,121 @@ export default function ExplorePage() {
             <div className="px-4 py-3 border-b border-gray-200">
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 text-secondary-text" />
+                        {isSearching ? (
+                            <Loader2 className="h-4 w-4 text-[#0085ff] animate-spin" />
+                        ) : (
+                            <Search className="h-4 w-4 text-secondary-text" />
+                        )}
                     </div>
                     <input
                         type="text"
-                        placeholder="Search for posts, users, or feeds"
+                        placeholder="Search for users"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="block w-full pl-11 pr-4 py-2.5 rounded-full bg-[#eff3f4] text-heading text-sm placeholder:text-secondary-text border-none outline-none focus:ring-2 focus:ring-[#0085ff] focus:bg-white transition-all"
                     />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery("")}
+                            className="absolute inset-y-0 right-3 flex items-center"
+                        >
+                            <X className="w-4 h-4 text-white bg-heading rounded-full p-0.5" />
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {/* Your Interests */}
-            {showInterests && (
-                <div className="px-4 py-4 border-b border-gray-200">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-[#0085ff]" />
-                            <h3 className="text-lg font-extrabold text-heading">Your interests</h3>
-                        </div>
-                        <button onClick={() => setShowInterests(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
-                            <X className="w-4 h-4 text-secondary-text" />
-                        </button>
-                    </div>
-                    <p className="text-sm text-secondary-text mb-3">Your interests help us find what you like!</p>
-                    <div className="flex flex-wrap gap-2">
-                        {interests.map((interest) => (
-                            <button
-                                key={interest.label}
-                                className="flex items-center gap-1.5 bg-[#eff3f4] hover:bg-[#e1e8eb] rounded-full px-3.5 py-2 text-sm font-medium text-heading transition-colors"
+            {/* Search Results */}
+            {searchQuery && (
+                <div className="flex flex-col border-b border-gray-200">
+                    {searchResults.length > 0 ? (
+                        searchResults.map((user) => (
+                            <Link
+                                key={user.id}
+                                href={`/profile/${user.username}`}
+                                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
                             >
-                                <span>{interest.emoji}</span>
-                                <span>{interest.label}</span>
-                            </button>
-                        ))}
-                    </div>
+                                <div className="w-10 h-10 bg-[#eff3f4] rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                    {user.profileImage ? (
+                                        <img src={user.profileImage} alt={user.username} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="font-bold text-[#0085ff]">{user.username[0].toUpperCase()}</span>
+                                    )}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-bold text-heading text-[15px] truncate">{user.username}</span>
+                                        {user.isAi && (
+                                            <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
+                                        )}
+                                    </div>
+                                    <span className="text-sm text-secondary-text truncate">@{user.username}</span>
+                                    {user.bio && <p className="text-sm text-heading mt-0.5 line-clamp-1">{user.bio}</p>}
+                                </div>
+                            </Link>
+                        ))
+                    ) : !isSearching && (
+                        <div className="px-4 py-8 text-center text-secondary-text text-sm">
+                            No users found for &quot;{searchQuery}&quot;
+                        </div>
+                    )}
                 </div>
             )}
 
-            {/* Trending */}
-            <div>
-                <div className="px-4 py-3 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-[#0085ff]" />
-                    <h3 className="text-lg font-extrabold text-heading">Trending</h3>
-                </div>
-                {trending.map((item) => (
-                    <div key={item.rank} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100">
-                        <div className="flex gap-3">
-                            <span className="text-secondary-text text-sm font-medium mt-0.5">{item.rank}.</span>
-                            <div className="flex flex-col">
-                                <span className="font-bold text-heading text-[15px]">{item.name}</span>
-                                <span className="text-xs text-secondary-text">{item.posts} · {item.category}</span>
+            {!searchQuery && (
+                <>
+                    {/* Your Interests */}
+                    {showInterests && (
+                        <div className="px-4 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="w-5 h-5 text-[#0085ff]" />
+                                    <h3 className="text-lg font-extrabold text-heading">Your interests</h3>
+                                </div>
+                                <button onClick={() => setShowInterests(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                                    <X className="w-4 h-4 text-secondary-text" />
+                                </button>
+                            </div>
+                            <p className="text-sm text-secondary-text mb-3">Your interests help us find what you like!</p>
+                            <div className="flex flex-wrap gap-2">
+                                {interests.map((interest) => (
+                                    <button
+                                        key={interest.label}
+                                        className="flex items-center gap-1.5 bg-[#eff3f4] hover:bg-[#e1e8eb] rounded-full px-3.5 py-2 text-sm font-medium text-heading transition-colors"
+                                    >
+                                        <span>{interest.emoji}</span>
+                                        <span>{interest.label}</span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                        {item.hot && (
-                            <span className="text-xs bg-[#0085ff] text-white px-2.5 py-1 rounded-full font-semibold">
-                                🔥 Hot
-                            </span>
-                        )}
+                    )}
+
+                    {/* Trending */}
+                    <div>
+                        <div className="px-4 py-3 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-[#0085ff]" />
+                            <h3 className="text-lg font-extrabold text-heading">Trending</h3>
+                        </div>
+                        {trending.map((item) => (
+                            <div key={item.rank} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100">
+                                <div className="flex gap-3">
+                                    <span className="text-secondary-text text-sm font-medium mt-0.5">{item.rank}.</span>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-heading text-[15px]">{item.name}</span>
+                                        <span className="text-xs text-secondary-text">{item.posts} · {item.category}</span>
+                                    </div>
+                                </div>
+                                {item.hot && (
+                                    <span className="text-xs bg-[#0085ff] text-white px-2.5 py-1 rounded-full font-semibold">
+                                        🔥 Hot
+                                    </span>
+                                )}
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </>
+            )}
         </div>
     );
 }

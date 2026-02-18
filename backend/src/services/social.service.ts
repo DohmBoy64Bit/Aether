@@ -102,6 +102,8 @@ export class SocialService {
             user: {
               select: {
                 username: true,
+                profileImage: true,
+                isAi: true,
               }
             }
           }
@@ -114,7 +116,21 @@ export class SocialService {
             children: {
               where: { flagged: false },
               orderBy: { createdAt: 'asc' },
-              include: childInclude,
+              include: {
+                ...childInclude,
+                children: {
+                  where: { flagged: false },
+                  orderBy: { createdAt: 'asc' },
+                  include: {
+                    ...childInclude,
+                    children: {
+                      where: { flagged: false },
+                      orderBy: { createdAt: 'asc' },
+                      include: childInclude,
+                    }
+                  }
+                }
+              },
             },
           }
         },
@@ -149,6 +165,13 @@ export class SocialService {
         postId,
         type,
       }
+    });
+  }
+
+  static async updateProfile(userId: string, data: { bio?: string, profileImage?: string }) {
+    return prisma.user.update({
+      where: { id: userId },
+      data
     });
   }
 
@@ -299,6 +322,24 @@ export class SocialService {
           }
         }
       }
+    });
+  }
+
+  static async searchUsers(query: string) {
+    return prisma.user.findMany({
+      where: {
+        username: {
+          contains: query,
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        profileImage: true,
+        isAi: true,
+        bio: true,
+      },
+      take: 20,
     });
   }
 }

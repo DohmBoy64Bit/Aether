@@ -1,12 +1,23 @@
 "use client";
 
-import { MessageCircle, Repeat2, Heart, Share2, MoreHorizontal, Image as ImageIcon, Loader2, X, Play } from "lucide-react";
+import {
+  MessageCircle, Repeat2, Heart, Share2, MoreHorizontal,
+  Image as ImageIcon, Loader2, X, Play,
+  Home, Hash, MessageSquare, Bell, Bookmark, List, Sparkles, User, SquarePen,
+  Search, Settings, ArrowLeft
+} from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import api from "@/utils/api";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import PostContent from "@/components/PostContent";
 import { getMediaUrl } from "@/utils/media";
+import ReplyModal from "@/components/ReplyModal";
 
 // Move debouncing helper outside
 function useDebounce<T>(value: T, delay: number): T {
@@ -27,6 +38,14 @@ export default function Feed() {
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+
+  const handleOpenReply = (e: React.MouseEvent, post: any) => {
+    e.stopPropagation();
+    setSelectedPost(post);
+    setReplyModalOpen(true);
+  };
 
   // Media State
   const [mediaImages, setMediaImages] = useState<string[]>([]);
@@ -190,11 +209,12 @@ export default function Feed() {
       await api.post("/social/interact", { postId, type });
       setPosts(prev => prev.map(post => {
         if (post.id === postId) {
+          const count = post._count || { interactions: 0, children: 0 };
           return {
             ...post,
             _count: {
-              ...post._count,
-              interactions: type === "LIKE" ? post._count.interactions + 1 : post._count.interactions
+              ...count,
+              interactions: type === "LIKE" ? (count.interactions || 0) + 1 : count.interactions
             }
           };
         }
@@ -388,7 +408,10 @@ export default function Feed() {
                   {/* Actions */}
                   <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
                     {/* Reply */}
-                    <div className="flex items-center gap-0.5 group/action cursor-pointer">
+                    <div
+                      className="flex items-center gap-0.5 group/action cursor-pointer"
+                      onClick={(e) => handleOpenReply(e, post)}
+                    >
                       <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
                         <MessageCircle className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
                       </div>
@@ -400,7 +423,7 @@ export default function Feed() {
                       <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
                         <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
                       </div>
-                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors">{post._count.retweets || ""}</span>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors"></span>
                     </div>
 
                     {/* Like */}
@@ -424,6 +447,16 @@ export default function Feed() {
           ))
         )}
       </div>
+
+      {/* Reply Modal */}
+      {selectedPost && (
+        <ReplyModal
+          isOpen={replyModalOpen}
+          onClose={() => setReplyModalOpen(false)}
+          parentPost={selectedPost}
+          onReplyPosted={fetchFeed}
+        />
+      )}
     </div>
   );
 }

@@ -9,6 +9,8 @@ router.get('/posts', SocialController.getFeed as any);
 router.get('/posts/:id', SocialController.getPost as any);
 router.post('/interact', authMiddleware as any, SocialController.interact as any);
 router.get('/profiles/:username', SocialController.getProfile as any);
+router.post('/update-profile', authMiddleware as any, SocialController.updateProfile as any);
+router.get('/search', SocialController.search as any);
 router.post('/persona', authMiddleware as any, SocialController.updatePersona as any);
 router.post('/follow/:userId', authMiddleware as any, SocialController.follow as any);
 router.post('/unfollow/:userId', authMiddleware as any, SocialController.unfollow as any);

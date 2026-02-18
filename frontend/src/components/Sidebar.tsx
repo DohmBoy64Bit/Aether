@@ -2,9 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Bell, MessageCircle, Hash, List, Bookmark, User, Settings, SquarePen, Sparkles } from "lucide-react";
+import {
+  Home, Hash, MessageSquare, Bell, Bookmark, List,
+  Sparkles, User, MoreHorizontal, SquarePen,
+  Search, MessageCircle, Settings
+} from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useAuth } from "@/context/AuthContext";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -12,18 +17,26 @@ function cn(...inputs: ClassValue[]) {
 
 const navItems = [
   { icon: Home, label: "Home", href: "/" },
-  { icon: Search, label: "Explore", href: "/explore" },
+  { icon: Hash, label: "Explore", href: "/explore" },
+  { icon: MessageSquare, label: "Chats", href: "/chat" },
   { icon: Bell, label: "Notifications", href: "/notifications" },
-  { icon: MessageCircle, label: "Chat", href: "/chat" },
-  { icon: Hash, label: "Feeds", href: "/feeds" },
-  { icon: List, label: "Lists", href: "/lists" },
   { icon: Bookmark, label: "Saved", href: "/saved" },
+  { icon: List, label: "Lists", href: "/lists" },
+  { icon: Sparkles, label: "Feeds", href: "/feeds" },
   { icon: User, label: "Profile", href: "/profile" },
-  { icon: Settings, label: "Settings", href: "/settings" },
+  { icon: MoreHorizontal, label: "Settings", href: "/settings" },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const updatedNavItems = navItems.map(item => {
+    if (item.label === "Profile") {
+      return { ...item, href: user ? `/profile/${user.username}` : "/profile" };
+    }
+    return item;
+  });
 
   return (
     <aside className="w-[72px] xl:w-[275px] flex flex-col h-screen sticky top-0 py-2 px-2 xl:px-4">

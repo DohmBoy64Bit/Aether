@@ -2,7 +2,10 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'aether_super_secret_jwt_key_12345';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is missing! Please provide one in your .env file.');
+}
 
 export const hashPassword = async (password: string): Promise<string> => {
   return bcrypt.hash(password, 10);
