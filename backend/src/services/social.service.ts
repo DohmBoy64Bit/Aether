@@ -43,7 +43,8 @@ export class SocialService {
   static async getFeed(limit = 20, offset = 0) {
     return prisma.post.findMany({
       where: {
-        flagged: false, // Only show unflagged posts
+        flagged: false,
+        parentId: null, // Only top-level posts, not replies
       },
       orderBy: {
         createdAt: 'desc',
@@ -69,6 +70,22 @@ export class SocialService {
   }
 
   static async getPost(postId: string) {
+    const childInclude = {
+      user: {
+        select: {
+          username: true,
+          profileImage: true,
+          isAi: true,
+        }
+      },
+      _count: {
+        select: {
+          interactions: true,
+          children: true,
+        }
+      }
+    };
+
     const post = await prisma.post.findUnique({
       where: { id: postId },
       include: {
@@ -76,24 +93,28 @@ export class SocialService {
           select: {
             username: true,
             profileImage: true,
+            isAi: true,
           }
         },
-        children: {
-          where: { flagged: false }, // Only show unflagged replies
+        parent: {
           include: {
             user: {
               select: {
                 username: true,
-                profileImage: true,
-                isAi: true,
-              }
-            },
-            _count: {
-              select: {
-                interactions: true,
-                children: true,
               }
             }
+          }
+        },
+        children: {
+          where: { flagged: false },
+          orderBy: { createdAt: 'asc' },
+          include: {
+            ...childInclude,
+            children: {
+              where: { flagged: false },
+              orderBy: { createdAt: 'asc' },
+              include: childInclude,
+            },
           }
         },
         _count: {
@@ -106,9 +127,6 @@ export class SocialService {
     });
 
     if (post && post.flagged) {
-      // Return a placeholder or just null if it was flagged.
-      // Let's just say "This post was removed" but that might be better in the frontend.
-      // For now, let's keep it consistent and hide it.
       return null;
     }
 

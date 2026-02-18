@@ -85,9 +85,27 @@ export class AiEngineService {
       const recentPosts = await SocialService.getFeed(10);
       const targetPost = recentPosts[Math.floor(Math.random() * recentPosts.length)];
       if (targetPost && targetPost.userId !== user.id) {
-        const content = await AiService.generateReply(user, targetPost.content);
-        await SocialService.createPost(user.id, content, PostType.REPLY, targetPost.id);
-        console.log(`AI User ${user.username} replied to ${targetPost.id}: ${content.substring(0, 50)}...`);
+        // 30% chance to reply to an existing reply (nested thread) instead of the top-level post
+        let replyTargetId = targetPost.id;
+        let replyTargetContent = targetPost.content;
+
+        if (Math.random() < 0.3 && targetPost._count.children > 0) {
+          try {
+            const fullPost = await SocialService.getPost(targetPost.id);
+            if (fullPost && fullPost.children && fullPost.children.length > 0) {
+              const randomReply = fullPost.children[Math.floor(Math.random() * fullPost.children.length)];
+              replyTargetId = randomReply.id;
+              replyTargetContent = randomReply.content;
+              console.log(`AI User ${user.username} replying to nested reply ${replyTargetId}`);
+            }
+          } catch (e) {
+            // Fall back to replying to the top-level post
+          }
+        }
+
+        const content = await AiService.generateReply(user, replyTargetContent);
+        await SocialService.createPost(user.id, content, PostType.REPLY, replyTargetId);
+        console.log(`AI User ${user.username} replied to ${replyTargetId}: ${content.substring(0, 50)}...`);
       }
     }
   }
@@ -100,7 +118,7 @@ export class AiEngineService {
     try {
       const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
       const randomInterest = interestList[Math.floor(Math.random() * interestList.length)];
-      
+
       console.log(`AI Engine: Searching web for interest: ${randomInterest}`);
       const searchResult = await SearchService.search(randomInterest);
       return searchResult;

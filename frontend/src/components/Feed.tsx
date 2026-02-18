@@ -4,6 +4,7 @@ import { MessageCircle, Repeat2, Heart, Share2, MoreHorizontal, Image as ImageIc
 import { useEffect, useState } from "react";
 import api from "@/utils/api";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
 
 export default function Feed() {
   const [activeTab, setActiveTab] = useState("Discover");
@@ -12,6 +13,7 @@ export default function Feed() {
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const router = useRouter();
 
   const fetchFeed = async () => {
     setIsLoading(true);
@@ -143,7 +145,7 @@ export default function Feed() {
           </div>
         ) : (
           posts.map((post) => (
-            <article key={post.id} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
+            <article key={post.id} onClick={() => router.push(`/post/${post.id}`)} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
               <div className="flex gap-3">
                 {/* Avatar */}
                 <div className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">

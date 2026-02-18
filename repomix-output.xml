@@ -85,15 +85,22 @@ backend/src/utils/prisma.ts
 frontend/next-env.d.ts
 frontend/next.config.ts
 frontend/postcss.config.mjs
-frontend/src/app/auth/signin/page.tsx
-frontend/src/app/auth/signup/page.tsx
+frontend/src/app/(auth)/layout.tsx
+frontend/src/app/(auth)/signin/page.tsx
+frontend/src/app/(auth)/signup/page.tsx
+frontend/src/app/(main)/layout.tsx
+frontend/src/app/(main)/page.tsx
+frontend/src/app/(main)/profile/[username]/page.tsx
+frontend/src/app/(main)/profile/page.tsx
 frontend/src/app/globals.css
 frontend/src/app/layout.tsx
-frontend/src/app/page.tsx
-frontend/src/app/profile/[username]/page.tsx
 frontend/src/components/Feed.tsx
+frontend/src/components/MobileNav.tsx
 frontend/src/components/RightSidebar.tsx
 frontend/src/components/Sidebar.tsx
+frontend/src/context/AuthContext.tsx
+frontend/src/middleware.ts
+frontend/src/types/index.ts
 frontend/src/utils/api.ts
 frontend/tailwind.config.ts
 WebsiteReference/createaccountpage.png
@@ -6632,7 +6639,7 @@ export class AiService {
   static async generatePersona(): Promise<PersonaDetails> {
     const prompt = `
       Generate a unique persona for a social media user.
-      The persona should have a name, a unique twitter-like handle (starting with @), a short bio, a detailed personality description, and a list of 3-5 interests (e.g., gaming, music, tech, cooking).
+      The persona should have a name, a unique twitter-like handle (without the @ symbol), a short bio, a detailed personality description, and a list of 3-5 interests (e.g., gaming, music, tech, cooking).
       Return the result ONLY as a JSON object with the following structure:
       {
         "name": "...",
@@ -6652,9 +6659,9 @@ export class AiService {
       });
 
       const persona = JSON.parse(response.response) as PersonaDetails;
-      // Ensure handle starts with @
-      if (!persona.handle.startsWith('@')) {
-        persona.handle = '@' + persona.handle;
+      // Strip @ from handle if present — the frontend adds it for display
+      if (persona.handle.startsWith('@')) {
+        persona.handle = persona.handle.slice(1);
       }
       return persona;
     } catch (error) {
@@ -7056,218 +7063,719 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 </file>
 
-<file path="frontend/src/app/auth/signin/page.tsx">
+<file path="frontend/src/app/(auth)/layout.tsx">
+export default function AuthLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <div className="min-h-screen bg-[#f2f2f2] flex items-center justify-center p-4">
+            {children}
+        </div>
+    );
+}
+</file>
+
+<file path="frontend/src/app/(auth)/signin/page.tsx">
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AtSign, Lock, ArrowRight, ArrowLeft } from "lucide-react";
+import { AtSign, Lock, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import api from "@/utils/api";
 import Cookies from "js-cookie";
 
 export default function SigninPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
-  const handleSignin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    try {
-      const response = await api.post("/auth/login", { username, password });
-      Cookies.set("token", response.data.token, { expires: 7 });
-      router.push("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Signin failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleSignin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError("");
+        try {
+            const response = await api.post("/auth/login", { username, password });
+            Cookies.set("token", response.data.token, { expires: 7 });
+            router.push("/");
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Signin failed");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col md:flex-row">
-      <div className="flex-1 flex flex-col justify-center items-center md:items-start p-10 md:pl-20">
-        <h1 className="text-6xl font-black text-primary mb-2">Sign in</h1>
-        <p className="text-xl text-gray-500">Enter your username and password</p>
-      </div>
+    return (
+        <div className="w-full max-w-[420px]">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-8 py-10">
+                {/* Logo */}
+                <div className="flex justify-center mb-8">
+                    <div className="flex items-center gap-2 text-[#0085ff]">
+                        <Sparkles className="w-10 h-10 fill-[#0085ff]" />
+                    </div>
+                </div>
 
-      <div className="flex-1 flex flex-col justify-center items-center p-10 bg-secondary/10 border-l border-secondary/50">
-        <div className="w-full max-w-md space-y-8">
-          <div className="space-y-4">
-            {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-sm">{error}</div>}
-            <div className="space-y-1">
-              <label className="text-sm font-bold text-gray-400">Account</label>
-              <div className="relative">
-                <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Username or email address"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-secondary/50 border border-secondary/50 rounded-lg py-3 pl-10 pr-4 focus:ring-1 focus:ring-primary outline-none transition-all"
-                />
-              </div>
+                {/* Header */}
+                <h1 className="text-3xl font-extrabold text-heading text-center mb-1">Sign in</h1>
+                <p className="text-secondary-text text-center mb-8">Enter your username and password</p>
+
+                {/* Error */}
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm mb-4">
+                        {error}
+                    </div>
+                )}
+
+                {/* Form */}
+                <form onSubmit={handleSignin} className="space-y-4">
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-secondary-text">Account</label>
+                        <div className="relative">
+                            <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Username or email address"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-secondary-text">Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="password"
+                                placeholder="••••••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10 pr-20"
+                            />
+                            <button type="button" className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#0085ff] font-semibold hover:underline">
+                                Forgot?
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4">
+                        <Link href="/signup" className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-2.5 px-6 text-sm">
+                            Create account
+                        </Link>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors disabled:opacity-50 py-2.5 px-8 flex items-center gap-2 text-sm"
+                        >
+                            {isLoading ? "Signing in..." : "Next"}
+                            {!isLoading && <ArrowRight className="w-4 h-4" />}
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <div className="space-y-1">
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <input
-                  type="password"
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-secondary/50 border border-secondary/50 rounded-lg py-3 pl-10 pr-4 focus:ring-1 focus:ring-primary outline-none transition-all"
-                />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold hover:text-primary transition-colors">
-                  Forgot?
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center pt-4">
-            <Link href="/auth/signup" className="bg-secondary/50 hover:bg-secondary text-foreground font-bold py-3 px-8 rounded-full transition-all flex items-center gap-2">
-              <ArrowLeft className="w-5 h-5" />
-              Back
-            </Link>
-            <button
-              onClick={handleSignin}
-              className="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full transition-all flex items-center gap-2"
-            >
-              Next
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
+            {/* Footer */}
+            <p className="text-center text-xs text-secondary-text mt-6">
+                By signing in, you agree to our{" "}
+                <span className="text-[#0085ff] hover:underline cursor-pointer">Terms of Service</span> and{" "}
+                <span className="text-[#0085ff] hover:underline cursor-pointer">Privacy Policy</span>.
+            </p>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 </file>
 
-<file path="frontend/src/app/auth/signup/page.tsx">
+<file path="frontend/src/app/(auth)/signup/page.tsx">
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AtSign, Lock, ArrowRight, ArrowLeft } from "lucide-react";
+import { AtSign, Lock, ArrowRight, Sparkles, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 import api from "@/utils/api";
 import Cookies from "js-cookie";
 
 export default function SignupPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [step, setStep] = useState(1);
-  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [step, setStep] = useState(1);
+    const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    try {
-      const response = await api.post("/auth/signup", { username, password });
-      setRecoveryCodes(response.data.recoveryCodes);
-      Cookies.set("token", response.data.token, { expires: 7 });
-      setStep(2);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Signup failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleSignup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError("");
+        try {
+            const response = await api.post("/auth/signup", { username, password });
+            setRecoveryCodes(response.data.recoveryCodes);
+            Cookies.set("token", response.data.token, { expires: 7 });
+            setStep(2);
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Signup failed");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col md:flex-row">
-      <div className="flex-1 flex flex-col justify-center items-center md:items-start p-10 md:pl-20">
-        <h1 className="text-6xl font-black text-primary mb-2">Create Account</h1>
-        <p className="text-xl text-gray-500">Join the AI social revolution.</p>
-      </div>
-
-      <div className="flex-1 flex flex-col justify-center items-center p-10 bg-secondary/10 border-l border-secondary/50">
-        <div className="w-full max-w-md space-y-8">
-          {step === 1 ? (
-            <>
-              <div className="space-y-4">
-                {error && <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-sm">{error}</div>}
-                <div className="space-y-1">
-                  <label className="text-sm font-bold text-gray-400">Username</label>
-                  <div className="relative">
-                    <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                    <input
-                      type="text"
-                      placeholder="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-secondary/50 border border-secondary/50 rounded-lg py-3 pl-10 pr-4 focus:ring-1 focus:ring-primary outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-bold text-gray-400">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                    <input
-                      type="password"
-                      placeholder="••••••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-secondary/50 border border-secondary/50 rounded-lg py-3 pl-10 pr-4 focus:ring-1 focus:ring-primary outline-none transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center pt-4">
-                <Link href="/auth/signin" className="bg-secondary/50 hover:bg-secondary text-foreground font-bold py-3 px-8 rounded-full transition-all flex items-center gap-2">
-                  <ArrowLeft className="w-5 h-5" />
-                  Back
-                </Link>
-                <button
-                  onClick={handleSignup}
-                  className="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full transition-all flex items-center gap-2"
-                >
-                  Next
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-accent/10 border border-accent/20 p-6 rounded-2xl">
-                <h3 className="text-xl font-bold text-accent mb-2">Recovery Codes</h3>
-                <p className="text-sm text-gray-400 mb-4">Save these codes in a safe place. You will need them if you lose access to your account.</p>
-                <div className="grid grid-cols-1 gap-2">
-                  {recoveryCodes.map((code) => (
-                    <div key={code} className="bg-background/50 p-2 rounded font-mono text-center border border-secondary/50">
-                      {code}
+    return (
+        <div className="w-full max-w-[420px]">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-8 py-10">
+                {/* Logo */}
+                <div className="flex justify-center mb-8">
+                    <div className="flex items-center gap-2 text-[#0085ff]">
+                        <Sparkles className="w-10 h-10 fill-[#0085ff]" />
                     </div>
-                  ))}
                 </div>
-              </div>
-              <button
-                onClick={() => router.push("/")}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-full transition-all text-lg"
-              >
-                I've saved them, let's go!
-              </button>
+
+                {step === 1 ? (
+                    <>
+                        {/* Header */}
+                        <h1 className="text-3xl font-extrabold text-heading text-center mb-1">Create Account</h1>
+                        <p className="text-secondary-text text-center mb-8">Join the AI social revolution.</p>
+
+                        {/* Error */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-lg text-sm mb-4">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* Form */}
+                        <form onSubmit={handleSignup} className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-secondary-text">Username</label>
+                                <div className="relative">
+                                    <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Choose a username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-secondary-text">Password</label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <input
+                                        type="password"
+                                        placeholder="Choose a password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center pt-4">
+                                <Link href="/signin" className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-2.5 px-6 text-sm">
+                                    Sign in instead
+                                </Link>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors disabled:opacity-50 py-2.5 px-8 flex items-center gap-2 text-sm"
+                                >
+                                    {isLoading ? "Creating..." : "Next"}
+                                    {!isLoading && <ArrowRight className="w-4 h-4" />}
+                                </button>
+                            </div>
+                        </form>
+                    </>
+                ) : (
+                    <div className="space-y-6">
+                        {/* Recovery Codes */}
+                        <div className="text-center">
+                            <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <ShieldCheck className="w-7 h-7 text-green-600" />
+                            </div>
+                            <h2 className="text-2xl font-extrabold text-heading mb-1">Recovery Codes</h2>
+                            <p className="text-sm text-secondary-text">Save these codes in a safe place. You&apos;ll need them if you lose access to your account.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2">
+                            {recoveryCodes.map((code) => (
+                                <div key={code} className="bg-[#f2f2f2] p-3 rounded-lg font-mono text-sm text-center text-heading border border-gray-200">
+                                    {code}
+                                </div>
+                            ))}
+                        </div>
+
+                        <button
+                            onClick={() => router.push("/")}
+                            className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors w-full py-3 text-base"
+                        >
+                            I&apos;ve saved them, let&apos;s go!
+                        </button>
+                    </div>
+                )}
             </div>
-          )}
+
+            {/* Footer */}
+            <p className="text-center text-xs text-secondary-text mt-6">
+                By creating an account, you agree to our{" "}
+                <span className="text-[#0085ff] hover:underline cursor-pointer">Terms of Service</span> and{" "}
+                <span className="text-[#0085ff] hover:underline cursor-pointer">Privacy Policy</span>.
+            </p>
         </div>
-      </div>
-    </div>
-  );
+    );
+}
+</file>
+
+<file path="frontend/src/app/(main)/layout.tsx">
+import Sidebar from "@/components/Sidebar";
+import RightSidebar from "@/components/RightSidebar";
+import MobileNav from "@/components/MobileNav";
+
+export default function MainLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <div className="flex justify-center min-h-screen">
+            <div className="flex w-full max-w-[1230px]">
+                {/* Left Sidebar - hidden on mobile */}
+                <div className="hidden md:flex">
+                    <Sidebar />
+                </div>
+
+                {/* Center Feed */}
+                <main className="flex-1 min-w-0 border-x border-gray-200 bg-white">
+                    {children}
+                </main>
+
+                {/* Right Sidebar - hidden below xl */}
+                <div className="hidden xl:flex">
+                    <RightSidebar />
+                </div>
+            </div>
+
+            {/* Mobile Bottom Nav */}
+            <MobileNav />
+        </div>
+    );
+}
+</file>
+
+<file path="frontend/src/app/(main)/page.tsx">
+import Feed from "@/components/Feed";
+
+export default function Home() {
+    return (
+        <Feed />
+    );
+}
+</file>
+
+<file path="frontend/src/app/(main)/profile/[username]/page.tsx">
+"use client";
+
+import { ArrowLeft, Calendar, Link as LinkIcon, MapPin, Loader2, MoreHorizontal, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState, use } from "react";
+import api from "@/utils/api";
+import { format } from "date-fns";
+
+export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
+    const { username } = use(params);
+    const [profile, setProfile] = useState<any>(null);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("Posts");
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const [profileRes, userRes] = await Promise.all([
+                    api.get(`/social/profiles/${username}`),
+                    api.get("/auth/me").catch(() => ({ data: null }))
+                ]);
+                setProfile(profileRes.data);
+                setCurrentUser(userRes.data);
+            } catch (err) {
+                console.error("Failed to fetch data", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [username]);
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center pt-20">
+                <Loader2 className="w-8 h-8 animate-spin text-[#0085ff]" />
+            </div>
+        );
+    }
+
+    if (!profile) {
+        return (
+            <div className="p-10 text-center">
+                <h1 className="text-2xl font-bold text-heading">User not found</h1>
+                <Link href="/" className="text-[#0085ff] hover:underline mt-2 inline-block">Go home</Link>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col">
+            {/* Sticky Header */}
+            <header className="sticky top-0 bg-white/85 backdrop-blur-md z-10 border-b border-gray-200 px-4 h-[53px] flex items-center gap-6">
+                <Link href="/" className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors">
+                    <ArrowLeft className="w-5 h-5 text-heading" />
+                </Link>
+                <div className="flex flex-col">
+                    <h2 className="text-lg font-bold text-heading leading-tight">{profile.username}</h2>
+                    <span className="text-xs text-secondary-text">{profile._count.posts} posts</span>
+                </div>
+            </header>
+
+            {/* Banner */}
+            <div className="aspect-[3/1] bg-gradient-to-br from-[#0085ff] via-[#6dd5ed] to-[#2193b0] relative">
+                {/* Avatar overlapping */}
+                <div className="absolute -bottom-12 left-4">
+                    <div className="w-[84px] h-[84px] rounded-full border-4 border-white bg-[#eff3f4] flex items-center justify-center text-3xl font-bold text-[#0085ff] overflow-hidden shadow-sm">
+                        {profile.profileImage ? (
+                            <img src={profile.profileImage} alt={profile.username} className="w-full h-full object-cover" />
+                        ) : (
+                            <span>{profile.username[0].toUpperCase()}</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Profile Info */}
+            <div className="pt-16 px-4 pb-3">
+                {/* Action buttons */}
+                <div className="flex justify-end gap-2 -mt-2 mb-3">
+                    {currentUser?.id === profile.id ? (
+                        <button className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-1.5 px-5 text-sm">
+                            Edit Profile
+                        </button>
+                    ) : (
+                        <>
+                            <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                                <MoreHorizontal className="w-4 h-4 text-heading" />
+                            </button>
+                            <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                                <MessageCircle className="w-4 h-4 text-heading" />
+                            </button>
+                            <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors py-1.5 px-5 text-sm">
+                                Follow
+                            </button>
+                        </>
+                    )}
+                </div>
+
+                {/* Name & Handle */}
+                <div className="mb-3">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-xl font-extrabold text-heading">{profile.username}</h1>
+                        {profile.isAi && (
+                            <span className="text-xs bg-blue-50 text-[#0085ff] px-2 py-0.5 rounded-full font-semibold">AI Persona</span>
+                        )}
+                    </div>
+                    <span className="text-secondary-text text-[15px]">@{profile.username}</span>
+                </div>
+
+                {/* Bio */}
+                <p className="text-heading text-[15px] leading-relaxed whitespace-pre-wrap mb-3">
+                    {profile.bio || "No bio yet."}
+                </p>
+
+                {/* Metadata */}
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-secondary-text text-sm mb-3">
+                    <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>Cyberspace</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <LinkIcon className="w-4 h-4" />
+                        <a href="#" className="text-[#0085ff] hover:underline">aether.social</a>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>Joined {format(new Date(profile.createdAt), "MMMM yyyy")}</span>
+                    </div>
+                </div>
+
+                {/* Stats */}
+                <div className="flex gap-4 text-sm">
+                    <div className="flex gap-1 hover:underline cursor-pointer">
+                        <span className="font-bold text-heading">0</span>
+                        <span className="text-secondary-text">followers</span>
+                    </div>
+                    <div className="flex gap-1 hover:underline cursor-pointer">
+                        <span className="font-bold text-heading">0</span>
+                        <span className="text-secondary-text">following</span>
+                    </div>
+                    <div className="flex gap-1">
+                        <span className="font-bold text-heading">{profile._count.posts}</span>
+                        <span className="text-secondary-text">posts</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="sticky top-[53px] bg-white z-[5] border-b border-gray-200 flex">
+                {["Posts", "Replies", "Media", "Likes"].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`flex-1 flex items-center justify-center text-sm h-[53px] transition-colors relative ${activeTab === tab
+                            ? "font-bold text-heading"
+                            : "font-medium text-secondary-text hover:text-heading hover:bg-gray-50"
+                            }`}
+                    >
+                        {tab}
+                        {activeTab === tab && (
+                            <div className="absolute bottom-0 w-14 h-1 bg-[#0085ff] rounded-full" />
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex flex-col min-h-[200px]">
+                <div className="p-12 text-center text-secondary-text">
+                    <p className="text-base">No posts to show yet.</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+</file>
+
+<file path="frontend/src/app/(main)/profile/page.tsx">
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { Loader2 } from "lucide-react";
+
+export default function ProfileIndex() {
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.replace(`/profile/${user.username}`);
+        }
+    }, [user, isLoading, router]);
+
+    return (
+        <div className="flex justify-center pt-20">
+            <Loader2 className="w-8 h-8 animate-spin text-[#0085ff]" />
+        </div>
+    );
+}
+</file>
+
+<file path="frontend/src/components/MobileNav.tsx">
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Search, Bell, User } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
+
+const mobileNavItems = [
+    { icon: Home, label: "Home", href: "/" },
+    { icon: Search, label: "Search", href: "/explore" },
+    { icon: Bell, label: "Notifications", href: "/notifications" },
+    { icon: User, label: "Profile", href: "/profile" },
+];
+
+export default function MobileNav() {
+    const pathname = usePathname();
+
+    return (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+            <div className="flex items-center justify-around h-14">
+                {mobileNavItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                                "flex flex-col items-center justify-center gap-0.5 p-2 transition-colors",
+                                isActive ? "text-[#0085ff]" : "text-gray-500"
+                            )}
+                        >
+                            <item.icon className={cn("w-6 h-6", isActive && "stroke-[2.5px]")} />
+                            <span className="text-[10px] font-medium">{item.label}</span>
+                        </Link>
+                    );
+                })}
+            </div>
+        </nav>
+    );
+}
+</file>
+
+<file path="frontend/src/context/AuthContext.tsx">
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { User } from "@/types";
+import api from "@/utils/api";
+import Cookies from "js-cookie";
+import { useRouter, usePathname } from "next/navigation";
+
+interface AuthContextType {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (token: string) => void;
+    logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const checkAuth = async () => {
+        const token = Cookies.get("token");
+        if (!token) {
+            setUser(null);
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            // Assuming there's an endpoint to get the current user
+            // Adjust the endpoint if necessary based on backend API
+            const response = await api.get("/auth/me");
+            setUser(response.data);
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            Cookies.remove("token");
+            setUser(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    const login = (token: string) => {
+        Cookies.set("token", token, { expires: 7 });
+        checkAuth();
+        router.push("/");
+    };
+
+    const logout = () => {
+        Cookies.remove("token");
+        setUser(null);
+        router.push("/signin");
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                isAuthenticated: !!user,
+                isLoading,
+                login,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
+}
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+};
+</file>
+
+<file path="frontend/src/middleware.ts">
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(request: NextRequest) {
+    const token = request.cookies.get("token")?.value;
+    const { pathname } = request.nextUrl;
+
+    // Public routes that don't require authentication
+    // Note: (auth) is a route group, so URLs are /signin and /signup (no /auth/ prefix)
+    const publicRoutes = ["/signin", "/signup"];
+    const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
+
+    // If user is authenticated and tries to access auth pages, redirect to home
+    if (token && isPublicRoute) {
+        return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    // If user is not authenticated and tries to access protected pages
+    if (!token && !isPublicRoute) {
+        return NextResponse.redirect(new URL("/signin", request.url));
+    }
+
+    return NextResponse.next();
+}
+
+export const config = {
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico, sitemap.xml, robots.txt
+         * - public folder content and static assets
+         */
+        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|public|static|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    ],
+};
+</file>
+
+<file path="frontend/src/types/index.ts">
+export interface User {
+    id: string;
+    username: string;
+    email?: string;
+    avatar?: string;
+}
+
+export interface AuthState {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
 }
 </file>
 
@@ -11378,541 +11886,6 @@ const config = {
 export default config;
 </file>
 
-<file path="frontend/src/app/layout.tsx">
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Sidebar from "@/components/Sidebar";
-import RightSidebar from "@/components/RightSidebar";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Aether - The AI Driven Social Network",
-  description: "A social network driven by autonomous AI personas.",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-background text-foreground flex justify-center`}>
-        <div className="flex w-full max-w-7xl">
-          <Sidebar />
-          <main className="flex-1 flex flex-col min-w-0">
-            {children}
-          </main>
-          <RightSidebar />
-        </div>
-      </body>
-    </html>
-  );
-}
-</file>
-
-<file path="frontend/src/app/page.tsx">
-import Feed from "@/components/Feed";
-
-export default function Home() {
-  return (
-    <Feed />
-  );
-}
-</file>
-
-<file path="frontend/src/app/profile/[username]/page.tsx">
-"use client";
-
-import { ArrowLeft, Calendar, Link as LinkIcon, MapPin, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState, use } from "react";
-import api from "@/utils/api";
-import { format } from "date-fns";
-
-export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
-  const { username } = use(params);
-  const [profile, setProfile] = useState<any>(null);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("Posts");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [profileRes, userRes] = await Promise.all([
-          api.get(`/social/profiles/${username}`),
-          api.get("/auth/me").catch(() => ({ data: null }))
-        ]);
-        setProfile(profileRes.data);
-        setCurrentUser(userRes.data);
-      } catch (err) {
-        console.error("Failed to fetch data", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, [username]);
-
-  if (isLoading) {
-    return (
-      <div className="flex-1 max-w-2xl border-r border-secondary/50 flex justify-center pt-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="flex-1 max-w-2xl border-r border-secondary/50 p-10 text-center">
-        <h1 className="text-2xl font-bold">User not found</h1>
-        <Link href="/" className="text-primary hover:underline">Go home</Link>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-1 max-w-2xl border-r border-secondary/50">
-      <header className="sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-secondary/50 p-2 px-4 flex items-center gap-6">
-        <Link href="/" className="p-2 hover:bg-secondary rounded-full transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div className="flex flex-col">
-          <h2 className="text-xl font-bold">{profile.username}</h2>
-          <span className="text-sm text-gray-500">{profile._count.posts} posts</span>
-        </div>
-      </header>
-
-      <div className="h-48 bg-secondary/50 relative">
-        <div className="absolute -bottom-16 left-4 w-32 h-32 rounded-3xl border-4 border-background bg-secondary flex items-center justify-center text-4xl font-bold text-white overflow-hidden shadow-xl">
-          {profile.profileImage ? (
-            <img src={profile.profileImage} alt={profile.username} className="w-full h-full object-cover" />
-          ) : (
-            <span>{profile.username[0].toUpperCase()}</span>
-          )}
-        </div>
-      </div>
-
-      <div className="pt-20 px-4 flex flex-col gap-4">
-        <div className="flex justify-end">
-          {currentUser?.id === profile.id ? (
-            <button className="border border-secondary font-bold py-2 px-6 rounded-xl hover:bg-secondary transition-colors">
-              Edit Profile
-            </button>
-          ) : (
-            <button className="bg-foreground text-background font-bold py-2 px-6 rounded-xl hover:bg-foreground/90 transition-colors">
-              Follow
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-black">{profile.username}</h1>
-          <span className="text-gray-500 text-lg">@{profile.username}</span>
-        </div>
-
-        <p className="text-foreground whitespace-pre-wrap">
-          {profile.bio || "No bio yet."}
-          {profile.isAi && (
-            <span className="ml-2 bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full font-bold">AI</span>
-          )}
-        </p>
-
-        <div className="flex flex-wrap gap-4 text-gray-500 text-sm">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" />
-            <span>Cyberspace</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <LinkIcon className="w-4 h-4" />
-            <a href="#" className="text-primary hover:underline">aether.social</a>
-          </div>
-          <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            <span>Joined {format(new Date(profile.createdAt), "MMMM yyyy")}</span>
-          </div>
-        </div>
-
-        <div className="flex gap-4">
-          <div className="flex gap-1 hover:underline cursor-pointer">
-            <span className="font-bold">0</span>
-            <span className="text-gray-500">Following</span>
-          </div>
-          <div className="flex gap-1 hover:underline cursor-pointer">
-            <span className="font-bold">0</span>
-            <span className="text-gray-500">Followers</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 border-b border-secondary/50 flex">
-        {["Posts", "Replies", "Media", "Likes"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 flex items-center justify-center font-bold text-sm h-14 border-b-4 transition-colors ${
-              activeTab === tab ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-foreground"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-col">
-        <div className="p-8 text-center text-gray-500">
-          No posts to show yet.
-        </div>
-      </div>
-    </div>
-  );
-}
-</file>
-
-<file path="frontend/src/components/Feed.tsx">
-"use client";
-
-import { MessageCircle, Repeat2, Heart, Share2, MoreHorizontal, Image as ImageIcon, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import api from "@/utils/api";
-import { formatDistanceToNow } from "date-fns";
-
-export default function Feed() {
-  const [activeTab, setActiveTab] = useState("Discover");
-  const [posts, setPosts] = useState<any[]>([]);
-  const [content, setContent] = useState("");
-  const [isPosting, setIsPosting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
-  const fetchFeed = async () => {
-    setIsLoading(true);
-    try {
-      const [postsRes, userRes] = await Promise.all([
-        api.get("/social/posts"),
-        api.get("/auth/me").catch(() => ({ data: null }))
-      ]);
-      setPosts(postsRes.data);
-      setCurrentUser(userRes.data);
-    } catch (err) {
-      console.error("Failed to fetch feed", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFeed();
-  }, []);
-
-  const handlePost = async () => {
-    if (!content.trim()) return;
-    setIsPosting(true);
-    try {
-      await api.post("/social/posts", { content });
-      setContent("");
-      fetchFeed();
-    } catch (err) {
-      console.error("Failed to post", err);
-    } finally {
-      setIsPosting(false);
-    }
-  };
-
-  const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
-    try {
-      await api.post("/social/interact", { postId, type });
-      // Update local state or re-fetch
-      setPosts(prev => prev.map(post => {
-        if (post.id === postId) {
-          return {
-            ...post,
-            _count: {
-              ...post._count,
-              interactions: type === "LIKE" ? post._count.interactions + 1 : post._count.interactions
-            }
-          };
-        }
-        return post;
-      }));
-    } catch (err) {
-      console.error("Failed to interact", err);
-    }
-  };
-
-  return (
-    <div className="flex-1 max-w-2xl border-r border-secondary/50">
-      <header className="sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-secondary/50">
-        <div className="flex items-center justify-around h-14">
-          {["Discover", "Following", "Video"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 flex items-center justify-center font-bold text-sm h-full border-b-4 transition-colors ${
-                activeTab === tab ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-foreground"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </header>
-
-      <div className="p-4 flex gap-4 border-b border-secondary/50">
-        <div className="w-12 h-12 bg-secondary rounded-2xl flex-shrink-0 flex items-center justify-center font-bold overflow-hidden shadow-sm">
-          {currentUser?.profileImage ? (
-            <img src={currentUser.profileImage} alt={currentUser.username} className="w-full h-full object-cover" />
-          ) : (
-            <span>{currentUser?.username?.[0] || "@"}</span>
-          )}
-        </div>
-        <div className="flex-1 flex flex-col gap-4">
-          <textarea
-            placeholder="What's up?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="bg-transparent border-none text-xl resize-none outline-none focus:ring-0 placeholder:text-gray-600 min-h-[100px]"
-          />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button className="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors">
-                <ImageIcon className="w-5 h-5" />
-              </button>
-            </div>
-            <button
-              onClick={handlePost}
-              disabled={isPosting || !content.trim()}
-              className="bg-primary text-white font-bold py-2 px-6 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              {isPosting && <Loader2 className="w-4 h-4 animate-spin" />}
-              Post
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-col">
-        {isLoading ? (
-          <div className="p-10 flex justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="p-10 text-center text-gray-500">
-            No posts found. Start the conversation!
-          </div>
-        ) : (
-          posts.map((post) => (
-            <div key={post.id} className="p-4 border-b border-secondary/50 hover:bg-secondary/10 transition-colors cursor-pointer group">
-              <div className="flex gap-4">
-                <div className="w-12 h-12 bg-secondary rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
-                  {post.user.profileImage ? (
-                    <img src={post.user.profileImage} alt={post.user.username} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="font-bold uppercase text-primary">{post.user.username[0]}</span>
-                  )}
-                </div>
-                <div className="flex-1 flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="font-bold hover:underline">{post.user.username}</span>
-                      <span className="text-gray-500 text-sm">@{post.user.username}</span>
-                      <span className="text-gray-500 text-sm">· {formatDistanceToNow(new Date(post.createdAt))}</span>
-                    </div>
-                    <MoreHorizontal className="w-5 h-5 text-gray-500" />
-                  </div>
-                  <p className="text-foreground whitespace-pre-wrap">{post.content}</p>
-                  <div className="flex items-center justify-between mt-4 text-gray-500 max-w-md">
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-primary transition-colors">
-                      <div className="p-2 rounded-full group-hover/icon:bg-primary/10">
-                        <MessageCircle className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">{post._count.children}</span>
-                    </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-green-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}>
-                      <div className="p-2 rounded-full group-hover/icon:bg-green-500/10">
-                        <Repeat2 className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">0</span>
-                    </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-red-500 transition-colors" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}>
-                      <div className="p-2 rounded-full group-hover/icon:bg-red-500/10">
-                        <Heart className="w-5 h-5" />
-                      </div>
-                      <span className="text-sm">{post._count.interactions}</span>
-                    </div>
-                    <div className="flex items-center gap-2 group/icon cursor-pointer hover:text-primary transition-colors">
-                      <div className="p-2 rounded-full group-hover/icon:bg-primary/10">
-                        <Share2 className="w-5 h-5" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-</file>
-
-<file path="frontend/src/components/RightSidebar.tsx">
-"use client";
-
-import { Search, TrendingUp, MoreHorizontal } from "lucide-react";
-
-export default function RightSidebar() {
-  return (
-    <aside className="w-80 h-screen sticky top-0 hidden lg:flex flex-col gap-4 px-4 py-4 border-l border-secondary/50">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
-        </div>
-        <input
-          type="text"
-          placeholder="Search"
-          className="block w-full pl-10 pr-3 py-2 border-none rounded-full bg-secondary text-foreground focus:ring-1 focus:ring-primary focus:bg-background transition-colors"
-        />
-      </div>
-
-      <div className="bg-secondary/50 rounded-3xl p-6 border border-secondary/50">
-        <h2 className="text-xl font-black mb-6">Trending</h2>
-        <div className="space-y-6">
-          {[
-            { topic: "AI & Future", tag: "#AetherLoop", posts: "42.1k" },
-            { topic: "Gaming", tag: "CyberConnect", posts: "12.5k" },
-            { topic: "Music", tag: "LofiPersonas", posts: "8.2k" },
-            { topic: "Technology", tag: "OllamaLocal", posts: "5.4k" },
-          ].map((item, i) => (
-            <div key={i} className="flex justify-between items-start group cursor-pointer">
-              <div className="flex flex-col">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">{item.topic}</span>
-                <span className="font-bold text-lg group-hover:text-primary transition-colors">{item.tag}</span>
-                <span className="text-sm text-gray-500">{item.posts} interactions</span>
-              </div>
-              <MoreHorizontal className="w-5 h-5 text-gray-500 group-hover:text-primary transition-colors" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-secondary/50 rounded-3xl p-6 border border-secondary/50">
-        <h2 className="text-xl font-black mb-6">Who to follow</h2>
-        <div className="space-y-6">
-          {[
-            { name: "Nova AI", handle: "@nova_aether", category: "Moderator" },
-            { name: "Echo Persona", handle: "@echo_loop", category: "Creator" },
-            { name: "Zenith Bot", handle: "@zenith_ai", category: "News" },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between group">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center font-bold text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                  {item.name[0]}
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-sm">{item.name}</span>
-                    <span className="text-[10px] bg-secondary px-1 rounded text-gray-400 font-bold uppercase">{item.category}</span>
-                  </div>
-                  <span className="text-xs text-gray-500">{item.handle}</span>
-                </div>
-              </div>
-              <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-xl text-xs font-black transition-all">
-                Follow
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <footer className="text-xs text-gray-500 px-4 mt-auto">
-        <div className="flex flex-wrap gap-2">
-          <span>Terms of Service</span>
-          <span>Privacy Policy</span>
-          <span>Cookie Policy</span>
-          <span>Accessibility</span>
-          <span>Ads info</span>
-          <span>More...</span>
-          <span>© 2026 Aether, Inc.</span>
-        </div>
-      </footer>
-    </aside>
-  );
-}
-</file>
-
-<file path="frontend/src/components/Sidebar.tsx">
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, Search, Bell, Mail, Hash, List, Bookmark, User, Settings, PlusCircle, Sparkles } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-const navItems = [
-  { icon: Home, label: "Home", href: "/" },
-  { icon: Search, label: "Explore", href: "/explore" },
-  { icon: Bell, label: "Notifications", href: "/notifications" },
-  { icon: Mail, label: "Chat", href: "/chat" },
-  { icon: Hash, label: "Feeds", href: "/feeds" },
-  { icon: List, label: "Lists", href: "/lists" },
-  { icon: Bookmark, label: "Saved", href: "/saved" },
-  { icon: User, label: "Profile", href: "/profile" },
-  { icon: Settings, label: "Settings", href: "/settings" },
-];
-
-export default function Sidebar() {
-  const pathname = usePathname();
-
-  return (
-    <aside className="w-64 flex flex-col h-screen sticky top-0 border-r border-secondary/50 px-4 py-4">
-      <div className="mb-6 px-4">
-        <Link href="/">
-          <div className="flex items-center gap-2 text-primary">
-            <Sparkles className="w-8 h-8 fill-primary" />
-            <span className="text-2xl font-black tracking-tighter">AETHER</span>
-          </div>
-        </Link>
-      </div>
-
-      <nav className="flex-1 space-y-1">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-4 px-4 py-3 rounded-full text-lg transition-colors hover:bg-secondary",
-                isActive ? "font-bold" : "font-normal"
-              )}
-            >
-              <item.icon className="w-6 h-6" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      <button className="mt-4 bg-primary text-white rounded-full py-3 px-6 flex items-center justify-center gap-2 font-bold hover:bg-primary/90 transition-colors">
-        <PlusCircle className="w-6 h-6" />
-        <span>New Post</span>
-      </button>
-    </aside>
-  );
-}
-</file>
-
 <file path="frontend/src/utils/api.ts">
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -11935,31 +11908,6 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
-</file>
-
-<file path="frontend/tailwind.config.ts">
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        primary: "var(--primary)",
-        accent: "var(--accent)",
-        secondary: "var(--secondary)",
-      },
-    },
-  },
-  plugins: [],
-};
-export default config;
 </file>
 
 <file path="backend/src/controllers/auth.controller.ts">
@@ -12309,24 +12257,441 @@ export class SocialService {
 }
 </file>
 
-<file path="frontend/src/app/globals.css">
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+<file path="frontend/src/app/layout.tsx">
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 
-:root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --primary: #6366f1;
-  --accent: #10b981;
-  --secondary: #1e293b;
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Aether - The AI Driven Social Network",
+  description: "A social network driven by autonomous AI personas.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} min-h-screen bg-[#f2f2f2] text-slate-900 antialiased`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+</file>
+
+<file path="frontend/src/components/Feed.tsx">
+"use client";
+
+import { MessageCircle, Repeat2, Heart, Share2, MoreHorizontal, Image as ImageIcon, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import api from "@/utils/api";
+import { formatDistanceToNow } from "date-fns";
+
+export default function Feed() {
+  const [activeTab, setActiveTab] = useState("Discover");
+  const [posts, setPosts] = useState<any[]>([]);
+  const [content, setContent] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  const fetchFeed = async () => {
+    setIsLoading(true);
+    try {
+      const [postsRes, userRes] = await Promise.all([
+        api.get("/social/posts"),
+        api.get("/auth/me").catch(() => ({ data: null }))
+      ]);
+      setPosts(postsRes.data);
+      setCurrentUser(userRes.data);
+    } catch (err) {
+      console.error("Failed to fetch feed", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFeed();
+  }, []);
+
+  const handlePost = async () => {
+    if (!content.trim()) return;
+    setIsPosting(true);
+    try {
+      await api.post("/social/posts", { content });
+      setContent("");
+      fetchFeed();
+    } catch (err) {
+      console.error("Failed to post", err);
+    } finally {
+      setIsPosting(false);
+    }
+  };
+
+  const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
+    try {
+      await api.post("/social/interact", { postId, type });
+      setPosts(prev => prev.map(post => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            _count: {
+              ...post._count,
+              interactions: type === "LIKE" ? post._count.interactions + 1 : post._count.interactions
+            }
+          };
+        }
+        return post;
+      }));
+    } catch (err) {
+      console.error("Failed to interact", err);
+    }
+  };
+
+  return (
+    <div className="flex flex-col">
+      {/* Tab Header */}
+      <header className="sticky top-0 bg-white/85 backdrop-blur-md z-10 border-b border-gray-200">
+        <div className="flex items-center justify-around h-[53px]">
+          {["Discover", "Following", "Video"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 flex items-center justify-center text-sm h-full transition-colors relative ${activeTab === tab
+                ? "font-bold text-heading"
+                : "font-medium text-secondary-text hover:text-heading hover:bg-gray-50"
+                }`}
+            >
+              {tab}
+              {activeTab === tab && (
+                <div className="absolute bottom-0 w-14 h-1 bg-[#0085ff] rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* Compose Area */}
+      <div className="px-4 py-3 flex gap-3 border-b border-gray-200">
+        <div className="w-11 h-11 bg-[#0085ff] rounded-full flex-shrink-0 flex items-center justify-center font-bold text-white text-sm overflow-hidden">
+          {currentUser?.profileImage ? (
+            <img src={currentUser.profileImage} alt={currentUser.username} className="w-full h-full object-cover" />
+          ) : (
+            <span>{currentUser?.username?.[0]?.toUpperCase() || "@"}</span>
+          )}
+        </div>
+        <div className="flex-1 flex flex-col">
+          <textarea
+            placeholder="What's up?"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="bg-transparent text-lg resize-none outline-none border-none placeholder:text-secondary-text min-h-[80px] py-2 text-heading"
+          />
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-1">
+              <button className="text-[#0085ff] hover:bg-blue-50 p-2 rounded-full transition-colors">
+                <ImageIcon className="w-5 h-5" />
+              </button>
+            </div>
+            <button
+              onClick={handlePost}
+              disabled={isPosting || !content.trim()}
+              className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors disabled:opacity-50 text-sm py-1.5 px-5 flex items-center gap-2"
+            >
+              {isPosting && <Loader2 className="w-4 h-4 animate-spin" />}
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Posts Feed */}
+      <div className="flex flex-col">
+        {isLoading ? (
+          <div className="p-10 flex justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-[#0085ff]" />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="p-14 text-center text-secondary-text">
+            <p className="text-lg font-medium">No posts yet</p>
+            <p className="text-sm mt-1">Start the conversation!</p>
+          </div>
+        ) : (
+          posts.map((post) => (
+            <article key={post.id} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
+              <div className="flex gap-3">
+                {/* Avatar */}
+                <div className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">
+                  {post.user.profileImage ? (
+                    <img src={post.user.profileImage} alt={post.user.username} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-bold uppercase text-[#0085ff] text-sm">{post.user.username[0]}</span>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  {/* Header */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    <span className="font-bold text-heading text-[15px] hover:underline">{post.user.username}</span>
+                    {post.user.isAi && (
+                      <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
+                    )}
+                    <span className="text-secondary-text text-[15px]">@{post.user.username}</span>
+                    <span className="text-secondary-text text-[15px]">·</span>
+                    <span className="text-secondary-text text-[15px] hover:underline">{formatDistanceToNow(new Date(post.createdAt))}</span>
+                    <div className="ml-auto">
+                      <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+
+                  {/* Post text */}
+                  <p className="text-heading text-[15px] leading-relaxed mt-0.5 whitespace-pre-wrap">{post.content}</p>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
+                    {/* Reply */}
+                    <div className="flex items-center gap-0.5 group/action cursor-pointer">
+                      <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                        <MessageCircle className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                      </div>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors">{post._count.children || ""}</span>
+                    </div>
+
+                    {/* Retweet */}
+                    <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}>
+                      <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
+                        <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
+                      </div>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors">0</span>
+                    </div>
+
+                    {/* Like */}
+                    <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}>
+                      <div className="p-2 rounded-full group-hover/action:bg-pink-50 transition-colors">
+                        <Heart className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
+                      </div>
+                      <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{post._count.interactions || ""}</span>
+                    </div>
+
+                    {/* Share */}
+                    <div className="flex items-center group/action cursor-pointer">
+                      <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                        <Share2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/components/RightSidebar.tsx">
+"use client";
+
+import { Search, TrendingUp, MoreHorizontal } from "lucide-react";
+
+export default function RightSidebar() {
+  return (
+    <aside className="w-[350px] h-screen sticky top-0 flex flex-col gap-4 px-6 py-3 overflow-y-auto">
+      {/* Search Bar */}
+      <div className="relative mt-1">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <Search className="h-4 w-4 text-secondary-text" />
+        </div>
+        <input
+          type="text"
+          placeholder="Search"
+          className="block w-full pl-11 pr-4 py-2.5 rounded-full bg-[#eff3f4] text-heading text-sm placeholder:text-secondary-text border-none outline-none focus:ring-2 focus:ring-[#0085ff] focus:bg-white transition-all"
+        />
+      </div>
+
+      {/* Trending */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Trending</h2>
+        <div>
+          {[
+            { topic: "AI & Future", tag: "#AetherLoop", posts: "42.1k" },
+            { topic: "Gaming", tag: "CyberConnect", posts: "12.5k" },
+            { topic: "Music", tag: "LofiPersonas", posts: "8.2k" },
+            { topic: "Technology", tag: "OllamaLocal", posts: "5.4k" },
+          ].map((item, i) => (
+            <div key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
+              <div className="flex flex-col">
+                <span className="text-xs text-secondary-text">{item.topic}</span>
+                <span className="font-bold text-heading text-[15px]">{item.tag}</span>
+                <span className="text-xs text-secondary-text">{item.posts} interactions</span>
+              </div>
+              <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text mt-1" />
+            </div>
+          ))}
+        </div>
+        <div className="px-4 py-3 text-[#0085ff] text-sm hover:bg-gray-50 transition-colors cursor-pointer">
+          Show more
+        </div>
+      </div>
+
+      {/* Who to follow */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
+        <div>
+          {[
+            { name: "Nova AI", handle: "@nova_aether", category: "Moderator" },
+            { name: "Echo Persona", handle: "@echo_loop", category: "Creator" },
+            { name: "Zenith Bot", handle: "@zenith_ai", category: "News" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#0085ff] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {item.name[0]}
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-heading text-sm hover:underline cursor-pointer">{item.name}</span>
+                    <span className="text-[10px] bg-[#eff3f4] px-1.5 py-0.5 rounded text-secondary-text font-semibold uppercase">{item.category}</span>
+                  </div>
+                  <span className="text-xs text-secondary-text">{item.handle}</span>
+                </div>
+              </div>
+              <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4">
+                Follow
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="px-4 py-3 text-[#0085ff] text-sm hover:bg-gray-50 transition-colors cursor-pointer">
+          Show more
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="text-xs text-secondary-text px-1 mt-auto pb-4">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+          <span className="hover:underline cursor-pointer">Terms of Service</span>
+          <span className="hover:underline cursor-pointer">Privacy Policy</span>
+          <span className="hover:underline cursor-pointer">Cookie Policy</span>
+          <span className="hover:underline cursor-pointer">Accessibility</span>
+          <span className="hover:underline cursor-pointer">Ads info</span>
+          <span>© 2026 Aether, Inc.</span>
+        </div>
+      </footer>
+    </aside>
+  );
+}
+</file>
+
+<file path="frontend/src/components/Sidebar.tsx">
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Search, Bell, MessageCircle, Hash, List, Bookmark, User, Settings, SquarePen, Sparkles } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+const navItems = [
+  { icon: Home, label: "Home", href: "/" },
+  { icon: Search, label: "Explore", href: "/explore" },
+  { icon: Bell, label: "Notifications", href: "/notifications" },
+  { icon: MessageCircle, label: "Chat", href: "/chat" },
+  { icon: Hash, label: "Feeds", href: "/feeds" },
+  { icon: List, label: "Lists", href: "/lists" },
+  { icon: Bookmark, label: "Saved", href: "/saved" },
+  { icon: User, label: "Profile", href: "/profile" },
+  { icon: Settings, label: "Settings", href: "/settings" },
+];
+
+export default function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="w-[72px] xl:w-[275px] flex flex-col h-screen sticky top-0 py-2 px-2 xl:px-4">
+      {/* Logo */}
+      <div className="mb-2 flex justify-center xl:justify-start xl:px-3 py-3">
+        <Link href="/" className="flex items-center gap-2 text-[#0085ff] hover:opacity-80 transition-opacity">
+          <Sparkles className="w-8 h-8 fill-[#0085ff]" />
+          <span className="text-xl font-black tracking-tight hidden xl:inline">AETHER</span>
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-0.5">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-4 px-3 xl:px-4 py-3 rounded-full text-[15px] transition-colors hover:bg-gray-100",
+                "justify-center xl:justify-start",
+                isActive ? "font-bold text-heading" : "font-normal text-heading"
+              )}
+            >
+              <item.icon className={cn("w-[26px] h-[26px]", isActive && "stroke-[2.5px]")} />
+              <span className="hidden xl:inline">{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* New Post Button */}
+      <div className="mt-2 mb-4 px-1 xl:px-0">
+        <button className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors w-full py-3 flex items-center justify-center gap-2 text-[17px]">
+          <SquarePen className="w-5 h-5 xl:hidden" />
+          <span className="hidden xl:inline">New Post</span>
+        </button>
+      </div>
+    </aside>
+  );
 }
+</file>
+
+<file path="frontend/tailwind.config.ts">
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        sky: {
+          DEFAULT: "#0085ff",
+          hover: "#006fd6",
+        },
+        shell: "#f2f2f2",
+        heading: "#0f1419",
+        "secondary-text": "#536471",
+        card: "#ffffff",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
 </file>
 
 <file path="backend/prisma/schema.prisma">
@@ -12446,6 +12811,32 @@ app.get('/health', (req, res) => {
 });
 
 export default app;
+</file>
+
+<file path="frontend/src/app/globals.css">
+@import "tailwindcss";
+
+@theme {
+  --color-sky: #0085ff;
+  --color-sky-hover: #006fd6;
+  --color-shell: #f2f2f2;
+  --color-heading: #0f1419;
+  --color-secondary-text: #536471;
+  --color-card: #ffffff;
+}
+
+body {
+  background-color: #f2f2f2;
+  color: #0f1419;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 0px;
+}
 </file>
 
 </files>

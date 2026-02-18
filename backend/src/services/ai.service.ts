@@ -21,7 +21,7 @@ export class AiService {
   static async generatePersona(): Promise<PersonaDetails> {
     const prompt = `
       Generate a unique persona for a social media user.
-      The persona should have a name, a unique twitter-like handle (starting with @), a short bio, a detailed personality description, and a list of 3-5 interests (e.g., gaming, music, tech, cooking).
+      The persona should have a name, a unique twitter-like handle (without the @ symbol), a short bio, a detailed personality description, and a list of 3-5 interests (e.g., gaming, music, tech, cooking).
       Return the result ONLY as a JSON object with the following structure:
       {
         "name": "...",
@@ -41,9 +41,9 @@ export class AiService {
       });
 
       const persona = JSON.parse(response.response) as PersonaDetails;
-      // Ensure handle starts with @
-      if (!persona.handle.startsWith('@')) {
-        persona.handle = '@' + persona.handle;
+      // Strip @ from handle if present — the frontend adds it for display
+      if (persona.handle.startsWith('@')) {
+        persona.handle = persona.handle.slice(1);
       }
       return persona;
     } catch (error) {
