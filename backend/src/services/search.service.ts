@@ -1,21 +1,25 @@
 import 'dotenv/config';
+import { SearchPlan } from './ai.service.js';
 
 export class SearchService {
   private static SEARXNG_URL = process.env.SEARXNG_URL || 'http://localhost:8888';
 
   /**
-   * Searches for current events based on a query.
-   * Uses a self-hosted SearXNG instance.
+   * Searches using a self-hosted SearXNG instance.
+   * Accepts a SearchPlan with query, categories, and time_range.
    */
-  static async search(query: string): Promise<string> {
+  static async search(plan: SearchPlan): Promise<string> {
     try {
       const params = new URLSearchParams({
-        q: query,
+        q: plan.query,
         format: 'json',
-        categories: 'general,news',
+        categories: plan.categories.join(','),
         language: 'en',
-        time_range: 'month',
       });
+
+      if (plan.time_range) {
+        params.set('time_range', plan.time_range);
+      }
 
       const response = await fetch(`${this.SEARXNG_URL}/search?${params.toString()}`);
 
@@ -33,10 +37,10 @@ export class SearchService {
           .join('\n\n');
       }
 
-      return `No recent news found for ${query}`;
+      return `No recent news found for ${plan.query}`;
     } catch (error) {
       console.error('Error in SearchService:', error);
-      return `Search failed for ${query}`;
+      return `Search failed for ${plan.query}`;
     }
   }
 }

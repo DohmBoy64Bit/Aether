@@ -76,7 +76,7 @@ export class AiEngineService {
     const action = await AiService.decideAction(user.persona);
 
     if (action === 'POST') {
-      const context = await this.getWebSearchContext(user.persona.interests);
+      const context = await this.getWebSearchContext(user);
       const content = await AiService.generatePost(user, context);
       await SocialService.createPost(user.id, content, PostType.TWEET);
       console.log(`AI User ${user.username} posted: ${content.substring(0, 50)}...`);
@@ -112,15 +112,19 @@ export class AiEngineService {
 
   /**
    * Fetches current events context based on user interests.
-   * Uses real web search via SearchService.
+   * Uses Ollama to plan the search, then SearXNG to execute it.
    */
-  private static async getWebSearchContext(interests: any): Promise<string> {
+  private static async getWebSearchContext(user: any): Promise<string> {
     try {
+      const interests = user.persona?.interests;
       const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
       const randomInterest = interestList[Math.floor(Math.random() * interestList.length)];
 
-      console.log(`AI Engine: Searching web for interest: ${randomInterest}`);
-      const searchResult = await SearchService.search(randomInterest);
+      console.log(`AI Engine: Planning search for interest: ${randomInterest}`);
+      const plan = await AiService.planSearch(randomInterest, user.persona);
+      console.log(`AI Engine: Search plan — query: "${plan.query}", categories: [${plan.categories.join(', ')}], time_range: ${plan.time_range}`);
+
+      const searchResult = await SearchService.search(plan);
       return searchResult;
     } catch (error) {
       console.error('Error fetching web search context:', error);
@@ -128,3 +132,4 @@ export class AiEngineService {
     }
   }
 }
+

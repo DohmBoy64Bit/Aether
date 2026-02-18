@@ -14,6 +14,20 @@ export interface PersonaDetails {
   interests: string[];
 }
 
+export interface SearchPlan {
+  query: string;
+  categories: string[];
+  time_range: string | null;
+}
+
+const SEARXNG_CATEGORIES = [
+  'general', 'videos', 'social media', 'images', 'music', 'packages', 'it',
+  'files', 'books', 'news', 'apps', 'software wikis', 'science',
+  'scientific publications', 'web', 'repos', 'other', 'currency', 'icons',
+  'weather', 'map', 'dictionaries', 'shopping', 'lyrics', 'cargo', 'movies',
+  'translate', 'radio', 'q&a', 'wikimedia', 'define'
+];
+
 export class AiService {
   /**
    * Generates a unique persona using Ollama.
@@ -151,5 +165,60 @@ export class AiService {
     if (rand < 0.1) return 'POST';
     if (rand < 0.2) return 'REPLY';
     return 'IDLE';
+  }
+
+  /**
+   * Plans a search query for SearXNG based on an interest and persona.
+   * Returns a crafted query, relevant categories, and time range.
+   */
+  static async planSearch(interest: string, persona: any): Promise<SearchPlan> {
+    const prompt = `
+      You are planning a web search for a social media user.
+      Their personality: ${persona?.personality || 'general internet user'}
+      Their interest topic: "${interest}"
+
+      Available SearXNG search categories: ${SEARXNG_CATEGORIES.join(', ')}
+
+      Based on the interest and personality, create a search plan:
+      1. "query": A natural, specific search query that would find interesting/trending content about this topic. Make it something a real person would search for.
+      2. "categories": An array of 2-5 of the most relevant categories from the list above.
+      3. "time_range": One of "day", "month", "year", or null. Use "day" or "month" for trending/current topics, "year" for broader topics, and null for timeless/historical topics.
+
+      Return ONLY a JSON object with these three fields.
+    `;
+
+    try {
+      const response = await ollama.generate({
+        model: MODEL,
+        prompt: prompt,
+        format: 'json',
+        stream: false,
+      });
+
+      const plan = JSON.parse(response.response) as SearchPlan;
+
+      // Validate categories — only keep ones that actually exist
+      plan.categories = (plan.categories || []).filter(
+        (c: string) => SEARXNG_CATEGORIES.includes(c.toLowerCase())
+      );
+      if (plan.categories.length === 0) {
+        plan.categories = ['general', 'news'];
+      }
+
+      // Validate time_range
+      if (plan.time_range && !['day', 'month', 'year'].includes(plan.time_range)) {
+        plan.time_range = null;
+      }
+
+      // Ensure query is a non-empty string
+      if (!plan.query || typeof plan.query !== 'string' || plan.query.trim().length === 0) {
+        plan.query = interest;
+      }
+
+      return plan;
+    } catch (error) {
+      console.error('Error planning search:', error);
+      return { query: interest, categories: ['general', 'news'], time_range: null };
+    }
   }
 }

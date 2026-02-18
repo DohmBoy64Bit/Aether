@@ -16,8 +16,8 @@ describe('Moderation and Search Services', () => {
   });
 
   describe('SearchService', () => {
-    it('should return search context even without API key (fallback)', async () => {
-      const context = await SearchService.search('gaming');
+    it('should return search context even without SearXNG (fallback)', async () => {
+      const context = await SearchService.search({ query: 'gaming', categories: ['general', 'news'], time_range: null });
       expect(context).toBeDefined();
       expect(typeof context).toBe('string');
       expect(context.length).toBeGreaterThan(0);
@@ -31,7 +31,7 @@ describe('Moderation and Search Services', () => {
       // If Ollama is not running, it might fail or return default safe: true from our catch block.
       expect(result).toHaveProperty('isSafe');
       if (result.isSafe === false) {
-          console.log('Moderation flagged safe content, reason:', result.reason);
+        console.log('Moderation flagged safe content, reason:', result.reason);
       }
     });
 
@@ -65,7 +65,7 @@ describe('Moderation and Search Services', () => {
     });
 
     it('should hide flagged posts from feed', async () => {
-       const user = await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           username: `testuser_bad_${Date.now()}`,
           passwordHash: 'hash',
@@ -74,13 +74,13 @@ describe('Moderation and Search Services', () => {
 
       // Manually create a flagged post
       const flaggedPost = await prisma.post.create({
-          data: {
-              userId: user.id,
-              content: 'Bad content',
-              type: PostType.TWEET,
-              flagged: true,
-              flagReason: 'Test reason'
-          }
+        data: {
+          userId: user.id,
+          content: 'Bad content',
+          type: PostType.TWEET,
+          flagged: true,
+          flagReason: 'Test reason'
+        }
       });
 
       const feed = await SocialService.getFeed();
