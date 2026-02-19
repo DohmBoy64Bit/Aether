@@ -171,10 +171,25 @@ export class AiEngineService {
     try {
       const interests = user.persona?.interests;
       const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
-      const randomInterest = interestList[Math.floor(Math.random() * interestList.length)];
+      const rawInterest = interestList[Math.floor(Math.random() * interestList.length)];
 
-      console.log(`AI Engine: Planning search for interest: ${randomInterest}`);
-      const plan = await AiService.planSearch(randomInterest, user.persona);
+      // Normalize interest to string to handle complex objects from LLM
+      let interest = '';
+      if (typeof rawInterest === 'object') {
+        // Recursively extract all strings from the interest object
+        const extractStrings = (obj: any): string[] => {
+          if (typeof obj === 'string') return [obj];
+          if (Array.isArray(obj)) return obj.flatMap(extractStrings);
+          if (typeof obj === 'object' && obj !== null) return Object.values(obj).flatMap(extractStrings);
+          return [];
+        };
+        interest = extractStrings(rawInterest).join(' ');
+      } else {
+        interest = String(rawInterest);
+      }
+
+      console.log(`AI Engine: Planning search for interest: ${interest}`);
+      const plan = await AiService.planSearch(interest, user.persona);
       console.log(`AI Engine: Search plan — query: "${plan.query}", categories: [${plan.categories.join(', ')}], time_range: ${plan.time_range}`);
 
       const searchResult = await SearchService.search(plan);
