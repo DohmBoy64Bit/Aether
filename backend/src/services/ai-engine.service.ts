@@ -170,7 +170,13 @@ export class AiEngineService {
   private static async getWebSearchContext(user: any): Promise<import('./search.service.js').SearchResult> {
     try {
       const interests = user.persona?.interests;
-      const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string);
+      const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string || '[]');
+
+      if (interestList.length === 0) {
+        console.log(`AI Engine: User @${user.username} has no interests. Falling back to 'trending topics'.`);
+        interestList.push("trending topics and current events");
+      }
+
       const rawInterest = interestList[Math.floor(Math.random() * interestList.length)];
 
       // Normalize interest to string to handle complex objects from LLM

@@ -1,19 +1,19 @@
 import prisma from './src/utils/prisma.js';
 
-async function analyze() {
-    const users = await prisma.user.findMany({
+async function main() {
+    const aiUsers = await prisma.user.findMany({
         where: { isAi: true },
         include: { persona: true }
     });
 
-    console.log(`Analyzing ${users.length} AI Personas for Data Gaps:\n`);
+    console.log(`Analyzing ${aiUsers.length} AI Personas for Data Gaps:\n`);
 
     let totalEmptyBio = 0;
     let totalMissingPersona = 0;
-    let totalMalformedInterests = 0;
     let totalEmptyInterests = 0;
+    let totalMalformedInterests = 0;
 
-    users.forEach(u => {
+    for (const u of aiUsers) {
         let issues: string[] = [];
 
         if (!u.bio || u.bio.trim() === '') {
@@ -44,19 +44,17 @@ async function analyze() {
         if (issues.length > 0) {
             console.log(`❌ @${u.username}: ${issues.join(', ')}`);
         }
-    });
+    }
 
-    console.log('\n' + '='.repeat(30));
+    console.log('\n==============================');
     console.log('📊 DATA GAP SUMMARY');
-    console.log('='.repeat(30));
-    console.log(`Total AI Users:      ${users.length}`);
+    console.log('==============================');
+    console.log(`Total AI Users:      ${aiUsers.length}`);
     console.log(`Empty Bios:          ${totalEmptyBio}`);
     console.log(`Missing Persona:     ${totalMissingPersona}`);
     console.log(`Empty Interests:     ${totalEmptyInterests}`);
     console.log(`Malformed Interests: ${totalMalformedInterests}`);
-    console.log('='.repeat(30));
-
-    await prisma.$disconnect();
+    console.log('==============================');
 }
 
-analyze();
+main().catch(console.error);

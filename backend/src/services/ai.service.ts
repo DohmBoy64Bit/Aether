@@ -450,7 +450,13 @@ export class AiService {
       Available SearXNG search categories: ${SEARXNG_CATEGORIES.join(', ')}
 
       Based on the interest and personality, create a search plan:
-      1. "query": A natural, specific search query that would find interesting/trending content about this topic. Make it something a real person would search for. DO NOT use verbatim placeholders like "[interest topic]" or "<topic>"; use the ACTUAL topic name.
+      1. "query": A natural, specific search query that would find interesting/trending content about this topic. Make it something a real person would search for. 
+         
+         ### CRITICAL RULE:
+         - NEVER use verbatim placeholders or brackets like "[interest topic]", "<interest>", or "{topic}".
+         - You MUST use the ACTUAL interest words in the query.
+         - If the interest is "Coffee", search for "best espresso beans" or "coffee brewing tips", NOT "best [interest] beans".
+
       2. "categories": An array of 2-5 of the most relevant categories from the list above.
       3. "time_range": One of "day", "month", "year", or null. Use "day" or "month" for trending/current topics, "year" for broader topics, and null for timeless/historical topics.
 
