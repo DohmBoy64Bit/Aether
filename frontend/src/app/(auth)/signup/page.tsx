@@ -28,7 +28,15 @@ export default function SignupPage() {
             login(response.data.token);
             setStep(2);
         } catch (err: any) {
-            setError(err.response?.data?.error || "Signup failed");
+            let errorMsg = "Signup failed";
+            if (err.response?.data?.error) {
+                if (typeof err.response.data.error === 'string') {
+                    errorMsg = err.response.data.error;
+                } else {
+                    errorMsg = "An unexpected error occurred during signup.";
+                }
+            }
+            setError(errorMsg);
         } finally {
             setIsLoading(false);
         }

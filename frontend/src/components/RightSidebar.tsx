@@ -1,8 +1,30 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Search, TrendingUp, MoreHorizontal } from "lucide-react";
+import api from "@/utils/api";
+import { getMediaUrl } from "@/utils/media";
 
 export default function RightSidebar() {
+  const [trending, setTrending] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [trendRes, recRes] = await Promise.all([
+          api.get("/social/trending"),
+          api.get("/social/recommendations")
+        ]);
+        setTrending(trendRes.data);
+        setRecommendations(recRes.data);
+      } catch (err) {
+        console.error("Failed to fetch sidebar data", err);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <aside className="w-[350px] h-screen sticky top-0 flex flex-col gap-4 px-6 py-3 overflow-y-auto">
       {/* Search Bar */}
@@ -21,17 +43,12 @@ export default function RightSidebar() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Trending</h2>
         <div>
-          {[
-            { topic: "AI & Future", tag: "#AetherLoop", posts: "42.1k" },
-            { topic: "Gaming", tag: "CyberConnect", posts: "12.5k" },
-            { topic: "Music", tag: "LofiPersonas", posts: "8.2k" },
-            { topic: "Technology", tag: "OllamaLocal", posts: "5.4k" },
-          ].map((item, i) => (
+          {trending.map((item, i) => (
             <div key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
               <div className="flex flex-col">
                 <span className="text-xs text-secondary-text">{item.topic}</span>
                 <span className="font-bold text-heading text-[15px]">{item.tag}</span>
-                <span className="text-xs text-secondary-text">{item.posts} interactions</span>
+                <span className="text-xs text-secondary-text">{item.posts}</span>
               </div>
               <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text mt-1" />
             </div>
@@ -43,15 +60,15 @@ export default function RightSidebar() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
         <div>
-          {[
-            { name: "Nova AI", handle: "@nova_aether", category: "Moderator" },
-            { name: "Echo Persona", handle: "@echo_loop", category: "Creator" },
-            { name: "Zenith Bot", handle: "@zenith_ai", category: "News" },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+          {recommendations.map((item, i) => (
+            <div key={item.id || i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#0085ff] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {item.name[0]}
+                <div className="w-10 h-10 bg-[#eff3f4] overflow-hidden rounded-full flex items-center justify-center text-heading font-bold text-sm">
+                  {item.profileImage ? (
+                    <img src={getMediaUrl(item.profileImage)} alt={item.name} className="w-full h-full object-cover" />
+                  ) : (
+                    item.name[0]
+                  )}
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5">

@@ -53,6 +53,7 @@ export default function Feed() {
   const [videoEmbed, setVideoEmbed] = useState<any>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fetchedUrls = useRef<Set<string>>(new Set());
 
   const debouncedContent = useDebounce(content, 500);
   const router = useRouter();
@@ -96,6 +97,9 @@ export default function Feed() {
         else if (url.includes("youtu.be/")) videoId = url.split("youtu.be/")[1]?.split("?")[0];
 
         if (videoId) {
+          if (fetchedUrls.current.has(url)) return;
+          fetchedUrls.current.add(url);
+
           // Fetch preview first to get title/thumbnail
           api.get(`/media/preview?url=${encodeURIComponent(url)}`)
             .then(res => {
@@ -132,9 +136,12 @@ export default function Feed() {
 
       // Otherwise fetch link preview
       if (!linkPreview || linkPreview.url !== url) {
-        api.get(`/media/preview?url=${encodeURIComponent(url)}`)
-          .then(res => setLinkPreview(res.data))
-          .catch(() => { }); // Ignore errors
+        if (!fetchedUrls.current.has(url)) {
+          fetchedUrls.current.add(url);
+          api.get(`/media/preview?url=${encodeURIComponent(url)}`)
+            .then(res => setLinkPreview(res.data))
+            .catch(() => { }); // Ignore errors
+        }
       }
     } else {
       setLinkPreview(null);

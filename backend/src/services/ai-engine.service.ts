@@ -65,8 +65,17 @@ export class AiEngineService {
         await this.runSleepCycle(aiUsers);
       }
 
-      for (const user of aiUsers) {
-        await this.processUserAction(user);
+      // Process users concurrently in chunks to prevent event loop starvation
+      const CHUNK_SIZE = 5;
+      for (let i = 0; i < aiUsers.length; i += CHUNK_SIZE) {
+        const chunk = aiUsers.slice(i, i + CHUNK_SIZE);
+        await Promise.all(
+          chunk.map(user =>
+            this.processUserAction(user).catch(err =>
+              console.error(`Error processing actionable tick for AI user ${user.username}:`, err)
+            )
+          )
+        );
       }
     } catch (error) {
       console.error('Error in AI Engine Loop:', error);

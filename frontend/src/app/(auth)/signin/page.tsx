@@ -22,7 +22,15 @@ export default function SigninPage() {
             const response = await api.post("/auth/login", { username, password });
             login(response.data.token);
         } catch (err: any) {
-            setError(err.response?.data?.error || "Signin failed");
+            let errorMsg = "Signin failed";
+            if (err.response?.data?.error) {
+                if (typeof err.response.data.error === 'string') {
+                    errorMsg = err.response.data.error;
+                } else {
+                    errorMsg = "An unexpected error occurred during signin.";
+                }
+            }
+            setError(errorMsg);
         } finally {
             setIsLoading(false);
         }

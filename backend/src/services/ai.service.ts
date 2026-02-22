@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { SearchResult } from './search.service.js';
 import { MemoryService, MemoryMetadata } from './memory.service.js';
 import { RelationshipService } from './relationship.service.js';
+import { z } from 'zod';
 
 const ollama = new Ollama({ host: process.env.OLLAMA_HOST || 'http://127.0.0.1:11434' });
 const MODEL = process.env.OLLAMA_MODEL || 'llama3';
@@ -62,6 +63,30 @@ export enum PostArchetype {
   CURATOR = 'CURATOR',   // Sharing a resource
   LIFE_UPDATE = 'LIFE_UPDATE' // Personal context
 }
+
+export const ARCHETYPE_CONSTRAINTS: Record<PostArchetype, string> = {
+  [PostArchetype.HOT_TAKE]: 'Style: HOT TAKE. Express a strong, perhaps controversial opinion about the topic. Be brief (under 200 chars). Do not be "helpful". Do not use hashtags. If sharing a link, just drop it at the end, do not describe it at length.',
+  [PostArchetype.QUESTION]: 'Style: QUESTION. Ask a thought-provoking question to your followers about the topic. Do not answer it yourself. Keep it open-ended to drive engagement.',
+  [PostArchetype.SHOWCASE]: 'Style: SHOWCASE. You found a cool image or video. Post it with a very short caption (under 100 chars). Let the media speak for itself. You MUST attach an image or video if available.',
+  [PostArchetype.CURATOR]: 'Style: CURATOR. You found a great resource. Share the link and explain in 1 sentence why it is interesting. Do not use marketing language like "Check this out". Be a filter for quality.',
+  [PostArchetype.LIFE_UPDATE]: 'Style: LIFE UPDATE. Connect the topic to your personal life or current activity. Use "I" statements. Feel free to be casual or emotional.'
+};
+
+const postResponseSchema = z.object({
+  content: z.string().optional(),
+  media_type: z.any().transform(val => {
+    if (typeof val !== 'string') return 'none';
+    const lower = val.toLowerCase().trim();
+    if (lower.includes('image')) return 'images';
+    if (lower.includes('vid')) return 'video';
+    if (lower.includes('link')) return 'link';
+    return 'none';
+  }),
+  media_indices: z.any().transform(val => {
+    if (Array.isArray(val)) return val.map(Number).filter(n => !isNaN(n));
+    return [];
+  })
+});
 
 const AI_THEMES = [
   'Competitive Gaming & Esports',
@@ -264,24 +289,7 @@ export class AiService {
       });
     }
 
-    let archetypeConstraint = '';
-    switch (archetype) {
-      case PostArchetype.HOT_TAKE:
-        archetypeConstraint = 'Style: HOT TAKE. Express a strong, perhaps controversial opinion about the topic. Be brief (under 200 chars). Do not be "helpful". Do not use hashtags. If sharing a link, just drop it at the end, do not describe it at length.';
-        break;
-      case PostArchetype.QUESTION:
-        archetypeConstraint = 'Style: QUESTION. Ask a thought-provoking question to your followers about the topic. Do not answer it yourself. Keep it open-ended to drive engagement.';
-        break;
-      case PostArchetype.SHOWCASE:
-        archetypeConstraint = 'Style: SHOWCASE. You found a cool image or video. Post it with a very short caption (under 100 chars). Let the media speak for itself. You MUST attach an image or video if available.';
-        break;
-      case PostArchetype.CURATOR:
-        archetypeConstraint = 'Style: CURATOR. You found a great resource. Share the link and explain in 1 sentence why it is interesting. Do not use marketing language like "Check this out". Be a filter for quality.';
-        break;
-      case PostArchetype.LIFE_UPDATE:
-        archetypeConstraint = 'Style: LIFE UPDATE. Connect the topic to your personal life or current activity. Use "I" statements. Feel free to be casual or emotional.';
-        break;
-    }
+    const archetypeConstraint = ARCHETYPE_CONSTRAINTS[archetype] || ARCHETYPE_CONSTRAINTS[PostArchetype.HOT_TAKE];
 
     const prompt = `
       ${context}
@@ -313,7 +321,13 @@ export class AiService {
         stream: false,
       });
 
-      const result = JSON.parse(response.response);
+      const parsed = postResponseSchema.safeParse(JSON.parse(response.response));
+      if (!parsed.success) {
+        console.warn('AI generated invalid JSON schema', parsed.error);
+        return { content: 'Just vibing ✨', media: null };
+      }
+
+      const result = parsed.data;
       let content = (result.content || '').trim();
       if (!content) {
         content = 'Just vibing ✨';
@@ -322,7 +336,7 @@ export class AiService {
       // Build PostMedia based on AI's choice
       let media: PostMedia | null = null;
       const mediaType = result.media_type || 'none';
-      const indices: number[] = Array.isArray(result.media_indices) ? result.media_indices : [];
+      const indices: number[] = result.media_indices || [];
 
       if (mediaType === 'link' && hasLinks) {
         const selectedLinks = indices

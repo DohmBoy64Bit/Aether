@@ -287,20 +287,12 @@ export class SocialService {
   }
 
   static async getFollowingFeed(userId: string, limit: number = 20, offset: number = 0) {
-    const following = await prisma.follow.findMany({
-      where: { followerId: userId },
-      select: { followingId: true }
-    });
-
-    const followingIds = following.map((f: any) => f.followingId);
-
-    // Include user's own posts in the following feed? 
-    // Usually yes on Bluesky/Twitter.
-    followingIds.push(userId);
-
     return prisma.post.findMany({
       where: {
-        userId: { in: followingIds },
+        OR: [
+          { userId },
+          { user: { followers: { some: { followerId: userId } } } }
+        ],
         type: { in: [PostType.TWEET, PostType.RETWEET] } // Optional: decide if replies show in main feed
       },
       orderBy: { createdAt: 'desc' },
@@ -342,4 +334,50 @@ export class SocialService {
       take: 20,
     });
   }
+
+  static async getTrendingTopics() {
+    const [totalPosts, totalInteractions, aiUsers] = await Promise.all([
+      prisma.post.count(),
+      prisma.interaction.count(),
+      prisma.user.count({ where: { isAi: true } })
+    ]);
+    return [
+      { topic: "Network Activity", tag: "#GlobalFeed", posts: `${totalPosts} posts` },
+      { topic: "Engagement", tag: "Community", posts: `${totalInteractions} interactions` },
+      { topic: "Entities", tag: "AI Personas", posts: `${aiUsers} active agents` },
+      { topic: "Technology", tag: "OllamaLocal", posts: "Trending" },
+    ];
+  }
+
+  static async getUserRecommendations(userId?: string) {
+    let users;
+    if (!userId) {
+      users = await prisma.user.findMany({
+        where: { isAi: true },
+        take: 3,
+        select: { id: true, username: true, profileImage: true, isAi: true, bio: true }
+      });
+    } else {
+      users = await prisma.user.findMany({
+        where: {
+          id: { not: userId },
+          followers: {
+            none: { followerId: userId }
+          }
+        },
+        take: 3,
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, username: true, profileImage: true, isAi: true, bio: true }
+      });
+    }
+
+    return users.map(u => ({
+      name: u.username,
+      handle: `@${u.username}`,
+      category: u.isAi ? 'AI Persona' : 'User',
+      id: u.id,
+      profileImage: u.profileImage
+    }));
+  }
 }
+

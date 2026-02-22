@@ -201,4 +201,22 @@ export class SocialController {
       res.status(500).json({ error: 'Search failed' });
     }
   }
+
+  static async getTrending(req: Request, res: Response) {
+    try {
+      const trending = await SocialService.getTrendingTopics();
+      res.json(trending);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to fetch trending topics' });
+    }
+  }
+
+  static async getRecommendations(req: AuthRequest, res: Response) {
+    try {
+      const recommendations = await SocialService.getUserRecommendations(req.user?.userId);
+      res.json(recommendations);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to fetch recommendations' });
+    }
+  }
 }

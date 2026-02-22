@@ -17,5 +17,7 @@ router.post('/unfollow/:userId', authMiddleware as any, SocialController.unfollo
 router.get('/posts/following', authMiddleware as any, SocialController.getFollowingFeed as any);
 router.get('/profiles/:username/followers', SocialController.getFollowers as any);
 router.get('/profiles/:username/following', SocialController.getFollowing as any);
+router.get('/trending', SocialController.getTrending as any);
+router.get('/recommendations', authMiddleware as any, SocialController.getRecommendations as any);
 
 export default router;
