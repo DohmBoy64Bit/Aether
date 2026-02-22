@@ -5,28 +5,20 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import api from "@/utils/api";
 
-const interests = [
-    { label: "AI & Machine Learning", emoji: "🤖" },
-    { label: "Creative Writing", emoji: "✍️" },
-    { label: "Music Production", emoji: "🎵" },
-    { label: "Game Development", emoji: "🎮" },
-    { label: "Digital Art", emoji: "🎨" },
-    { label: "Science & Tech", emoji: "🔬" },
-];
-
-const trending = [
-    { rank: 1, name: "AI Personas", posts: "2.6K posts", category: "AI & Future", hot: true },
-    { rank: 2, name: "Aether Loop", posts: "1.8K posts", category: "Technology" },
-    { rank: 3, name: "Digital Minds", posts: "994 posts", category: "Philosophy" },
-    { rank: 4, name: "Neural Networks", posts: "876 posts", category: "Science" },
-    { rank: 5, name: "Creative AI", posts: "543 posts", category: "Art" },
-];
+import { getMediaUrl } from "@/utils/media";
 
 export default function ExplorePage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
-    const [showInterests, setShowInterests] = useState(true);
+    const [showRecommendations, setShowRecommendations] = useState(true);
+    const [trending, setTrending] = useState<any[]>([]);
+    const [recommendations, setRecommendations] = useState<any[]>([]);
+
+    useEffect(() => {
+        api.get("/social/trending").then(res => setTrending(res.data)).catch(console.error);
+        api.get("/social/recommendations").then(res => setRecommendations(res.data)).catch(console.error);
+    }, []);
 
     useEffect(() => {
         if (!searchQuery.trim()) {
@@ -70,6 +62,8 @@ export default function ExplorePage() {
                         )}
                     </div>
                     <input
+                        id="explore-search-input"
+                        aria-label="Search for users"
                         type="text"
                         placeholder="Search for users"
                         value={searchQuery}
@@ -126,28 +120,39 @@ export default function ExplorePage() {
 
             {!searchQuery && (
                 <>
-                    {/* Your Interests */}
-                    {showInterests && (
+                    {/* Recommendations */}
+                    {showRecommendations && (
                         <div className="px-4 py-4 border-b border-gray-200">
                             <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
                                     <Sparkles className="w-5 h-5 text-[#0085ff]" />
-                                    <h3 className="text-lg font-extrabold text-heading">Your interests</h3>
+                                    <h3 className="text-lg font-extrabold text-heading">Who to follow</h3>
                                 </div>
-                                <button onClick={() => setShowInterests(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                                <button onClick={() => setShowRecommendations(false)} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
                                     <X className="w-4 h-4 text-secondary-text" />
                                 </button>
                             </div>
-                            <p className="text-sm text-secondary-text mb-3">Your interests help us find what you like!</p>
-                            <div className="flex flex-wrap gap-2">
-                                {interests.map((interest) => (
-                                    <button
-                                        key={interest.label}
-                                        className="flex items-center gap-1.5 bg-[#eff3f4] hover:bg-[#e1e8eb] rounded-full px-3.5 py-2 text-sm font-medium text-heading transition-colors"
+                            <div className="flex flex-col gap-1">
+                                {recommendations.map((item) => (
+                                    <Link
+                                        key={item.id}
+                                        href={`/profile/${item.username}`}
+                                        className="flex items-center justify-between py-3 hover:bg-gray-50 transition-colors rounded-xl px-2 -mx-2"
                                     >
-                                        <span>{interest.emoji}</span>
-                                        <span>{interest.label}</span>
-                                    </button>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-[#eff3f4] rounded-full overflow-hidden flex items-center justify-center font-bold text-sm">
+                                                {item.profileImage ? (
+                                                    <img src={getMediaUrl(item.profileImage)} alt={item.username} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    item.username[0].toUpperCase()
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-heading text-sm">{item.username}</span>
+                                                <span className="text-xs text-secondary-text">@{item.username}</span>
+                                            </div>
+                                        </div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -159,20 +164,15 @@ export default function ExplorePage() {
                             <TrendingUp className="w-5 h-5 text-[#0085ff]" />
                             <h3 className="text-lg font-extrabold text-heading">Trending</h3>
                         </div>
-                        {trending.map((item) => (
-                            <div key={item.rank} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100">
+                        {trending.map((item, index) => (
+                            <div key={item.tag} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-0">
                                 <div className="flex gap-3">
-                                    <span className="text-secondary-text text-sm font-medium mt-0.5">{item.rank}.</span>
+                                    <span className="text-secondary-text text-sm font-medium mt-0.5">{index + 1}.</span>
                                     <div className="flex flex-col">
-                                        <span className="font-bold text-heading text-[15px]">{item.name}</span>
-                                        <span className="text-xs text-secondary-text">{item.posts} · {item.category}</span>
+                                        <span className="font-bold text-heading text-[15px]">{item.tag}</span>
+                                        <span className="text-xs text-secondary-text">{item.posts} posts · {item.topic}</span>
                                     </div>
                                 </div>
-                                {item.hot && (
-                                    <span className="text-xs bg-[#0085ff] text-white px-2.5 py-1 rounded-full font-semibold">
-                                        🔥 Hot
-                                    </span>
-                                )}
                             </div>
                         ))}
                     </div>

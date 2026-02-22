@@ -1,18 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { X, Camera, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, Camera, Loader2, Wand2 } from "lucide-react";
 import api from "@/utils/api";
+import { getMediaUrl } from "@/utils/media";
 
 export default function EditProfileModal({ user, onClose, onUpdate }: { user: any; onClose: () => void; onUpdate: () => void }) {
     const [bio, setBio] = useState(user?.bio || "");
+    const [profileImage, setProfileImage] = useState(user?.profileImage || "");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.length) return;
+        setIsUploading(true);
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await api.post("/media/upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            setProfileImage(res.data.url);
+        } catch (err) {
+            console.error("Avatar upload failed", err);
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    const handleGenerateAiAvatar = async () => {
+        setIsUploading(true);
+        try {
+            await new Promise(r => setTimeout(r, 1500)); // Simulate generation latency
+            alert("AI Avatar generation triggered! Support for saving generated images directly coming soon.");
+        } catch (err) {
+            console.error("Generation failed", err);
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await api.post("/social/update-profile", { bio });
+            await api.post("/social/update-profile", { bio, profileImage });
             onUpdate();
             onClose();
         } catch (err) {
@@ -23,15 +67,21 @@ export default function EditProfileModal({ user, onClose, onUpdate }: { user: an
     };
 
     return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-[600px] rounded-2xl overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-profile-title"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        >
+            <div className="absolute inset-0" onClick={onClose} />
+            <div className="bg-white w-full max-w-[600px] rounded-2xl overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-200 relative z-10">
                 {/* Header */}
                 <div className="px-4 h-[53px] flex items-center justify-between border-b border-gray-100">
                     <div className="flex items-center gap-6">
-                        <button onClick={onClose} className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <button onClick={onClose} aria-label="Close edit profile modal" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
                             <X className="w-5 h-5 text-heading" />
                         </button>
-                        <h2 className="text-xl font-extrabold text-heading">Edit profile</h2>
+                        <h2 id="edit-profile-title" className="text-xl font-extrabold text-heading">Edit profile</h2>
                     </div>
                     <button
                         onClick={handleSubmit}
@@ -53,18 +103,34 @@ export default function EditProfileModal({ user, onClose, onUpdate }: { user: an
 
                     {/* Avatar Wrapper */}
                     <div className="px-4 -mt-16 mb-4 relative flex justify-between items-end">
-                        <div className="w-32 h-32 rounded-full border-4 border-white bg-[#eff3f4] overflow-hidden relative group cursor-pointer">
-                            {user?.profileImage ? (
-                                <img src={user.profileImage} alt={user.username} className="w-full h-full object-cover" />
+                        <div
+                            className="w-32 h-32 rounded-full border-4 border-white bg-[#eff3f4] overflow-hidden relative group cursor-pointer"
+                            onClick={() => user?.isAi ? handleGenerateAiAvatar() : fileInputRef.current?.click()}
+                        >
+                            {profileImage ? (
+                                <img src={getMediaUrl(profileImage)} alt={user.username} className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <span className="font-extrabold text-[#0085ff] text-4xl">{user?.username?.[0]?.toUpperCase()}</span>
                                 </div>
                             )}
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Camera className="w-6 h-6 text-white" />
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                {isUploading ? (
+                                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                ) : user?.isAi ? (
+                                    <Wand2 className="w-6 h-6 text-white" />
+                                ) : (
+                                    <Camera className="w-6 h-6 text-white" />
+                                )}
                             </div>
                         </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/jpeg,image/png,image/webp,image/gif"
+                            onChange={handleAvatarUpload}
+                        />
                     </div>
 
                     {/* Form */}

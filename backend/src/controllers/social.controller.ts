@@ -219,4 +219,29 @@ export class SocialController {
       res.status(500).json({ error: 'Failed to fetch recommendations' });
     }
   }
+
+  static async getSavedPosts(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      const posts = await SocialService.getSavedPosts(req.user.userId, limit, offset);
+      res.json(posts);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to fetch saved posts' });
+    }
+  }
+
+  static async getNotifications(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      const notifications = await SocialService.getNotifications(req.user.userId, limit, offset);
+      // Sort in memory by interaction id, since id is UUID we can only approximate or use as-is
+      res.json(notifications);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+  }
 }

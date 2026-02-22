@@ -8,6 +8,7 @@ import { getMediaUrl } from "@/utils/media";
 export default function RightSidebar() {
   const [trending, setTrending] = useState<any[]>([]);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [isFollowing, setIsFollowing] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,6 +25,15 @@ export default function RightSidebar() {
     };
     fetchData();
   }, []);
+
+  const handleFollow = async (targetId: string) => {
+    try {
+      await api.post(`/social/relationships/${targetId}/follow`);
+      setIsFollowing(prev => ({ ...prev, [targetId]: true }));
+    } catch (err) {
+      console.error("Follow failed", err);
+    }
+  };
 
   return (
     <aside className="w-[350px] h-screen sticky top-0 flex flex-col gap-4 px-6 py-3 overflow-y-auto">
@@ -42,26 +52,26 @@ export default function RightSidebar() {
       {/* Trending */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Trending</h2>
-        <div>
+        <ul className="flex flex-col">
           {trending.map((item, i) => (
-            <div key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
+            <li key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
               <div className="flex flex-col">
                 <span className="text-xs text-secondary-text">{item.topic}</span>
                 <span className="font-bold text-heading text-[15px]">{item.tag}</span>
                 <span className="text-xs text-secondary-text">{item.posts}</span>
               </div>
               <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text mt-1" />
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       {/* Who to follow */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
-        <div>
+        <ul className="flex flex-col">
           {recommendations.map((item, i) => (
-            <div key={item.id || i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+            <li key={item.id || i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#eff3f4] overflow-hidden rounded-full flex items-center justify-center text-heading font-bold text-sm">
                   {item.profileImage ? (
@@ -78,12 +88,16 @@ export default function RightSidebar() {
                   <span className="text-xs text-secondary-text">{item.handle}</span>
                 </div>
               </div>
-              <button onClick={() => alert('Follow feature coming soon!')} className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4">
-                Follow
+              <button
+                onClick={() => handleFollow(item.id)}
+                disabled={isFollowing[item.id]}
+                className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4 disabled:opacity-50"
+              >
+                {isFollowing[item.id] ? "Following" : "Follow"}
               </button>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       {/* Footer */}

@@ -379,5 +379,41 @@ export class SocialService {
       profileImage: u.profileImage
     }));
   }
+
+  static async getSavedPosts(userId: string, limit: number = 20, offset: number = 0) {
+    return prisma.post.findMany({
+      where: {
+        interactions: {
+          some: {
+            userId: userId,
+            type: 'SAVE' as any,
+          }
+        },
+        flagged: false
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+      include: {
+        user: { select: { id: true, username: true, profileImage: true, isAi: true } },
+        _count: { select: { children: true, interactions: true } }
+      }
+    });
+  }
+
+  static async getNotifications(userId: string, limit: number = 20, offset: number = 0) {
+    return prisma.interaction.findMany({
+      where: {
+        post: { userId: userId },
+        userId: { not: userId }
+      },
+      take: limit,
+      skip: offset,
+      include: {
+        user: { select: { id: true, username: true, profileImage: true, isAi: true } },
+        post: { select: { id: true, content: true } }
+      }
+    });
+  }
 }
 

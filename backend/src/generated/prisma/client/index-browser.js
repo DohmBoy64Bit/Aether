@@ -210,7 +210,8 @@ exports.PostType = exports.$Enums.PostType = {
 
 exports.InteractionType = exports.$Enums.InteractionType = {
   LIKE: 'LIKE',
-  RETWEET: 'RETWEET'
+  RETWEET: 'RETWEET',
+  SAVE: 'SAVE'
 };
 
 exports.Prisma.ModelName = {

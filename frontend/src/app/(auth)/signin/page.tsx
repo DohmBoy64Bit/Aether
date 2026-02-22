@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import api from "@/utils/api";
 import { useAuth } from "@/context/AuthContext";
+import AuthInput from "@/components/auth/AuthInput";
 
 export default function SigninPage() {
     const [username, setUsername] = useState("");
@@ -59,33 +60,29 @@ export default function SigninPage() {
 
                 {/* Form */}
                 <form onSubmit={handleSignin} className="space-y-4">
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-secondary-text">Account</label>
-                        <div className="relative">
-                            <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Username or email address"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10"
-                            />
-                        </div>
-                    </div>
+                    <AuthInput
+                        id="signin-username"
+                        label="Account"
+                        icon={AtSign}
+                        type="text"
+                        name="username"
+                        autoComplete="username"
+                        placeholder="Username or email address"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-secondary-text">Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                                type="password"
-                                placeholder="••••••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-[#0f1419] placeholder:text-gray-400 outline-none transition-all focus:ring-2 focus:ring-[#0085ff] focus:border-transparent pl-10"
-                            />
-                        </div>
-                    </div>
+                    <AuthInput
+                        id="signin-password"
+                        label="Password"
+                        icon={Lock}
+                        type="password"
+                        name="password"
+                        autoComplete="current-password"
+                        placeholder="••••••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
                     <div className="flex justify-between items-center pt-4">
                         <Link href="/signup" className="bg-transparent border border-gray-300 text-[#0f1419] font-bold rounded-full transition-colors hover:bg-gray-50 py-2.5 px-6 text-sm">

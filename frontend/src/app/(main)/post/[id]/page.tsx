@@ -3,6 +3,8 @@
 import { ArrowLeft, MessageCircle, Repeat2, Heart, Share2, MoreHorizontal, Loader2, X } from "lucide-react";
 import PostContent from "@/components/PostContent";
 import Link from "next/link";
+import PostComposer from "@/components/PostComposer";
+import { useMediaComposer } from "@/hooks/useMediaComposer";
 import { useEffect, useState, use } from "react";
 import api from "@/utils/api";
 import { formatDistanceToNow, format } from "date-fns";
@@ -10,20 +12,26 @@ import { useRouter } from "next/navigation";
 import ReplyModal from "@/components/ReplyModal";
 
 function ReplyCompose({ postId, onReplyPosted }: { postId: string; onReplyPosted: () => void }) {
-    const [content, setContent] = useState("");
     const [isPosting, setIsPosting] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
+    const composer = useMediaComposer();
 
     useEffect(() => {
         api.get("/auth/me").then(res => setCurrentUser(res.data)).catch(() => { });
     }, []);
 
     const handleReply = async () => {
-        if (!content.trim()) return;
+        if (!composer.canPost) return;
         setIsPosting(true);
         try {
-            await api.post("/social/posts", { content, type: "REPLY", parentId: postId });
-            setContent("");
+            const mediaPayload = composer.getMediaPayload();
+            await api.post("/social/posts", {
+                content: composer.content,
+                media: mediaPayload ? JSON.stringify(mediaPayload) : null,
+                type: "REPLY",
+                parentId: postId
+            });
+            composer.clearComposer();
             onReplyPosted();
         } catch (err) {
             console.error("Failed to reply", err);
@@ -33,37 +41,20 @@ function ReplyCompose({ postId, onReplyPosted }: { postId: string; onReplyPosted
     };
 
     return (
-        <div className="px-4 py-3 flex gap-3 border-b border-gray-200">
-            <div className="w-9 h-9 bg-[#0085ff] rounded-full flex-shrink-0 flex items-center justify-center font-bold text-white text-xs overflow-hidden">
-                {currentUser?.profileImage ? (
-                    <img src={currentUser.profileImage} alt={currentUser.username} className="w-full h-full object-cover" />
-                ) : (
-                    <span>{currentUser?.username?.[0]?.toUpperCase() || "@"}</span>
-                )}
-            </div>
-            <div className="flex-1 flex flex-col">
-                <textarea
-                    placeholder="Write your reply"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="bg-transparent text-sm resize-none outline-none border-none placeholder:text-secondary-text min-h-[48px] py-2 text-heading"
-                />
-                <div className="flex justify-end">
-                    <button
-                        onClick={handleReply}
-                        disabled={isPosting || !content.trim()}
-                        className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors disabled:opacity-50 text-xs py-1.5 px-4 flex items-center gap-1.5"
-                    >
-                        {isPosting && <Loader2 className="w-3 h-3 animate-spin" />}
-                        Reply
-                    </button>
-                </div>
-            </div>
-        </div>
+        <PostComposer
+            currentUser={currentUser}
+            composer={composer}
+            onPost={handleReply}
+            isPosting={isPosting}
+            placeholder="Write your reply"
+            submitLabel="Reply"
+            avatarSize="w-9 h-9"
+            minHeight="min-h-[48px]"
+        />
     );
 }
 
-function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted }: { reply: any; depth?: number; isLast?: boolean; onReplyPosted: (post: any) => void }) {
+function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted, onInteract }: { reply: any; depth?: number; isLast?: boolean; onReplyPosted: (post: any) => void; onInteract: (postId: string, type: "LIKE" | "RETWEET") => void }) {
     const router = useRouter();
     const hasChildren = reply.children && reply.children.length > 0;
     const visualDepth = Math.min(depth, 3);
@@ -79,8 +70,7 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted }: { reply:
             )}
 
             <article
-                className="px-4 py-3 hover:bg-gray-50/50 transition-colors cursor-pointer group/post relative"
-                style={{ marginLeft: '-40px', paddingLeft: '22px' }}
+                className="px-4 py-3 hover:bg-gray-50/50 transition-colors cursor-pointer group/post relative -ml-6 sm:-ml-[40px] pl-4 sm:pl-[22px]"
                 onClick={() => router.push(`/post/${reply.id}`)}
             >
                 <div className="flex gap-3 relative">
@@ -123,19 +113,28 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted }: { reply:
                                 <span className="text-[11px] text-secondary-text group-hover/action:text-[#0085ff]">{reply._count?.children || ""}</span>
                             </div>
 
-                            <div className="flex items-center gap-0.5 group/action cursor-pointer">
+                            <div
+                                className="flex items-center gap-0.5 group/action cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); onInteract(reply.id, 'RETWEET'); }}
+                            >
                                 <div className="p-1.5 rounded-full group-hover/action:bg-green-50 transition-colors">
                                     <Repeat2 className="w-[15px] h-[15px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-0.5 group/action cursor-pointer">
+                            <div
+                                className="flex items-center gap-0.5 group/action cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); onInteract(reply.id, 'LIKE'); }}
+                            >
                                 <div className="p-1.5 rounded-full group-hover/action:bg-pink-50 transition-colors">
                                     <Heart className="w-[15px] h-[15px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
                                 </div>
                                 <span className="text-[11px] text-secondary-text group-hover/action:text-pink-600">{reply._count?.interactions || ""}</span>
                             </div>
-                            <div className="flex items-center group/action cursor-pointer">
+                            <div
+                                className="flex items-center group/action cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.origin + '/post/' + reply.id); alert('Link copied!'); }}
+                            >
                                 <div className="p-1.5 rounded-full group-hover/action:bg-blue-50 transition-colors">
                                     <Share2 className="w-[15px] h-[15px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
                                 </div>
@@ -148,7 +147,7 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted }: { reply:
             {/* Recursively bordered container for children */}
             {hasChildren && (
                 depth < 3 ? (
-                    <div className="ml-[34px] border-l-2 border-gray-100">
+                    <div className="ml-6 sm:ml-[34px] border-l-2 border-gray-100">
                         {reply.children.map((child: any, idx: number) => (
                             <ReplyItem
                                 key={child.id}
@@ -156,6 +155,7 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted }: { reply:
                                 depth={depth + 1}
                                 isLast={idx === reply.children.length - 1}
                                 onReplyPosted={onReplyPosted}
+                                onInteract={onInteract}
                             />
                         ))}
                     </div>
@@ -191,6 +191,15 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
         e.stopPropagation();
         setSelectedPost(post);
         setReplyModalOpen(true);
+    };
+
+    const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
+        try {
+            await api.post("/social/interact", { postId, type });
+            fetchPost();
+        } catch (err) {
+            console.error("Failed to interact", err);
+        }
     };
 
     const fetchPost = async () => {
@@ -256,8 +265,18 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                             </div>
                             <span className="text-secondary-text text-sm">@{post.user.username}</span>
                         </div>
-                        <div className="ml-auto">
-                            <MoreHorizontal className="w-5 h-5 text-secondary-text" />
+                        <div className="ml-auto relative group/more">
+                            <div className="p-2 hover:bg-blue-50 rounded-full transition-colors cursor-pointer">
+                                <MoreHorizontal className="w-5 h-5 text-secondary-text" />
+                            </div>
+                            <div className="absolute right-0 top-full w-40 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden translate-y-2 group-hover/more:translate-y-0">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); alert("Post reported. Our moderation team will review it shortly."); }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
+                                >
+                                    Report Post
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -293,13 +312,22 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                         >
                             <MessageCircle className="w-5 h-5 text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
                         </div>
-                        <div className="p-2.5 rounded-full hover:bg-green-50 transition-colors cursor-pointer group/action">
+                        <div
+                            className="p-2.5 rounded-full hover:bg-green-50 transition-colors cursor-pointer group/action"
+                            onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}
+                        >
                             <Repeat2 className="w-5 h-5 text-secondary-text group-hover/action:text-green-600 transition-colors" />
                         </div>
-                        <div className="p-2.5 rounded-full hover:bg-pink-50 transition-colors cursor-pointer group/action">
+                        <div
+                            className="p-2.5 rounded-full hover:bg-pink-50 transition-colors cursor-pointer group/action"
+                            onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}
+                        >
                             <Heart className="w-5 h-5 text-secondary-text group-hover/action:text-pink-600 transition-colors" />
                         </div>
-                        <div className="p-2.5 rounded-full hover:bg-blue-50 transition-colors cursor-pointer group/action">
+                        <div
+                            className="p-2.5 rounded-full hover:bg-blue-50 transition-colors cursor-pointer group/action"
+                            onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.origin + '/post/' + post.id); alert('Link copied!'); }}
+                        >
                             <Share2 className="w-5 h-5 text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
                         </div>
                     </div>
@@ -309,7 +337,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                 </div>
 
                 {/* Level-0 Replies Container with Spine from primary post */}
-                <div className="relative ml-[40px] border-l-2 border-gray-100 min-h-[50px]">
+                <div className="relative ml-6 sm:ml-[40px] border-l-2 border-gray-100 min-h-[50px]">
                     {/* Connector dash from primary post avatar to the spine */}
                     <div className="absolute left-[-2px] -top-12 h-12 w-[2px] bg-gray-100 z-0" />
 
@@ -321,10 +349,11 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                                 depth={0}
                                 isLast={idx === post.children.length - 1}
                                 onReplyPosted={(p) => handleOpenReply({ stopPropagation: () => { } } as any, p)}
+                                onInteract={handleInteract}
                             />
                         ))
                     ) : (
-                        <div className="py-10 px-4 text-center text-secondary-text ml-[-40px]">
+                        <div className="py-10 px-4 text-center text-secondary-text -ml-6 sm:-ml-[40px]">
                             <p className="text-sm italic">Be the first to reply...</p>
                         </div>
                     )}

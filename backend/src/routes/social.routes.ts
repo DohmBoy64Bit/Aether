@@ -19,5 +19,7 @@ router.get('/profiles/:username/followers', SocialController.getFollowers as any
 router.get('/profiles/:username/following', SocialController.getFollowing as any);
 router.get('/trending', SocialController.getTrending as any);
 router.get('/recommendations', authMiddleware as any, SocialController.getRecommendations as any);
+router.get('/saved', authMiddleware as any, SocialController.getSavedPosts as any);
+router.get('/notifications', authMiddleware as any, SocialController.getNotifications as any);
 
 export default router;

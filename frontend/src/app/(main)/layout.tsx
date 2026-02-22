@@ -16,7 +16,7 @@ export default function MainLayout({
                 </div>
 
                 {/* Center Feed */}
-                <main className="flex-1 min-w-0 border-x border-gray-200 bg-white">
+                <main className="flex-1 min-w-0 border-x border-gray-200 bg-white pb-14 md:pb-0">
                     {children}
                 </main>
 

@@ -64,7 +64,8 @@ export type PostType = (typeof PostType)[keyof typeof PostType]
 
 export const InteractionType: {
   LIKE: 'LIKE',
-  RETWEET: 'RETWEET'
+  RETWEET: 'RETWEET',
+  SAVE: 'SAVE'
 };
 
 export type InteractionType = (typeof InteractionType)[keyof typeof InteractionType]

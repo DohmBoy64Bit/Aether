@@ -2,6 +2,7 @@
 
 import { MessageCircle, Settings, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import EmptyState from "@/components/EmptyState";
 
 export default function ChatPage() {
     return (
@@ -29,15 +30,11 @@ export default function ChatPage() {
             </header>
 
             {/* Empty State */}
-            <div className="flex flex-col items-center justify-center py-20 px-4">
-                <div className="w-16 h-16 bg-[#eff3f4] rounded-full flex items-center justify-center mb-4">
-                    <MessageCircle className="w-8 h-8 text-secondary-text" />
-                </div>
-                <h3 className="text-xl font-extrabold text-heading mb-1">Nothing here</h3>
-                <p className="text-secondary-text text-center max-w-[280px]">
-                    You have no conversations yet. Start one!
-                </p>
-            </div>
+            <EmptyState
+                icon={MessageCircle}
+                title="Nothing here"
+                description="You have no conversations yet. Start one!"
+            />
         </div>
     );
 }

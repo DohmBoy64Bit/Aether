@@ -18,28 +18,20 @@ import { useRouter } from "next/navigation";
 import PostContent from "@/components/PostContent";
 import { getMediaUrl } from "@/utils/media";
 import ReplyModal from "@/components/ReplyModal";
-
-// Move debouncing helper outside
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-}
+import { useMediaComposer } from "@/hooks/useMediaComposer";
+import PostComposer from "@/components/PostComposer";
 
 export default function Feed() {
   const [activeTab, setActiveTab] = useState("Discover");
   const [posts, setPosts] = useState<any[]>([]);
-  const [content, setContent] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
+
+  const composer = useMediaComposer();
+  const router = useRouter();
 
   const handleOpenReply = (e: React.MouseEvent, post: any) => {
     e.stopPropagation();
@@ -47,16 +39,6 @@ export default function Feed() {
     setReplyModalOpen(true);
   };
 
-  // Media State
-  const [mediaImages, setMediaImages] = useState<string[]>([]);
-  const [linkPreview, setLinkPreview] = useState<any>(null);
-  const [videoEmbed, setVideoEmbed] = useState<any>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const fetchedUrls = useRef<Set<string>>(new Set());
-
-  const debouncedContent = useDebounce(content, 500);
-  const router = useRouter();
 
   const fetchFeed = async () => {
     setIsLoading(true);
@@ -79,130 +61,19 @@ export default function Feed() {
     fetchFeed();
   }, [activeTab]);
 
-  // Auto-detect links and fetch previews
-  useEffect(() => {
-    if (mediaImages.length > 0 || videoEmbed) return; // Don't fetch if other media is attached
-
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const matches = content.match(urlRegex);
-
-    if (matches && matches.length > 0) {
-      const url = matches[0];
-
-      // Check for YouTube/Dailymotion for video embed first
-      if (url.includes("youtube.com") || url.includes("youtu.be")) {
-        // Simple YouTube ID extraction
-        let videoId = null;
-        if (url.includes("v=")) videoId = url.split("v=")[1]?.split("&")[0];
-        else if (url.includes("youtu.be/")) videoId = url.split("youtu.be/")[1]?.split("?")[0];
-
-        if (videoId) {
-          if (fetchedUrls.current.has(url)) return;
-          fetchedUrls.current.add(url);
-
-          // Fetch preview first to get title/thumbnail
-          api.get(`/media/preview?url=${encodeURIComponent(url)}`)
-            .then(res => {
-              setVideoEmbed({
-                url,
-                iframe_src: `https://www.youtube.com/embed/${videoId}`,
-                title: res.data.title || "YouTube Video",
-                thumbnail: res.data.image
-              });
-              setLinkPreview(null);
-            })
-            .catch(() => {
-              // Fallback if preview fails
-              setVideoEmbed({
-                url,
-                iframe_src: `https://www.youtube.com/embed/${videoId}`,
-                title: "YouTube Video"
-              });
-              setLinkPreview(null);
-            });
-          return;
-        }
-      }
-
-      // Check for direct image URLs
-      if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-        if (!mediaImages.includes(url)) {
-          setMediaImages(prev => [...prev, url].slice(0, 4));
-          setLinkPreview(null);
-          setVideoEmbed(null);
-        }
-        return;
-      }
-
-      // Otherwise fetch link preview
-      if (!linkPreview || linkPreview.url !== url) {
-        if (!fetchedUrls.current.has(url)) {
-          fetchedUrls.current.add(url);
-          api.get(`/media/preview?url=${encodeURIComponent(url)}`)
-            .then(res => setLinkPreview(res.data))
-            .catch(() => { }); // Ignore errors
-        }
-      }
-    } else {
-      setLinkPreview(null);
-      setVideoEmbed(null);
-    }
-  }, [debouncedContent]); // Respond to debounced content changes
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.length) return;
-    setIsUploading(true);
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await api.post("/media/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      setMediaImages(prev => [...prev, res.data.url].slice(0, 4)); // Max 4 images
-      // Clear other media types if images are added
-      setLinkPreview(null);
-      setVideoEmbed(null);
-    } catch (err) {
-      console.error("Upload failed", err);
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const removeMedia = () => {
-    setMediaImages([]);
-    setLinkPreview(null);
-    setVideoEmbed(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
   const handlePost = async () => {
-    if (!content.trim() && mediaImages.length === 0) return;
+    if (!composer.canPost) return;
     setIsPosting(true);
 
     try {
-      // Construct PostMedia object
-      let media = null;
-      if (mediaImages.length > 0) {
-        media = { images: mediaImages.map(url => ({ url })) };
-      } else if (videoEmbed) {
-        media = { video: videoEmbed }; // videoEmbed now includes thumbnail/title
-      } else if (linkPreview) {
-        media = { links: [{ ...linkPreview, thumbnail: linkPreview.image }] };
-      }
+      const mediaPayload = composer.getMediaPayload();
 
       await api.post("/social/posts", {
-        content,
-        media: media ? JSON.stringify(media) : null
+        content: composer.content,
+        media: mediaPayload ? JSON.stringify(mediaPayload) : null
       });
 
-      setContent("");
-      setMediaImages([]);
-      setLinkPreview(null);
-      setVideoEmbed(null);
+      composer.clearComposer();
       fetchFeed();
     } catch (err) {
       console.error("Failed to post", err);
@@ -256,107 +127,12 @@ export default function Feed() {
       </header>
 
       {/* Compose Area */}
-      <div className="px-4 py-3 flex gap-3 border-b border-gray-200">
-        <div className="w-11 h-11 bg-[#0085ff] rounded-full flex-shrink-0 flex items-center justify-center font-bold text-white text-sm overflow-hidden">
-          {currentUser?.profileImage ? (
-            <img src={getMediaUrl(currentUser.profileImage)} alt={currentUser.username} className="w-full h-full object-cover" />
-          ) : (
-            <span>{currentUser?.username?.[0]?.toUpperCase() || "@"}</span>
-          )}
-        </div>
-        <div className="flex-1 flex flex-col">
-          <textarea
-            placeholder="What's up?"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="bg-transparent text-lg resize-none outline-none border-none placeholder:text-secondary-text min-h-[80px] py-2 text-heading"
-          />
-
-          {/* Media Previews */}
-          {mediaImages.length > 0 && (
-            <div className="mb-3 relative inline-block">
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {mediaImages.map((img, i) => (
-                  <div key={i} className="relative w-32 h-32 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0">
-                    <img src={getMediaUrl(img)} alt="Upload" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              <button onClick={removeMedia} className="absolute -top-2 -right-2 bg-gray-900/80 text-white rounded-full p-1 hover:bg-black">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          {linkPreview && (
-            <div className="mb-3 relative border border-gray-200 rounded-xl overflow-hidden max-w-sm">
-              <button onClick={removeMedia} className="absolute top-2 right-2 bg-gray-900/80 text-white rounded-full p-1 hover:bg-black z-10">
-                <X className="w-4 h-4" />
-              </button>
-              {linkPreview.image && (
-                <div className="h-32 bg-gray-100 overflow-hidden">
-                  <img src={linkPreview.image} alt={linkPreview.title} className="w-full h-full object-cover" />
-                </div>
-              )}
-              <div className="p-3 bg-gray-50">
-                <p className="font-bold text-sm line-clamp-1">{linkPreview.title}</p>
-                <p className="text-xs text-secondary-text line-clamp-1 mt-0.5">{linkPreview.description}</p>
-                <p className="text-xs text-blue-500 mt-1">{new URL(linkPreview.url).hostname}</p>
-              </div>
-            </div>
-          )}
-
-          {videoEmbed && (
-            <div className="mb-3 relative rounded-xl overflow-hidden border border-gray-200 max-w-sm group">
-              <button onClick={removeMedia} className="absolute top-2 right-2 bg-gray-900/80 text-white rounded-full p-1 hover:bg-black z-10">
-                <X className="w-4 h-4" />
-              </button>
-              <div className="aspect-video bg-black flex items-center justify-center relative">
-                {videoEmbed.thumbnail ? (
-                  <img src={videoEmbed.thumbnail} alt={videoEmbed.title} className="w-full h-full object-cover opacity-80" />
-                ) : (
-                  <div className="absolute inset-0 bg-neutral-800" />
-                )}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-black/70 transition-colors">
-                    <Play className="w-6 h-6 text-white" fill="currentColor" />
-                  </div>
-                </div>
-              </div>
-              <div className="p-2 bg-gray-50 text-xs font-medium text-gray-900 line-clamp-1">
-                {videoEmbed.title}
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            <div className="flex items-center gap-1">
-              <button
-                className="p-2 hover:bg-blue-50 rounded-full transition-colors text-[#0085ff]"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-              >
-                <ImageIcon className="w-5 h-5" />
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={handleImageUpload}
-              />
-            </div>
-            <button
-              onClick={handlePost}
-              disabled={isPosting || (!content.trim() && !mediaImages.length) || isUploading}
-              className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors disabled:opacity-50 text-sm py-1.5 px-5 flex items-center gap-2"
-            >
-              {isPosting && <Loader2 className="w-4 h-4 animate-spin" />}
-              Post
-            </button>
-          </div>
-        </div>
-      </div>
+      <PostComposer
+        currentUser={currentUser}
+        composer={composer}
+        onPost={handlePost}
+        isPosting={isPosting}
+      />
 
       {/* Posts Feed */}
       <div className="flex flex-col">
@@ -402,8 +178,18 @@ export default function Feed() {
                     <span className="text-secondary-text text-[15px]">@{post.user.username}</span>
                     <span className="text-secondary-text text-[15px]">·</span>
                     <span className="text-secondary-text text-[15px] hover:underline">{formatDistanceToNow(new Date(post.createdAt))}</span>
-                    <div className="ml-auto">
-                      <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="ml-auto relative group/more">
+                      <div className="p-1.5 hover:bg-blue-50 rounded-full transition-colors cursor-pointer">
+                        <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <div className="absolute right-0 top-full w-40 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden translate-y-2 group-hover/more:translate-y-0">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); alert("Post reported. Our moderation team will review it shortly."); }}
+                          className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
+                        >
+                          Report Post
+                        </button>
+                      </div>
                     </div>
                   </div>
 

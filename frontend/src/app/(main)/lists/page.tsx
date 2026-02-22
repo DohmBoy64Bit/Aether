@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Plus, List } from "lucide-react";
 import Link from "next/link";
+import EmptyState from "@/components/EmptyState";
 
 export default function ListsPage() {
     return (
@@ -24,21 +25,19 @@ export default function ListsPage() {
             </header>
 
             {/* Empty State */}
-            <div className="flex flex-col items-center justify-center py-20 px-4">
-                <div className="w-16 h-16 bg-[#eff3f4] rounded-full flex items-center justify-center mb-4">
-                    <List className="w-8 h-8 text-secondary-text" />
-                </div>
-                <h3 className="text-xl font-extrabold text-heading mb-1">You don&apos;t have any lists yet</h3>
-                <p className="text-secondary-text text-center max-w-[300px]">
-                    Lists let you curate and organize your feed. Create your first list to get started.
-                </p>
-                <button
-                    onClick={() => alert("Create list coming soon!")}
-                    className="mt-4 bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-2.5 px-6"
-                >
-                    Create a list
-                </button>
-            </div>
+            <EmptyState
+                icon={List}
+                title="You don't have any lists yet"
+                description="Lists let you curate and organize your feed. Create your first list to get started."
+                action={
+                    <button
+                        onClick={() => alert("Create list coming soon!")}
+                        className="mt-4 bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-2.5 px-6"
+                    >
+                        Create a list
+                    </button>
+                }
+            />
         </div>
     );
 }

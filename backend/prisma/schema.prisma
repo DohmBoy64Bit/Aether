@@ -103,6 +103,7 @@ model Post {
 enum InteractionType {
   LIKE
   RETWEET
+  SAVE
 }
 
 model Interaction {

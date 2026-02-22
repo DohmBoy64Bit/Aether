@@ -44,6 +44,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         fetchData();
     }, [username]);
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && showUserList) setShowUserList(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showUserList]);
+
     const openUserList = async (type: 'followers' | 'following') => {
         setListType(type);
         setShowUserList(true);
@@ -135,12 +143,22 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                         </button>
                     ) : (
                         <>
-                            <button onClick={() => alert('Extra options coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
-                                <MoreHorizontal className="w-4 h-4 text-heading" />
-                            </button>
-                            <button onClick={() => alert('Messaging coming soon!')} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                            <div className="relative group/more">
+                                <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors">
+                                    <MoreHorizontal className="w-4 h-4 text-heading" />
+                                </button>
+                                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden transform translate-y-1 group-hover/more:translate-y-0">
+                                    <button
+                                        onClick={() => alert(`@${profile.username} has been reported. Our moderation team will review this.`)}
+                                        className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
+                                    >
+                                        Report @{profile.username}
+                                    </button>
+                                </div>
+                            </div>
+                            <Link href={`/chat?user=${profile.username}`} className="p-2 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center">
                                 <MessageCircle className="w-4 h-4 text-heading" />
-                            </button>
+                            </Link>
                             <button
                                 onClick={handleFollowToggle}
                                 className={`${isFollowing
@@ -207,53 +225,63 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             </div>
 
             {/* User List Modal */}
-            {showUserList && (
-                <div className="fixed inset-0 bg-black/40 z-[99] flex items-center justify-center p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
-                        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="text-lg font-bold text-heading">{listType === 'followers' ? 'Followers' : 'Following'}</h3>
-                            <button onClick={() => setShowUserList(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                                <X className="w-5 h-5 text-heading" />
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-2">
-                            {isListLoading ? (
-                                <div className="p-8 flex justify-center">
-                                    <Loader2 className="w-6 h-6 animate-spin text-[#0085ff]" />
-                                </div>
-                            ) : userList.length === 0 ? (
-                                <div className="p-8 text-center text-secondary-text">
-                                    No users found.
-                                </div>
-                            ) : (
-                                userList.map((item: any) => {
-                                    const user = item.follower || item.following;
-                                    return (
-                                        <Link
-                                            key={user.id}
-                                            href={`/profile/${user.username}`}
-                                            onClick={() => setShowUserList(false)}
-                                            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
-                                        >
-                                            <div className="w-10 h-10 rounded-full bg-[#eff3f4] flex items-center justify-center overflow-hidden">
-                                                {user.profileImage ? (
-                                                    <img src={getMediaUrl(user.profileImage)} alt={user.username} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-[#0085ff] font-bold">{user.username[0].toUpperCase()}</span>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-heading text-[15px]">{user.username}</span>
-                                                <span className="text-secondary-text text-sm">@{user.username}</span>
-                                            </div>
-                                        </Link>
-                                    );
-                                })
-                            )}
+            {
+                showUserList && (
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="user-list-title"
+                        className="fixed inset-0 bg-black/40 z-[99] flex items-center justify-center p-4 backdrop-blur-sm"
+                    >
+                        <div className="absolute inset-0" onClick={() => setShowUserList(false)} />
+                        <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl relative z-10">
+                            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                                <h3 id="user-list-title" className="text-lg font-bold text-heading">
+                                    {listType === 'followers' ? 'Followers' : 'Following'}
+                                </h3>
+                                <button onClick={() => setShowUserList(false)} aria-label="Close interface" className="p-2 hover:bg-gray-100 rounded-full">
+                                    <X className="w-5 h-5 text-heading" />
+                                </button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-2">
+                                {isListLoading ? (
+                                    <div className="p-8 flex justify-center">
+                                        <Loader2 className="w-6 h-6 animate-spin text-[#0085ff]" />
+                                    </div>
+                                ) : userList.length === 0 ? (
+                                    <div className="p-8 text-center text-secondary-text">
+                                        No users found.
+                                    </div>
+                                ) : (
+                                    userList.map((item: any) => {
+                                        const user = item.follower || item.following;
+                                        return (
+                                            <Link
+                                                key={user.id}
+                                                href={`/profile/${user.username}`}
+                                                onClick={() => setShowUserList(false)}
+                                                className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+                                            >
+                                                <div className="w-10 h-10 rounded-full bg-[#eff3f4] flex items-center justify-center overflow-hidden">
+                                                    {user.profileImage ? (
+                                                        <img src={getMediaUrl(user.profileImage)} alt={user.username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-[#0085ff] font-bold">{user.username[0].toUpperCase()}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-heading text-[15px]">{user.username}</span>
+                                                    <span className="text-secondary-text text-sm">@{user.username}</span>
+                                                </div>
+                                            </Link>
+                                        );
+                                    })
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Tabs */}
             <div className="sticky top-[53px] bg-white z-[5] border-b border-gray-200 flex">
@@ -285,6 +313,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                     </p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
