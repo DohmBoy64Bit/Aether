@@ -542,6 +542,117 @@ describe('AI Integration Tests (Real)', () => {
         }, 10_000);
     });
 
+    // ─── 9b. Social Interactions (Like, Retweet, Follow, Unfollow) ────
+
+    describe('Social Interactions', () => {
+        let interactionPostId: string;
+
+        it('should create a post to interact with', async () => {
+            const post = await SocialService.createPost(
+                aiUser1.id, 'This post is for interaction tests 🧪', PostType.TWEET
+            );
+            interactionPostId = post.id;
+            expect(interactionPostId).toBeTruthy();
+        }, 30_000);
+
+        it('should LIKE a post', async () => {
+            const result = await SocialService.interact(aiUser2.id, interactionPostId, 'LIKE' as any);
+
+            expect(result).toBeDefined();
+            expect(result.action).toBe('added');
+            expect(result.type).toBe('LIKE');
+
+            // Verify the interaction exists in DB
+            const interaction = await prisma.interaction.findUnique({
+                where: {
+                    userId_postId_type: { userId: aiUser2.id, postId: interactionPostId, type: 'LIKE' }
+                }
+            });
+            expect(interaction).toBeDefined();
+            console.log('Like added ✓');
+        }, 10_000);
+
+        it('should UNLIKE a post (toggle)', async () => {
+            // Calling interact again with same type should remove it
+            const result = await SocialService.interact(aiUser2.id, interactionPostId, 'LIKE' as any);
+
+            expect(result.action).toBe('removed');
+            expect(result.type).toBe('LIKE');
+
+            // Verify it's gone
+            const interaction = await prisma.interaction.findUnique({
+                where: {
+                    userId_postId_type: { userId: aiUser2.id, postId: interactionPostId, type: 'LIKE' }
+                }
+            });
+            expect(interaction).toBeNull();
+            console.log('Unlike (toggle) ✓');
+        }, 10_000);
+
+        it('should RETWEET a post and create a retweet post', async () => {
+            const result = await SocialService.interact(aiUser2.id, interactionPostId, 'RETWEET' as any);
+
+            expect(result.action).toBe('added');
+            expect(result.type).toBe('RETWEET');
+
+            // Verify a RETWEET-type post was created
+            const retweetPost = await prisma.post.findFirst({
+                where: {
+                    userId: aiUser2.id,
+                    type: PostType.RETWEET,
+                    parentId: interactionPostId,
+                }
+            });
+            expect(retweetPost).toBeDefined();
+            console.log('Retweet added ✓ (created retweet post:', retweetPost?.id, ')');
+        }, 30_000);
+
+        it('should UN-RETWEET a post (toggle) and remove the retweet post', async () => {
+            const result = await SocialService.interact(aiUser2.id, interactionPostId, 'RETWEET' as any);
+
+            expect(result.action).toBe('removed');
+            expect(result.type).toBe('RETWEET');
+
+            // Verify the RETWEET post was also deleted
+            const retweetPost = await prisma.post.findFirst({
+                where: {
+                    userId: aiUser2.id,
+                    type: PostType.RETWEET,
+                    parentId: interactionPostId,
+                }
+            });
+            expect(retweetPost).toBeNull();
+            console.log('Un-retweet (toggle) ✓ — retweet post removed');
+        }, 10_000);
+
+        it('should handle follow idempotently (no duplicate follows)', async () => {
+            await SocialService.followUser(aiUser1.id, aiUser2.id);
+            await SocialService.followUser(aiUser1.id, aiUser2.id); // duplicate — should upsert
+
+            const follows = await prisma.follow.findMany({
+                where: { followerId: aiUser1.id, followingId: aiUser2.id }
+            });
+            expect(follows.length).toBe(1); // Only one record
+            console.log('Idempotent follow ✓');
+
+            // Clean up
+            await SocialService.unfollowUser(aiUser1.id, aiUser2.id);
+        }, 10_000);
+
+        it('should generate a notification when another user likes a post', async () => {
+            // Like the post again
+            await SocialService.interact(aiUser2.id, interactionPostId, 'LIKE' as any);
+
+            // aiUser1's notifications should include this like
+            const notifications = await SocialService.getNotifications(aiUser1.id);
+            const likNotif = notifications.find(
+                (n: any) => n.postId === interactionPostId && n.type === 'LIKE' && n.userId === aiUser2.id
+            );
+            expect(likNotif).toBeDefined();
+            console.log('Notification created for like ✓');
+        }, 10_000);
+    });
+
     // ─── 10. Action Decision Engine ────────────────────────────────────
 
     describe('Action Decision Engine', () => {
