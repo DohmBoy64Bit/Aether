@@ -129,43 +129,39 @@ export default function PostComposer({
                         />
                     </div>
                     <div className="flex items-center gap-3">
-                        {content.length > 0 && (
-                            <div className="flex items-center gap-3 mr-1">
-                                <div className="relative w-[28px] h-[28px] flex items-center justify-center">
-                                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                                        <circle
-                                            className="text-gray-100"
-                                            strokeWidth="8"
-                                            stroke="currentColor"
-                                            fill="transparent"
-                                            r="40"
-                                            cx="50"
-                                            cy="50"
-                                        />
-                                        <circle
-                                            className="transition-colors duration-200"
-                                            strokeWidth="8"
-                                            strokeDasharray={251.2}
-                                            strokeDashoffset={Math.max(0, 251.2 - (251.2 * charPercent) / 100)}
-                                            strokeLinecap="round"
-                                            stroke={getMeterColor()}
-                                            fill="transparent"
-                                            r="40"
-                                            cx="50"
-                                            cy="50"
-                                        />
-                                    </svg>
-                                </div>
-                                {charCount >= charLimit - 20 && (
-                                    <div className="w-[30px] flex justify-center">
-                                        <span className={`text-sm ${charCount >= charLimit ? "text-red-500" : "text-orange-500"}`}>
-                                            {charLimit - charCount}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="w-[1px] h-6 bg-gray-200 hidden sm:block mx-1" />
+                        <div className="flex items-center gap-3 mr-1">
+                            <div className="relative w-[28px] h-[28px] flex items-center justify-center">
+                                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                                    <circle
+                                        className="text-gray-100"
+                                        strokeWidth="8"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="40"
+                                        cx="50"
+                                        cy="50"
+                                    />
+                                    <circle
+                                        className="transition-colors duration-200"
+                                        strokeWidth="8"
+                                        strokeDasharray={251.2}
+                                        strokeDashoffset={Math.max(0, 251.2 - (251.2 * charPercent) / 100)}
+                                        strokeLinecap="round"
+                                        stroke={getMeterColor()}
+                                        fill="transparent"
+                                        r="40"
+                                        cx="50"
+                                        cy="50"
+                                    />
+                                </svg>
                             </div>
-                        )}
+                            <div className="w-[30px] flex justify-center">
+                                <span className={`text-sm ${charCount >= charLimit ? "text-red-500" : charCount >= charLimit - 20 ? "text-orange-500" : "text-secondary-text"}`}>
+                                    {charLimit - charCount}
+                                </span>
+                            </div>
+                            <div className="w-[1px] h-6 bg-gray-200 hidden sm:block mx-1" />
+                        </div>
                         <button
                             onClick={onPost}
                             disabled={isPosting || !canPost || isUploading || charCount > charLimit}
@@ -177,6 +173,6 @@ export default function PostComposer({
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
