@@ -4,11 +4,13 @@ import { MediaController } from '../controllers/media.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import multer from 'multer';
 
-// Use memory storage for buffer access if resizing is needed later, 
-// or disk storage for simplicity. Using default disk storage by multer (temp)
-// and then moving in the Service is also fine, but here we'll just let 
-// the service handle the stream/buffer or let multer save to temp.
-const upload = multer({ dest: 'uploads/temp/' });
+// §2.3: Multer with file size limit (10MB) — defense in depth
+const upload = multer({
+    dest: 'uploads/temp/',
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+    }
+});
 
 const router = Router();
 

@@ -31,13 +31,21 @@ model User {
   following             Follow[]       @relation("UserFollower")
 }
 
+// §5.4: Converted status from untyped String to proper enum
+enum RelationshipStatus {
+  NEUTRAL
+  FRIEND
+  ENEMY
+  BLOCKED
+}
+
 model Relationship {
-  id         String   @id @default(uuid())
+  id         String             @id @default(uuid())
   sourceId   String
   targetId   String
-  trustScore Int      @default(50)
-  status     String   @default("NEUTRAL") // NEUTRAL, FRIEND, ENEMY, BLOCKED
-  updatedAt  DateTime @updatedAt
+  trustScore Int                @default(50)
+  status     RelationshipStatus @default(NEUTRAL)
+  updatedAt  DateTime           @updatedAt
 
   source User @relation("RelationshipSource", fields: [sourceId], references: [id], onDelete: Cascade)
   target User @relation("RelationshipTarget", fields: [targetId], references: [id], onDelete: Cascade)
@@ -55,6 +63,8 @@ model Follow {
   following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
+  // §5.1: Index for getFollowingFeed query
+  @@index([followerId])
 }
 
 model Persona {
@@ -86,18 +96,23 @@ model Post {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   content   String
-  media     String? // JSON string of PostMedia (links, images, video)
+  // §5.2: Changed from String to Json for proper type handling
+  media     Json?
   type      PostType
   parentId  String?
   createdAt DateTime @default(now())
 
-  // New moderation fields
+  // Moderation fields
   flagged    Boolean @default(false)
   flagReason String?
 
   parent       Post?         @relation("PostToPost", fields: [parentId], references: [id])
   children     Post[]        @relation("PostToPost")
   interactions Interaction[]
+
+  // §5.1: Index for feed queries (flagged + parentId + createdAt)
+  @@index([flagged, parentId, createdAt])
+  @@index([userId, createdAt])
 }
 
 enum InteractionType {
@@ -107,12 +122,16 @@ enum InteractionType {
 }
 
 model Interaction {
-  id     String          @id @default(uuid())
-  userId String
-  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postId String
-  post   Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
-  type   InteractionType
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type      InteractionType
+  // §5.5: Added createdAt for chronological sorting of notifications
+  createdAt DateTime        @default(now())
 
   @@unique([userId, postId, type])
+  // §5.1: Index for notification queries
+  @@index([postId])
 }

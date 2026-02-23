@@ -7,31 +7,43 @@ import socialRoutes from './routes/social.routes.js';
 import mediaRoutes from './routes/media.routes.js';
 import path from 'path';
 
-// ... (existing imports)
-
 const app = express();
 
-const limiter = rateLimit({
+// §6.2: Global rate limiter (generous for normal API usage)
+const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 1000, // Increased limit for development/testing
+  limit: 1000,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
 });
 
+// §6.2: Strict rate limiter for auth endpoints (brute-force protection)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 20, // Only 20 auth attempts per 15 minutes
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many authentication attempts. Please try again later.' },
+});
+
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow accessing uploaded files
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
+
+// §6.3: CORS origin from environment variable
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow Next.js frontend
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true
 }));
+
 app.use(express.json());
-app.use(limiter);
+app.use(globalLimiter);
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-app.use('/api/auth', authRoutes);
+// §6.2: Apply strict auth limiter to auth routes
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/media', mediaRoutes);
 

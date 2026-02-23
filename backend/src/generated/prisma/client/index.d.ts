@@ -53,7 +53,17 @@ export type Interaction = $Result.DefaultSelection<Prisma.$InteractionPayload>
  * Enums
  */
 export namespace $Enums {
-  export const PostType: {
+  export const RelationshipStatus: {
+  NEUTRAL: 'NEUTRAL',
+  FRIEND: 'FRIEND',
+  ENEMY: 'ENEMY',
+  BLOCKED: 'BLOCKED'
+};
+
+export type RelationshipStatus = (typeof RelationshipStatus)[keyof typeof RelationshipStatus]
+
+
+export const PostType: {
   TWEET: 'TWEET',
   REPLY: 'REPLY',
   RETWEET: 'RETWEET'
@@ -71,6 +81,10 @@ export const InteractionType: {
 export type InteractionType = (typeof InteractionType)[keyof typeof InteractionType]
 
 }
+
+export type RelationshipStatus = $Enums.RelationshipStatus
+
+export const RelationshipStatus: typeof $Enums.RelationshipStatus
 
 export type PostType = $Enums.PostType
 
@@ -2873,7 +2887,7 @@ export namespace Prisma {
     sourceId: string | null
     targetId: string | null
     trustScore: number | null
-    status: string | null
+    status: $Enums.RelationshipStatus | null
     updatedAt: Date | null
   }
 
@@ -2882,7 +2896,7 @@ export namespace Prisma {
     sourceId: string | null
     targetId: string | null
     trustScore: number | null
-    status: string | null
+    status: $Enums.RelationshipStatus | null
     updatedAt: Date | null
   }
 
@@ -3024,7 +3038,7 @@ export namespace Prisma {
     sourceId: string
     targetId: string
     trustScore: number
-    status: string
+    status: $Enums.RelationshipStatus
     updatedAt: Date
     _count: RelationshipCountAggregateOutputType | null
     _avg: RelationshipAvgAggregateOutputType | null
@@ -3114,7 +3128,7 @@ export namespace Prisma {
       sourceId: string
       targetId: string
       trustScore: number
-      status: string
+      status: $Enums.RelationshipStatus
       updatedAt: Date
     }, ExtArgs["result"]["relationship"]>
     composites: {}
@@ -3545,7 +3559,7 @@ export namespace Prisma {
     readonly sourceId: FieldRef<"Relationship", 'String'>
     readonly targetId: FieldRef<"Relationship", 'String'>
     readonly trustScore: FieldRef<"Relationship", 'Int'>
-    readonly status: FieldRef<"Relationship", 'String'>
+    readonly status: FieldRef<"Relationship", 'RelationshipStatus'>
     readonly updatedAt: FieldRef<"Relationship", 'DateTime'>
   }
     
@@ -7128,7 +7142,6 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     content: string | null
-    media: string | null
     type: $Enums.PostType | null
     parentId: string | null
     createdAt: Date | null
@@ -7140,7 +7153,6 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     content: string | null
-    media: string | null
     type: $Enums.PostType | null
     parentId: string | null
     createdAt: Date | null
@@ -7166,7 +7178,6 @@ export namespace Prisma {
     id?: true
     userId?: true
     content?: true
-    media?: true
     type?: true
     parentId?: true
     createdAt?: true
@@ -7178,7 +7189,6 @@ export namespace Prisma {
     id?: true
     userId?: true
     content?: true
-    media?: true
     type?: true
     parentId?: true
     createdAt?: true
@@ -7275,7 +7285,7 @@ export namespace Prisma {
     id: string
     userId: string
     content: string
-    media: string | null
+    media: JsonValue | null
     type: $Enums.PostType
     parentId: string | null
     createdAt: Date
@@ -7386,7 +7396,7 @@ export namespace Prisma {
       id: string
       userId: string
       content: string
-      media: string | null
+      media: Prisma.JsonValue | null
       type: $Enums.PostType
       parentId: string | null
       createdAt: Date
@@ -7822,7 +7832,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Post", 'String'>
     readonly userId: FieldRef<"Post", 'String'>
     readonly content: FieldRef<"Post", 'String'>
-    readonly media: FieldRef<"Post", 'String'>
+    readonly media: FieldRef<"Post", 'Json'>
     readonly type: FieldRef<"Post", 'PostType'>
     readonly parentId: FieldRef<"Post", 'String'>
     readonly createdAt: FieldRef<"Post", 'DateTime'>
@@ -8322,6 +8332,7 @@ export namespace Prisma {
     userId: string | null
     postId: string | null
     type: $Enums.InteractionType | null
+    createdAt: Date | null
   }
 
   export type InteractionMaxAggregateOutputType = {
@@ -8329,6 +8340,7 @@ export namespace Prisma {
     userId: string | null
     postId: string | null
     type: $Enums.InteractionType | null
+    createdAt: Date | null
   }
 
   export type InteractionCountAggregateOutputType = {
@@ -8336,6 +8348,7 @@ export namespace Prisma {
     userId: number
     postId: number
     type: number
+    createdAt: number
     _all: number
   }
 
@@ -8345,6 +8358,7 @@ export namespace Prisma {
     userId?: true
     postId?: true
     type?: true
+    createdAt?: true
   }
 
   export type InteractionMaxAggregateInputType = {
@@ -8352,6 +8366,7 @@ export namespace Prisma {
     userId?: true
     postId?: true
     type?: true
+    createdAt?: true
   }
 
   export type InteractionCountAggregateInputType = {
@@ -8359,6 +8374,7 @@ export namespace Prisma {
     userId?: true
     postId?: true
     type?: true
+    createdAt?: true
     _all?: true
   }
 
@@ -8439,6 +8455,7 @@ export namespace Prisma {
     userId: string
     postId: string
     type: $Enums.InteractionType
+    createdAt: Date
     _count: InteractionCountAggregateOutputType | null
     _min: InteractionMinAggregateOutputType | null
     _max: InteractionMaxAggregateOutputType | null
@@ -8463,6 +8480,7 @@ export namespace Prisma {
     userId?: boolean
     postId?: boolean
     type?: boolean
+    createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["interaction"]>
@@ -8472,6 +8490,7 @@ export namespace Prisma {
     userId?: boolean
     postId?: boolean
     type?: boolean
+    createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["interaction"]>
@@ -8481,6 +8500,7 @@ export namespace Prisma {
     userId?: boolean
     postId?: boolean
     type?: boolean
+    createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["interaction"]>
@@ -8490,9 +8510,10 @@ export namespace Prisma {
     userId?: boolean
     postId?: boolean
     type?: boolean
+    createdAt?: boolean
   }
 
-  export type InteractionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "postId" | "type", ExtArgs["result"]["interaction"]>
+  export type InteractionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "postId" | "type" | "createdAt", ExtArgs["result"]["interaction"]>
   export type InteractionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     post?: boolean | PostDefaultArgs<ExtArgs>
@@ -8517,6 +8538,7 @@ export namespace Prisma {
       userId: string
       postId: string
       type: $Enums.InteractionType
+      createdAt: Date
     }, ExtArgs["result"]["interaction"]>
     composites: {}
   }
@@ -8946,6 +8968,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"Interaction", 'String'>
     readonly postId: FieldRef<"Interaction", 'String'>
     readonly type: FieldRef<"Interaction", 'InteractionType'>
+    readonly createdAt: FieldRef<"Interaction", 'DateTime'>
   }
     
 
@@ -9445,7 +9468,8 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     postId: 'postId',
-    type: 'type'
+    type: 'type',
+    createdAt: 'createdAt'
   };
 
   export type InteractionScalarFieldEnum = (typeof InteractionScalarFieldEnum)[keyof typeof InteractionScalarFieldEnum]
@@ -9464,6 +9488,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const NullsOrder: {
@@ -9521,6 +9553,13 @@ export namespace Prisma {
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'RelationshipStatus'
+   */
+  export type EnumRelationshipStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RelationshipStatus'>
     
 
 
@@ -9656,7 +9695,7 @@ export namespace Prisma {
     sourceId?: StringFilter<"Relationship"> | string
     targetId?: StringFilter<"Relationship"> | string
     trustScore?: IntFilter<"Relationship"> | number
-    status?: StringFilter<"Relationship"> | string
+    status?: EnumRelationshipStatusFilter<"Relationship"> | $Enums.RelationshipStatus
     updatedAt?: DateTimeFilter<"Relationship"> | Date | string
     source?: XOR<UserScalarRelationFilter, UserWhereInput>
     target?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -9682,7 +9721,7 @@ export namespace Prisma {
     sourceId?: StringFilter<"Relationship"> | string
     targetId?: StringFilter<"Relationship"> | string
     trustScore?: IntFilter<"Relationship"> | number
-    status?: StringFilter<"Relationship"> | string
+    status?: EnumRelationshipStatusFilter<"Relationship"> | $Enums.RelationshipStatus
     updatedAt?: DateTimeFilter<"Relationship"> | Date | string
     source?: XOR<UserScalarRelationFilter, UserWhereInput>
     target?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -9710,7 +9749,7 @@ export namespace Prisma {
     sourceId?: StringWithAggregatesFilter<"Relationship"> | string
     targetId?: StringWithAggregatesFilter<"Relationship"> | string
     trustScore?: IntWithAggregatesFilter<"Relationship"> | number
-    status?: StringWithAggregatesFilter<"Relationship"> | string
+    status?: EnumRelationshipStatusWithAggregatesFilter<"Relationship"> | $Enums.RelationshipStatus
     updatedAt?: DateTimeWithAggregatesFilter<"Relationship"> | Date | string
   }
 
@@ -9885,7 +9924,7 @@ export namespace Prisma {
     id?: StringFilter<"Post"> | string
     userId?: StringFilter<"Post"> | string
     content?: StringFilter<"Post"> | string
-    media?: StringNullableFilter<"Post"> | string | null
+    media?: JsonNullableFilter<"Post">
     type?: EnumPostTypeFilter<"Post"> | $Enums.PostType
     parentId?: StringNullableFilter<"Post"> | string | null
     createdAt?: DateTimeFilter<"Post"> | Date | string
@@ -9920,7 +9959,7 @@ export namespace Prisma {
     NOT?: PostWhereInput | PostWhereInput[]
     userId?: StringFilter<"Post"> | string
     content?: StringFilter<"Post"> | string
-    media?: StringNullableFilter<"Post"> | string | null
+    media?: JsonNullableFilter<"Post">
     type?: EnumPostTypeFilter<"Post"> | $Enums.PostType
     parentId?: StringNullableFilter<"Post"> | string | null
     createdAt?: DateTimeFilter<"Post"> | Date | string
@@ -9954,7 +9993,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Post"> | string
     userId?: StringWithAggregatesFilter<"Post"> | string
     content?: StringWithAggregatesFilter<"Post"> | string
-    media?: StringNullableWithAggregatesFilter<"Post"> | string | null
+    media?: JsonNullableWithAggregatesFilter<"Post">
     type?: EnumPostTypeWithAggregatesFilter<"Post"> | $Enums.PostType
     parentId?: StringNullableWithAggregatesFilter<"Post"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Post"> | Date | string
@@ -9970,6 +10009,7 @@ export namespace Prisma {
     userId?: StringFilter<"Interaction"> | string
     postId?: StringFilter<"Interaction"> | string
     type?: EnumInteractionTypeFilter<"Interaction"> | $Enums.InteractionType
+    createdAt?: DateTimeFilter<"Interaction"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     post?: XOR<PostScalarRelationFilter, PostWhereInput>
   }
@@ -9979,6 +10019,7 @@ export namespace Prisma {
     userId?: SortOrder
     postId?: SortOrder
     type?: SortOrder
+    createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
     post?: PostOrderByWithRelationInput
   }
@@ -9992,6 +10033,7 @@ export namespace Prisma {
     userId?: StringFilter<"Interaction"> | string
     postId?: StringFilter<"Interaction"> | string
     type?: EnumInteractionTypeFilter<"Interaction"> | $Enums.InteractionType
+    createdAt?: DateTimeFilter<"Interaction"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     post?: XOR<PostScalarRelationFilter, PostWhereInput>
   }, "id" | "userId_postId_type">
@@ -10001,6 +10043,7 @@ export namespace Prisma {
     userId?: SortOrder
     postId?: SortOrder
     type?: SortOrder
+    createdAt?: SortOrder
     _count?: InteractionCountOrderByAggregateInput
     _max?: InteractionMaxOrderByAggregateInput
     _min?: InteractionMinOrderByAggregateInput
@@ -10014,6 +10057,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Interaction"> | string
     postId?: StringWithAggregatesFilter<"Interaction"> | string
     type?: EnumInteractionTypeWithAggregatesFilter<"Interaction"> | $Enums.InteractionType
+    createdAt?: DateTimeWithAggregatesFilter<"Interaction"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -10121,7 +10165,7 @@ export namespace Prisma {
   export type RelationshipCreateInput = {
     id?: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
     source: UserCreateNestedOneWithoutRelationshipsSentInput
     target: UserCreateNestedOneWithoutRelationshipsReceivedInput
@@ -10132,14 +10176,14 @@ export namespace Prisma {
     sourceId: string
     targetId: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
   }
 
   export type RelationshipUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     source?: UserUpdateOneRequiredWithoutRelationshipsSentNestedInput
     target?: UserUpdateOneRequiredWithoutRelationshipsReceivedNestedInput
@@ -10150,7 +10194,7 @@ export namespace Prisma {
     sourceId?: StringFieldUpdateOperationsInput | string
     targetId?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -10159,14 +10203,14 @@ export namespace Prisma {
     sourceId: string
     targetId: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
   }
 
   export type RelationshipUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -10175,7 +10219,7 @@ export namespace Prisma {
     sourceId?: StringFieldUpdateOperationsInput | string
     targetId?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -10339,7 +10383,7 @@ export namespace Prisma {
   export type PostCreateInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -10354,7 +10398,7 @@ export namespace Prisma {
     id?: string
     userId: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     parentId?: string | null
     createdAt?: Date | string
@@ -10367,7 +10411,7 @@ export namespace Prisma {
   export type PostUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -10382,7 +10426,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10396,7 +10440,7 @@ export namespace Prisma {
     id?: string
     userId: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     parentId?: string | null
     createdAt?: Date | string
@@ -10407,7 +10451,7 @@ export namespace Prisma {
   export type PostUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -10418,7 +10462,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10429,6 +10473,7 @@ export namespace Prisma {
   export type InteractionCreateInput = {
     id?: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
     user: UserCreateNestedOneWithoutInteractionsInput
     post: PostCreateNestedOneWithoutInteractionsInput
   }
@@ -10438,11 +10483,13 @@ export namespace Prisma {
     userId: string
     postId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
   }
 
   export type InteractionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutInteractionsNestedInput
     post?: PostUpdateOneRequiredWithoutInteractionsNestedInput
   }
@@ -10452,6 +10499,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InteractionCreateManyInput = {
@@ -10459,11 +10507,13 @@ export namespace Prisma {
     userId: string
     postId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
   }
 
   export type InteractionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InteractionUncheckedUpdateManyInput = {
@@ -10471,6 +10521,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -10674,6 +10725,13 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type EnumRelationshipStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RelationshipStatus | EnumRelationshipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RelationshipStatus[]
+    notIn?: $Enums.RelationshipStatus[]
+    not?: NestedEnumRelationshipStatusFilter<$PrismaModel> | $Enums.RelationshipStatus
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -10733,6 +10791,16 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type EnumRelationshipStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RelationshipStatus | EnumRelationshipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RelationshipStatus[]
+    notIn?: $Enums.RelationshipStatus[]
+    not?: NestedEnumRelationshipStatusWithAggregatesFilter<$PrismaModel> | $Enums.RelationshipStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRelationshipStatusFilter<$PrismaModel>
+    _max?: NestedEnumRelationshipStatusFilter<$PrismaModel>
   }
 
   export type FollowFollowerIdFollowingIdCompoundUniqueInput = {
@@ -10843,6 +10911,24 @@ export namespace Prisma {
     codeHash?: SortOrder
     used?: SortOrder
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type EnumPostTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.PostType | EnumPostTypeFieldRefInput<$PrismaModel>
@@ -10872,7 +10958,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     content?: SortOrder
-    media?: SortOrder
     type?: SortOrder
     parentId?: SortOrder
     createdAt?: SortOrder
@@ -10884,12 +10969,32 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     content?: SortOrder
-    media?: SortOrder
     type?: SortOrder
     parentId?: SortOrder
     createdAt?: SortOrder
     flagged?: SortOrder
     flagReason?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumPostTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10925,6 +11030,7 @@ export namespace Prisma {
     userId?: SortOrder
     postId?: SortOrder
     type?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type InteractionMaxOrderByAggregateInput = {
@@ -10932,6 +11038,7 @@ export namespace Prisma {
     userId?: SortOrder
     postId?: SortOrder
     type?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type InteractionMinOrderByAggregateInput = {
@@ -10939,6 +11046,7 @@ export namespace Prisma {
     userId?: SortOrder
     postId?: SortOrder
     type?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type EnumInteractionTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11313,6 +11421,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type EnumRelationshipStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RelationshipStatus
+  }
+
   export type UserUpdateOneRequiredWithoutRelationshipsSentNestedInput = {
     create?: XOR<UserCreateWithoutRelationshipsSentInput, UserUncheckedCreateWithoutRelationshipsSentInput>
     connectOrCreate?: UserCreateOrConnectWithoutRelationshipsSentInput
@@ -11657,6 +11769,13 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumRelationshipStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RelationshipStatus | EnumRelationshipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RelationshipStatus[]
+    notIn?: $Enums.RelationshipStatus[]
+    not?: NestedEnumRelationshipStatusFilter<$PrismaModel> | $Enums.RelationshipStatus
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -11683,6 +11802,16 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+
+  export type NestedEnumRelationshipStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RelationshipStatus | EnumRelationshipStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RelationshipStatus[]
+    notIn?: $Enums.RelationshipStatus[]
+    not?: NestedEnumRelationshipStatusWithAggregatesFilter<$PrismaModel> | $Enums.RelationshipStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRelationshipStatusFilter<$PrismaModel>
+    _max?: NestedEnumRelationshipStatusFilter<$PrismaModel>
+  }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -11707,6 +11836,24 @@ export namespace Prisma {
     in?: $Enums.PostType[]
     notIn?: $Enums.PostType[]
     not?: NestedEnumPostTypeFilter<$PrismaModel> | $Enums.PostType
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumPostTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11781,7 +11928,7 @@ export namespace Prisma {
   export type PostCreateWithoutUserInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -11794,7 +11941,7 @@ export namespace Prisma {
   export type PostUncheckedCreateWithoutUserInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     parentId?: string | null
     createdAt?: Date | string
@@ -11816,6 +11963,7 @@ export namespace Prisma {
   export type InteractionCreateWithoutUserInput = {
     id?: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
     post: PostCreateNestedOneWithoutInteractionsInput
   }
 
@@ -11823,6 +11971,7 @@ export namespace Prisma {
     id?: string
     postId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
   }
 
   export type InteractionCreateOrConnectWithoutUserInput = {
@@ -11837,7 +11986,7 @@ export namespace Prisma {
   export type RelationshipCreateWithoutSourceInput = {
     id?: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
     target: UserCreateNestedOneWithoutRelationshipsReceivedInput
   }
@@ -11846,7 +11995,7 @@ export namespace Prisma {
     id?: string
     targetId: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
   }
 
@@ -11862,7 +12011,7 @@ export namespace Prisma {
   export type RelationshipCreateWithoutTargetInput = {
     id?: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
     source: UserCreateNestedOneWithoutRelationshipsSentInput
   }
@@ -11871,7 +12020,7 @@ export namespace Prisma {
     id?: string
     sourceId: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
   }
 
@@ -12002,7 +12151,7 @@ export namespace Prisma {
     id?: StringFilter<"Post"> | string
     userId?: StringFilter<"Post"> | string
     content?: StringFilter<"Post"> | string
-    media?: StringNullableFilter<"Post"> | string | null
+    media?: JsonNullableFilter<"Post">
     type?: EnumPostTypeFilter<"Post"> | $Enums.PostType
     parentId?: StringNullableFilter<"Post"> | string | null
     createdAt?: DateTimeFilter<"Post"> | Date | string
@@ -12034,6 +12183,7 @@ export namespace Prisma {
     userId?: StringFilter<"Interaction"> | string
     postId?: StringFilter<"Interaction"> | string
     type?: EnumInteractionTypeFilter<"Interaction"> | $Enums.InteractionType
+    createdAt?: DateTimeFilter<"Interaction"> | Date | string
   }
 
   export type RelationshipUpsertWithWhereUniqueWithoutSourceInput = {
@@ -12060,7 +12210,7 @@ export namespace Prisma {
     sourceId?: StringFilter<"Relationship"> | string
     targetId?: StringFilter<"Relationship"> | string
     trustScore?: IntFilter<"Relationship"> | number
-    status?: StringFilter<"Relationship"> | string
+    status?: EnumRelationshipStatusFilter<"Relationship"> | $Enums.RelationshipStatus
     updatedAt?: DateTimeFilter<"Relationship"> | Date | string
   }
 
@@ -12668,7 +12818,7 @@ export namespace Prisma {
   export type PostCreateWithoutChildrenInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -12682,7 +12832,7 @@ export namespace Prisma {
     id?: string
     userId: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     parentId?: string | null
     createdAt?: Date | string
@@ -12699,7 +12849,7 @@ export namespace Prisma {
   export type PostCreateWithoutParentInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -12713,7 +12863,7 @@ export namespace Prisma {
     id?: string
     userId: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -12734,6 +12884,7 @@ export namespace Prisma {
   export type InteractionCreateWithoutPostInput = {
     id?: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
     user: UserCreateNestedOneWithoutInteractionsInput
   }
 
@@ -12741,6 +12892,7 @@ export namespace Prisma {
     id?: string
     userId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
   }
 
   export type InteractionCreateOrConnectWithoutPostInput = {
@@ -12811,7 +12963,7 @@ export namespace Prisma {
   export type PostUpdateWithoutChildrenInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -12825,7 +12977,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12908,7 +13060,7 @@ export namespace Prisma {
   export type PostCreateWithoutInteractionsInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -12922,7 +13074,7 @@ export namespace Prisma {
     id?: string
     userId: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     parentId?: string | null
     createdAt?: Date | string
@@ -12995,7 +13147,7 @@ export namespace Prisma {
   export type PostUpdateWithoutInteractionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -13009,7 +13161,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13027,7 +13179,7 @@ export namespace Prisma {
   export type PostCreateManyUserInput = {
     id?: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     parentId?: string | null
     createdAt?: Date | string
@@ -13039,13 +13191,14 @@ export namespace Prisma {
     id?: string
     postId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
   }
 
   export type RelationshipCreateManySourceInput = {
     id?: string
     targetId: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
   }
 
@@ -13053,7 +13206,7 @@ export namespace Prisma {
     id?: string
     sourceId: string
     trustScore?: number
-    status?: string
+    status?: $Enums.RelationshipStatus
     updatedAt?: Date | string
   }
 
@@ -13090,7 +13243,7 @@ export namespace Prisma {
   export type PostUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -13103,7 +13256,7 @@ export namespace Prisma {
   export type PostUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13116,7 +13269,7 @@ export namespace Prisma {
   export type PostUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     parentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13127,6 +13280,7 @@ export namespace Prisma {
   export type InteractionUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     post?: PostUpdateOneRequiredWithoutInteractionsNestedInput
   }
 
@@ -13134,18 +13288,20 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InteractionUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RelationshipUpdateWithoutSourceInput = {
     id?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     target?: UserUpdateOneRequiredWithoutRelationshipsReceivedNestedInput
   }
@@ -13154,7 +13310,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     targetId?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13162,14 +13318,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     targetId?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RelationshipUpdateWithoutTargetInput = {
     id?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     source?: UserUpdateOneRequiredWithoutRelationshipsSentNestedInput
   }
@@ -13178,7 +13334,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sourceId?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13186,7 +13342,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sourceId?: StringFieldUpdateOperationsInput | string
     trustScore?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    status?: EnumRelationshipStatusFieldUpdateOperationsInput | $Enums.RelationshipStatus
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13230,7 +13386,7 @@ export namespace Prisma {
     id?: string
     userId: string
     content: string
-    media?: string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type: $Enums.PostType
     createdAt?: Date | string
     flagged?: boolean
@@ -13241,12 +13397,13 @@ export namespace Prisma {
     id?: string
     userId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
   }
 
   export type PostUpdateWithoutParentInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -13260,7 +13417,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -13273,7 +13430,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
-    media?: NullableStringFieldUpdateOperationsInput | string | null
+    media?: NullableJsonNullValueInput | InputJsonValue
     type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     flagged?: BoolFieldUpdateOperationsInput | boolean
@@ -13283,6 +13440,7 @@ export namespace Prisma {
   export type InteractionUpdateWithoutPostInput = {
     id?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutInteractionsNestedInput
   }
 
@@ -13290,12 +13448,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InteractionUncheckedUpdateManyWithoutPostInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

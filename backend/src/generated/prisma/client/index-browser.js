@@ -175,7 +175,8 @@ exports.Prisma.InteractionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   postId: 'postId',
-  type: 'type'
+  type: 'type',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -184,6 +185,11 @@ exports.Prisma.SortOrder = {
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
@@ -202,6 +208,13 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
+exports.RelationshipStatus = exports.$Enums.RelationshipStatus = {
+  NEUTRAL: 'NEUTRAL',
+  FRIEND: 'FRIEND',
+  ENEMY: 'ENEMY',
+  BLOCKED: 'BLOCKED'
+};
+
 exports.PostType = exports.$Enums.PostType = {
   TWEET: 'TWEET',
   REPLY: 'REPLY',

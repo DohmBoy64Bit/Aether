@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { hashPassword, comparePassword, generateToken, generateRecoveryCode } from '../utils/auth.js';
+import { hashPassword, comparePassword, generateToken, generateRecoveryCode, hashRecoveryCode } from '../utils/auth.js';
 import { SignupData, LoginData, AuthResponse } from '../types/index.js';
 
 export class AuthService {
@@ -13,20 +13,18 @@ export class AuthService {
     }
 
     const passwordHash = await hashPassword(data.password);
-    
+
     // Generate 5 recovery codes
     const plainRecoveryCodes = Array.from({ length: 5 }, () => generateRecoveryCode());
-    
+
     const user = await prisma.user.create({
       data: {
         username: data.username,
         passwordHash,
         recoveryCodes: {
-          create: await Promise.all(
-            plainRecoveryCodes.map(async (code) => ({
-              codeHash: await hashPassword(code),
-            }))
-          ),
+          create: plainRecoveryCodes.map((code) => ({
+            codeHash: hashRecoveryCode(code),
+          })),
         },
       },
     });

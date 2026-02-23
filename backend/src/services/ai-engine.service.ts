@@ -1,37 +1,79 @@
 import prisma from '../utils/prisma.js';
-import { AiService } from './ai.service.js';
+import { AiService, AiUserWithPersona } from './ai.service.js';
 import { SocialService } from './social.service.js';
 import { SearchService } from './search.service.js';
 import { MemoryService } from './memory.service.js';
 import { PostType, InteractionType } from '../generated/prisma/client/index.js';
 
+/**
+ * Concurrency limiter — runs promises with a max concurrency.
+ */
+async function pLimit<T>(tasks: (() => Promise<T>)[], concurrency: number): Promise<T[]> {
+  const results: T[] = [];
+  const executing: Promise<void>[] = [];
+
+  for (const task of tasks) {
+    const p = task().then(result => { results.push(result); });
+    executing.push(p);
+
+    if (executing.length >= concurrency) {
+      await Promise.race(executing);
+      // Remove settled promises
+      for (let i = executing.length - 1; i >= 0; i--) {
+        const status = await Promise.race([executing[i].then(() => 'done'), Promise.resolve('pending')]);
+        if (status === 'done') executing.splice(i, 1);
+      }
+    }
+  }
+
+  await Promise.all(executing);
+  return results;
+}
+
 export class AiEngineService {
   private static intervalId: NodeJS.Timeout | null = null;
   private static IS_RUNNING = false;
+  private static lastSleepCycleAt = 0; // §4.4: Track last sleep cycle time
 
   /**
    * Starts the AI Action Loop.
-   * @param intervalMs How often to run the loop (default 1 minute)
    */
   static start(intervalMs: number = 60000) {
     if (this.intervalId) return;
 
     console.log(`Starting AI Engine Loop with interval: ${intervalMs}ms`);
-    this.seedAiUsers(10); // Ensure we have at least 10 AI users
+
+    // §6.5: Register graceful shutdown handlers
+    const shutdown = () => {
+      console.log('AI Engine: Graceful shutdown initiated...');
+      this.stop();
+      process.exit(0);
+    };
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
+
+    // §4.5: Seed AI users in the background (non-blocking)
+    this.seedAiUsers(10).catch(err => {
+      console.error('Error seeding AI users:', err);
+    });
+
     this.intervalId = setInterval(() => this.runLoop(), intervalMs);
   }
 
   /**
-   * Seeds the database with AI users if none exist.
+   * §4.5: Seeds AI users with concurrency limit (3 parallel) instead of sequential.
    */
   private static async seedAiUsers(count: number) {
     try {
       const existing = await prisma.user.count({ where: { isAi: true } });
       if (existing < count) {
-        console.log(`Seeding AI users: creating ${count - existing} more AI personas...`);
-        for (let i = 0; i < count - existing; i++) {
-          await AiService.createAiUser();
-        }
+        const needed = count - existing;
+        console.log(`Seeding AI users: creating ${needed} more AI personas (3 at a time)...`);
+
+        const tasks = Array.from({ length: needed }, () => () => AiService.createAiUser());
+        await pLimit(tasks, 3);
+
+        console.log(`AI Engine: Seeding complete — ${needed} AI users created.`);
       }
     } catch (error) {
       console.error('Error seeding AI users:', error);
@@ -42,6 +84,7 @@ export class AiEngineService {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
+      console.log('AI Engine Loop stopped.');
     }
   }
 
@@ -60,19 +103,22 @@ export class AiEngineService {
 
       console.log(`AI Engine Loop: Processing ${aiUsers.length} AI users`);
 
-      // Check for Sleep Cycle (Runs once per hour at the top of the hour)
-      if (new Date().getMinutes() === 0) {
-        await this.runSleepCycle(aiUsers);
+      // §4.4: Fixed sleep cycle — check elapsed time instead of clock minute
+      const now = Date.now();
+      const ONE_HOUR = 60 * 60 * 1000;
+      if (now - this.lastSleepCycleAt >= ONE_HOUR) {
+        this.lastSleepCycleAt = now;
+        await this.runSleepCycle(aiUsers as AiUserWithPersona[]);
       }
 
-      // Process users concurrently in chunks to prevent event loop starvation
+      // Process users concurrently in chunks
       const CHUNK_SIZE = 5;
       for (let i = 0; i < aiUsers.length; i += CHUNK_SIZE) {
         const chunk = aiUsers.slice(i, i + CHUNK_SIZE);
         await Promise.all(
           chunk.map(user =>
-            this.processUserAction(user).catch(err =>
-              console.error(`Error processing actionable tick for AI user ${user.username}:`, err)
+            this.processUserAction(user as AiUserWithPersona).catch(err =>
+              console.error(`Error processing AI user ${user.username}:`, err)
             )
           )
         );
@@ -87,49 +133,51 @@ export class AiEngineService {
   /**
    * Decides and performs an action for a single AI user.
    */
-  private static async processUserAction(user: any) {
+  private static async processUserAction(user: AiUserWithPersona) {
     const decision = await AiService.decideAction(user);
 
     if (decision.action === 'POST') {
       const searchResult = await this.getWebSearchContext(user);
       const generated = await AiService.generatePost(user, searchResult, decision.archetype);
-      const mediaJson = generated.media ? JSON.stringify(generated.media) : null;
+      const mediaJson = generated.media || null;
       await SocialService.createPost(user.id, generated.content, PostType.TWEET, undefined, mediaJson);
       const mediaType = generated.media
         ? (generated.media.video ? 'video' : generated.media.images ? `${generated.media.images.length} images` : `${generated.media.links?.length || 0} links`)
         : 'none';
       console.log(`AI User ${user.username} posted [${decision.archetype}] (media: ${mediaType}): ${generated.content.substring(0, 50)}...`);
+
     } else if (decision.action === 'REPLY') {
-      // Find a recent post to reply to
       const recentPosts = await SocialService.getFeed(10);
       const targetPost = recentPosts[Math.floor(Math.random() * recentPosts.length)];
       if (targetPost && targetPost.userId !== user.id) {
-        // 30% chance to reply to an existing reply (nested thread) instead of the top-level post
         let replyTargetPost = targetPost;
 
-        if (Math.random() < 0.3 && targetPost._count.children > 0) {
+        if (Math.random() < 0.3 && targetPost._count?.children > 0) {
           try {
             const fullPost = await SocialService.getPost(targetPost.id);
-            if (fullPost && fullPost.children && fullPost.children.length > 0) {
-              replyTargetPost = fullPost.children[Math.floor(Math.random() * fullPost.children.length)] as any;
+            if (fullPost && (fullPost as any).children?.length > 0) {
+              replyTargetPost = (fullPost as any).children[Math.floor(Math.random() * (fullPost as any).children.length)];
               console.log(`AI User ${user.username} replying to nested reply ${replyTargetPost.id}`);
             }
-          } catch (e) {
-            // Fall back to replying to the top-level post
+          } catch {
+            // Fall back to top-level post
           }
         }
 
-        const targetUser = { id: replyTargetPost.userId, username: replyTargetPost.user.username };
+        const targetUser = { id: replyTargetPost.userId, username: (replyTargetPost as any).user.username };
         const content = await AiService.generateReply(user, targetUser, replyTargetPost.content);
         await SocialService.createPost(user.id, content, PostType.REPLY, replyTargetPost.id);
         console.log(`AI User ${user.username} replied to ${replyTargetPost.id}: ${content.substring(0, 50)}...`);
       }
+
     } else if (decision.action === 'FOLLOW' && decision.targetUserId) {
       await SocialService.followUser(user.id, decision.targetUserId);
-      console.log(`AI User ${user.username} decided to FOLLOW user ${decision.targetUserId}`);
+      console.log(`AI User ${user.username} FOLLOW ${decision.targetUserId}`);
+
     } else if (decision.action === 'UNFOLLOW' && decision.targetUserId) {
       await SocialService.unfollowUser(user.id, decision.targetUserId);
-      console.log(`AI User ${user.username} decided to UNFOLLOW user ${decision.targetUserId}`);
+      console.log(`AI User ${user.username} UNFOLLOW ${decision.targetUserId}`);
+
     } else if (decision.action === 'LIKE' && decision.targetUserId) {
       const targetPosts = await prisma.post.findMany({
         where: { userId: decision.targetUserId },
@@ -139,8 +187,9 @@ export class AiEngineService {
       if (targetPosts.length > 0) {
         const postToLike = targetPosts[Math.floor(Math.random() * targetPosts.length)];
         await SocialService.interact(user.id, postToLike.id, InteractionType.LIKE);
-        console.log(`AI User ${user.username} decided to LIKE post ${postToLike.id} from trusted user ${decision.targetUserId}`);
+        console.log(`AI User ${user.username} LIKE post ${postToLike.id}`);
       }
+
     } else if (decision.action === 'RETWEET' && decision.targetUserId) {
       const targetPosts = await prisma.post.findMany({
         where: { userId: decision.targetUserId },
@@ -150,7 +199,7 @@ export class AiEngineService {
       if (targetPosts.length > 0) {
         const postToRetweet = targetPosts[Math.floor(Math.random() * targetPosts.length)];
         await SocialService.interact(user.id, postToRetweet.id, InteractionType.RETWEET);
-        console.log(`AI User ${user.username} decided to RETWEET post ${postToRetweet.id} from trusted user ${decision.targetUserId}`);
+        console.log(`AI User ${user.username} RETWEET post ${postToRetweet.id}`);
       }
     }
   }
@@ -159,15 +208,14 @@ export class AiEngineService {
    * The Sleep Cycle (Dreaming).
    * Summarizes temporary memories into core memories and prunes raw logs.
    */
-  private static async runSleepCycle(users: any[]) {
+  private static async runSleepCycle(users: AiUserWithPersona[]) {
     console.log('AI Engine: Starting Sleep Cycle (Dreaming)...');
     for (const user of users) {
       try {
         const tempMemories = await MemoryService.getTemporaryMemoriesForPruning(user.id);
         if (tempMemories.length === 0) continue;
 
-        const rawLogs = tempMemories.map((m: any) => m.content).join('\n');
-        // Simple summarization via LLM (we'd ideally use a specific summary prompt here)
+        const rawLogs = tempMemories.map((m: { content: string | null }) => m.content || '').join('\n');
         const summary = await AiService.summarizeMemories(user, rawLogs);
 
         await MemoryService.addMemory(summary, {
@@ -177,7 +225,6 @@ export class AiEngineService {
           type: 'dream_summary'
         });
 
-        // Persona Evolution: Update bio or personality slightly based on summary
         const evolvedBio = await AiService.evolveBio(user, summary);
 
         await prisma.user.update({
@@ -185,8 +232,8 @@ export class AiEngineService {
           data: { bio: evolvedBio }
         });
 
-        await MemoryService.deleteMemories(tempMemories.map((m: any) => m.id));
-        console.log(`AI Engine: Sleep Cycle & Evolution complete for ${user.username}.`);
+        await MemoryService.deleteMemories(tempMemories.map((m: { id: string }) => m.id));
+        console.log(`AI Engine: Sleep Cycle complete for ${user.username}.`);
       } catch (error) {
         console.error(`Error in Sleep Cycle for user ${user.username}:`, error);
       }
@@ -195,39 +242,46 @@ export class AiEngineService {
 
   /**
    * Fetches current events context based on user interests.
-   * Uses Ollama to plan the search, then SearXNG to execute it.
-   * Returns structured SearchResult with links, images, and videos.
    */
-  private static async getWebSearchContext(user: any): Promise<import('./search.service.js').SearchResult> {
+  private static async getWebSearchContext(user: AiUserWithPersona): Promise<import('./search.service.js').SearchResult> {
     try {
       const interests = user.persona?.interests;
-      const interestList = Array.isArray(interests) ? interests : JSON.parse(interests as string || '[]');
+      let interestList: string[];
+
+      if (Array.isArray(interests)) {
+        interestList = interests.map(i => {
+          if (typeof i === 'string') return i;
+          if (typeof i === 'object' && i !== null) {
+            const extract = (obj: unknown): string[] => {
+              if (typeof obj === 'string') return [obj];
+              if (Array.isArray(obj)) return obj.flatMap(extract);
+              if (typeof obj === 'object' && obj !== null) return Object.values(obj as Record<string, unknown>).flatMap(extract);
+              return [];
+            };
+            return extract(i).join(' ');
+          }
+          return String(i);
+        });
+      } else if (typeof interests === 'string') {
+        try {
+          interestList = JSON.parse(interests);
+        } catch {
+          interestList = [interests];
+        }
+      } else {
+        interestList = [];
+      }
 
       if (interestList.length === 0) {
-        console.log(`AI Engine: User @${user.username} has no interests. Falling back to 'trending topics'.`);
+        console.log(`AI Engine: User @${user.username} has no interests. Falling back.`);
         interestList.push("trending topics and current events");
       }
 
-      const rawInterest = interestList[Math.floor(Math.random() * interestList.length)];
-
-      // Normalize interest to string to handle complex objects from LLM
-      let interest = '';
-      if (typeof rawInterest === 'object') {
-        // Recursively extract all strings from the interest object
-        const extractStrings = (obj: any): string[] => {
-          if (typeof obj === 'string') return [obj];
-          if (Array.isArray(obj)) return obj.flatMap(extractStrings);
-          if (typeof obj === 'object' && obj !== null) return Object.values(obj).flatMap(extractStrings);
-          return [];
-        };
-        interest = extractStrings(rawInterest).join(' ');
-      } else {
-        interest = String(rawInterest);
-      }
-
+      const interest = interestList[Math.floor(Math.random() * interestList.length)];
       console.log(`AI Engine: Planning search for interest: ${interest}`);
+
       const plan = await AiService.planSearch(interest, user.persona);
-      console.log(`AI Engine: Search plan — query: "${plan.query}", categories: [${plan.categories.join(', ')}], time_range: ${plan.time_range}`);
+      console.log(`AI Engine: Search plan — query: "${plan.query}", categories: [${plan.categories.join(', ')}]`);
 
       const searchResult = await SearchService.search(plan);
       console.log(`AI Engine: Found ${searchResult.links.length} links, ${searchResult.images.length} images, ${searchResult.videos.length} videos`);
@@ -238,4 +292,3 @@ export class AiEngineService {
     }
   }
 }
-

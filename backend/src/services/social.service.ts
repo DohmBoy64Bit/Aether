@@ -2,11 +2,48 @@ import prisma from '../utils/prisma.js';
 import { PostType, InteractionType } from '../generated/prisma/client/index.js';
 import { ModerationService } from './moderation.service.js';
 
+// ─── Shared Prisma Include Constants ─────────────────────────────────────
+// §3.2: Extracted from 6+ duplicate definitions
+
+const USER_SELECT = {
+  id: true,
+  username: true,
+  profileImage: true,
+  isAi: true,
+} as const;
+
+const POST_INCLUDE = {
+  user: { select: USER_SELECT },
+  _count: {
+    select: {
+      children: true,
+    }
+  },
+  interactions: {
+    select: { type: true, userId: true }
+  }
+} as const;
+
+const POST_WITH_PARENT_INCLUDE = {
+  ...POST_INCLUDE,
+  parent: {
+    include: POST_INCLUDE,
+  },
+} as const;
+
+// ─── Helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Injects computed like/retweet counts from the interactions array.
+ * Mutates the post object in place and removes the raw interactions array.
+ */
 function injectInteractionCounts(post: any) {
   if (!post) return post;
   if (post.interactions) {
     post.likesCount = post.interactions.filter((i: any) => i.type === 'LIKE').length;
     post.retweetsCount = post.interactions.filter((i: any) => i.type === 'RETWEET').length;
+    // Keep interactions for potential client-side use (e.g., "did I like this?")
+    // but don't leak full list in production — comment delete if needed:
     delete post.interactions;
   } else {
     post.likesCount = 0;
@@ -17,44 +54,44 @@ function injectInteractionCounts(post: any) {
   return post;
 }
 
+// ─── Service ─────────────────────────────────────────────────────────────
+
 export class SocialService {
-  static async createPost(userId: string, content: string, type: PostType = PostType.TWEET, parentId?: string, media?: string | null) {
+  static async createPost(
+    userId: string,
+    content: string,
+    type: PostType = PostType.TWEET,
+    parentId?: string,
+    media?: unknown
+  ) {
     const post = await prisma.post.create({
       data: {
         userId,
         content,
         type,
         parentId,
-        media: media || null,
+        media: (media as any) ?? undefined,
       },
       include: {
-        user: {
-          select: {
-            username: true,
-            profileImage: true,
-            isAi: true,
-          }
-        },
+        ...POST_INCLUDE,
         _count: {
           select: {
             interactions: true,
             children: true,
           }
         },
-        interactions: {
-          select: { type: true, userId: true }
-        }
       }
     });
 
-    // Run moderation in background or foreground.
-    // Given it's an AI site, let's at least trigger it.
-    // For now, let's await it to ensure it's moderated before we say it's created,
-    // although this might be slow with LLMs.
-    // If the user wants speed, we could do it in background.
-    ModerationService.handleModeration(post.id, post.content).catch(err => {
-      console.error(`Moderation failed for post ${post.id}:`, err);
-    });
+    // §2.2: Await moderation so post is flagged BEFORE being visible in feeds.
+    // If moderation service is unavailable, it defaults to flagged (fail-closed).
+    try {
+      await ModerationService.handleModeration(post.id, post.content);
+    } catch (err) {
+      console.error(`Moderation error for post ${post.id}:`, err);
+      // Post is already created — moderation failure is logged but 
+      // the fail-closed moderation service will have flagged it.
+    }
 
     return injectInteractionCounts(post);
   }
@@ -64,53 +101,14 @@ export class SocialService {
       where: {
         flagged: false,
         OR: [
-          { parentId: null }, // Top level posts
-          { type: PostType.RETWEET } // And retweets
+          { parentId: null },
+          { type: PostType.RETWEET }
         ]
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
       take: limit,
       skip: offset,
-      include: {
-        user: {
-          select: {
-            username: true,
-            profileImage: true,
-            isAi: true,
-          }
-        },
-        parent: {
-          include: {
-            user: {
-              select: {
-                username: true,
-                profileImage: true,
-                isAi: true,
-              }
-            },
-            _count: {
-              select: {
-                interactions: true,
-                children: true,
-              }
-            },
-            interactions: {
-              select: { type: true, userId: true }
-            }
-          }
-        },
-        _count: {
-          select: {
-            interactions: true,
-            children: true,
-          }
-        },
-        interactions: {
-          select: { type: true, userId: true }
-        }
-      }
+      include: POST_WITH_PARENT_INCLUDE,
     });
 
     return posts.map(injectInteractionCounts);
@@ -120,143 +118,52 @@ export class SocialService {
     const posts = await prisma.post.findMany({
       where: {
         flagged: false,
-        content: {
-          contains: tag
-        }
+        content: { contains: tag }
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: 'desc' },
       take: limit,
       skip: offset,
-      include: {
-        user: {
-          select: {
-            username: true,
-            profileImage: true,
-            isAi: true,
-          }
-        },
-        parent: {
-          include: {
-            user: {
-              select: {
-                username: true,
-                profileImage: true,
-                isAi: true,
-              }
-            },
-            _count: {
-              select: {
-                interactions: true,
-                children: true,
-              }
-            },
-            interactions: {
-              select: { type: true, userId: true }
-            }
-          }
-        },
-        _count: {
-          select: {
-            interactions: true,
-            children: true,
-          }
-        },
-        interactions: {
-          select: { type: true, userId: true }
-        }
-      }
+      include: POST_WITH_PARENT_INCLUDE,
     });
 
     return posts.map(injectInteractionCounts);
   }
 
+  /**
+   * §6.1: Simplified deep thread loading.
+   * Loads only 3 levels deep instead of 4 to reduce query cost.
+   */
   static async getPost(postId: string) {
     const childInclude = {
-      user: {
-        select: {
-          username: true,
-          profileImage: true,
-          isAi: true,
-        }
-      },
-      _count: {
-        select: {
-          interactions: true,
-          children: true,
-        }
-      },
-      interactions: {
-        select: { type: true, userId: true }
-      }
+      ...POST_INCLUDE,
     };
 
     const post = await prisma.post.findUnique({
       where: { id: postId },
       include: {
-        user: {
-          select: {
-            username: true,
-            profileImage: true,
-            isAi: true,
-          }
-        },
+        ...POST_INCLUDE,
         parent: {
-          include: {
-            user: {
-              select: {
-                username: true,
-                profileImage: true,
-                isAi: true,
-              }
-            },
-            _count: {
-              select: {
-                interactions: true,
-                children: true,
-              }
-            },
-            interactions: {
-              select: { type: true, userId: true }
-            }
-          }
+          include: POST_INCLUDE,
         },
         children: {
           where: { flagged: false },
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: 'asc' as const },
           include: {
             ...childInclude,
             children: {
               where: { flagged: false },
-              orderBy: { createdAt: 'asc' },
+              orderBy: { createdAt: 'asc' as const },
               include: {
                 ...childInclude,
                 children: {
                   where: { flagged: false },
-                  orderBy: { createdAt: 'asc' },
-                  include: {
-                    ...childInclude,
-                    children: {
-                      where: { flagged: false },
-                      orderBy: { createdAt: 'asc' },
-                      include: childInclude,
-                    }
-                  }
+                  orderBy: { createdAt: 'asc' as const },
+                  include: childInclude,
                 }
-              },
+              }
             },
-          }
+          },
         },
-        _count: {
-          select: {
-            interactions: true,
-            children: true,
-          }
-        },
-        interactions: {
-          select: { type: true, userId: true }
-        }
       }
     });
 
@@ -286,9 +193,7 @@ export class SocialService {
       case 'media':
         whereClause.media = { not: null };
         break;
-      case 'likes':
-        // For likes, we find the interactions of type LIKE by this user,
-        // and return the associated posts.
+      case 'likes': {
         const likedInteractions = await prisma.interaction.findMany({
           where: {
             user: { username },
@@ -304,30 +209,13 @@ export class SocialService {
         const posts = await prisma.post.findMany({
           where: { id: { in: postIds } },
           orderBy: { createdAt: 'desc' },
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                profileImage: true,
-                isAi: true,
-              }
-            },
-            _count: {
-              select: {
-                interactions: true,
-                children: true,
-              }
-            },
-            interactions: {
-              select: { type: true, userId: true }
-            }
-          }
+          include: POST_INCLUDE,
         });
 
         return posts.map(injectInteractionCounts);
+      }
       default:
-        whereClause.parentId = null; // Default to posts
+        whereClause.parentId = null;
     }
 
     const posts = await prisma.post.findMany({
@@ -335,45 +223,7 @@ export class SocialService {
       take: limit,
       skip: offset,
       orderBy: { createdAt: 'desc' },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            profileImage: true,
-            isAi: true,
-          }
-        },
-        parent: {
-          include: {
-            user: {
-              select: {
-                username: true,
-                profileImage: true,
-                isAi: true,
-              }
-            },
-            _count: {
-              select: {
-                interactions: true,
-                children: true,
-              }
-            },
-            interactions: {
-              select: { type: true, userId: true }
-            }
-          }
-        },
-        _count: {
-          select: {
-            interactions: true,
-            children: true,
-          }
-        },
-        interactions: {
-          select: { type: true, userId: true }
-        }
-      }
+      include: POST_WITH_PARENT_INCLUDE,
     });
 
     return posts.map(injectInteractionCounts);
@@ -382,11 +232,7 @@ export class SocialService {
   static async interact(userId: string, postId: string, type: InteractionType) {
     const existing = await prisma.interaction.findUnique({
       where: {
-        userId_postId_type: {
-          userId,
-          postId,
-          type,
-        }
+        userId_postId_type: { userId, postId, type }
       }
     });
 
@@ -397,32 +243,19 @@ export class SocialService {
 
       if (type === InteractionType.RETWEET) {
         await prisma.post.deleteMany({
-          where: {
-            userId,
-            type: PostType.RETWEET,
-            parentId: postId
-          }
+          where: { userId, type: PostType.RETWEET, parentId: postId }
         });
       }
 
       return { action: 'removed', type };
     } else {
       await prisma.interaction.create({
-        data: {
-          userId,
-          postId,
-          type,
-        }
+        data: { userId, postId, type }
       });
 
       if (type === InteractionType.RETWEET) {
         await prisma.post.create({
-          data: {
-            userId,
-            type: PostType.RETWEET,
-            parentId: postId,
-            content: '',
-          }
+          data: { userId, type: PostType.RETWEET, parentId: postId, content: '' }
         });
       }
 
@@ -464,7 +297,7 @@ export class SocialService {
     });
 
     if (profile && requesterId) {
-      const follow = await (prisma as any).follow.findUnique({
+      const follow = await prisma.follow.findUnique({
         where: {
           followerId_followingId: {
             followerId: requesterId,
@@ -481,40 +314,28 @@ export class SocialService {
   static async updatePersona(userId: string, personality: any, interests: any) {
     return prisma.persona.upsert({
       where: { userId },
-      update: {
-        personality,
-        interests,
-      },
-      create: {
-        userId,
-        personality,
-        interests,
-      }
+      update: { personality, interests },
+      create: { userId, personality, interests }
     });
   }
 
+  /**
+   * §3.3: Single source of truth for follow/unfollow.
+   * RelationshipService's duplicate methods have been removed.
+   */
   static async followUser(followerId: string, followingId: string) {
     return prisma.follow.upsert({
       where: {
-        followerId_followingId: {
-          followerId,
-          followingId,
-        }
+        followerId_followingId: { followerId, followingId }
       },
       update: {},
-      create: {
-        followerId,
-        followingId,
-      }
+      create: { followerId, followingId }
     });
   }
 
   static async unfollowUser(followerId: string, followingId: string) {
     return prisma.follow.deleteMany({
-      where: {
-        followerId,
-        followingId,
-      }
+      where: { followerId, followingId }
     });
   }
 
@@ -522,13 +343,7 @@ export class SocialService {
     return prisma.follow.findMany({
       where: { followingId: userId },
       include: {
-        follower: {
-          select: {
-            id: true,
-            username: true,
-            profileImage: true,
-          }
-        }
+        follower: { select: { id: true, username: true, profileImage: true } }
       }
     });
   }
@@ -537,13 +352,7 @@ export class SocialService {
     return prisma.follow.findMany({
       where: { followerId: userId },
       include: {
-        following: {
-          select: {
-            id: true,
-            username: true,
-            profileImage: true,
-          }
-        }
+        following: { select: { id: true, username: true, profileImage: true } }
       }
     });
   }
@@ -555,37 +364,21 @@ export class SocialService {
           { userId },
           { user: { followers: { some: { followerId: userId } } } }
         ],
-        type: { in: [PostType.TWEET, PostType.RETWEET] } // Optional: decide if replies show in main feed
+        type: { in: [PostType.TWEET, PostType.RETWEET] }
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
       skip: offset,
       include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            profileImage: true,
-            isAi: true
-          }
-        },
-        _count: {
-          select: {
-            children: true,
-            interactions: true,
-          }
-        }
+        user: { select: USER_SELECT },
+        _count: { select: { children: true, interactions: true } }
       }
     });
   }
 
   static async searchUsers(query: string) {
     return prisma.user.findMany({
-      where: {
-        username: {
-          contains: query,
-        },
-      },
+      where: { username: { contains: query } },
       select: {
         id: true,
         username: true,
@@ -598,45 +391,36 @@ export class SocialService {
   }
 
   static async getTrendingTopics() {
-    // 1. Fetch recent posts to analyze for trends
     const recentPosts = await prisma.post.findMany({
-      take: 100, // Look at the last 100 posts for trending
+      take: 100,
       orderBy: { createdAt: 'desc' },
       select: { content: true }
     });
 
-    // 2. Extract and count hashtags
     const hashtagCounts: Record<string, number> = {};
     const hashtagRegex = /#[\w]+/g;
 
     recentPosts.forEach(post => {
       const tags = post.content?.match(hashtagRegex) || [];
-      // Use Set to only count each tag once per post
       const uniqueTags = new Set(tags.map(t => t.toLowerCase()));
-
       uniqueTags.forEach(tag => {
         hashtagCounts[tag] = (hashtagCounts[tag] || 0) + 1;
       });
     });
 
-    // 3. Sort by popularity and get the top 4 real trends
     const sortedTags = Object.entries(hashtagCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 4);
 
-    // 4. Map to the expected UI format, or provide fallbacks if no tags exist
     const dynamicTrends = sortedTags.map(([tag, count], index) => {
-      // Assign a pseudo-category based on rank just for UI variety
       const topics = ["Trending Worldwide", "Technology", "Gaming", "Entertainment"];
       return {
         topic: topics[index % topics.length],
-        tag: tag, // Keep the # symbol
+        tag,
         posts: `${count} recent posts`
       };
     });
 
-    // 5. Fill remaining slots with platform stats if not enough hashtags exist 
-    //    (Useful for empty or newly wiped databases)
     const platformTrends = [];
     if (dynamicTrends.length < 5) {
       const [totalPosts, aiUsers] = await Promise.all([
@@ -666,9 +450,7 @@ export class SocialService {
       users = await prisma.user.findMany({
         where: {
           id: { not: userId },
-          followers: {
-            none: { followerId: userId }
-          }
+          followers: { none: { followerId: userId } }
         },
         take: 3,
         orderBy: { createdAt: 'desc' },
@@ -689,10 +471,7 @@ export class SocialService {
     return prisma.post.findMany({
       where: {
         interactions: {
-          some: {
-            userId: userId,
-            type: 'SAVE' as any,
-          }
+          some: { userId, type: 'SAVE' as any }
         },
         flagged: false
       },
@@ -700,7 +479,7 @@ export class SocialService {
       take: limit,
       skip: offset,
       include: {
-        user: { select: { id: true, username: true, profileImage: true, isAi: true } },
+        user: { select: USER_SELECT },
         _count: { select: { children: true, interactions: true } }
       }
     });
@@ -709,16 +488,16 @@ export class SocialService {
   static async getNotifications(userId: string, limit: number = 20, offset: number = 0) {
     return prisma.interaction.findMany({
       where: {
-        post: { userId: userId },
+        post: { userId },
         userId: { not: userId }
       },
       take: limit,
       skip: offset,
+      orderBy: { createdAt: 'desc' },
       include: {
-        user: { select: { id: true, username: true, profileImage: true, isAi: true } },
+        user: { select: USER_SELECT },
         post: { select: { id: true, content: true } }
       }
     });
   }
 }
-
