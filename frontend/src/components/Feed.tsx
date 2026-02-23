@@ -84,7 +84,9 @@ export default function Feed() {
 
   const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
     try {
-      await api.post("/social/interact", { postId, type });
+      const res = await api.post("/social/interact", { postId, type });
+      const action = res.data.action;
+
       setPosts(prev => prev.map(post => {
         if (post.id === postId) {
           const count = post._count || { interactions: 0, children: 0 };
@@ -92,7 +94,7 @@ export default function Feed() {
             ...post,
             _count: {
               ...count,
-              interactions: type === "LIKE" ? (count.interactions || 0) + 1 : count.interactions
+              interactions: action === "added" ? (count.interactions || 0) + 1 : Math.max(0, (count.interactions || 0) - 1)
             }
           };
         }
@@ -155,102 +157,116 @@ export default function Feed() {
             <p className="text-sm mt-1">Start the conversation!</p>
           </div>
         ) : (
-          posts.map((post) => (
-            <article key={post.id} onClick={() => router.push(`/post/${post.id}`)} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
-              <div className="flex gap-3">
-                {/* Avatar */}
-                <div
-                  className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
-                >
-                  {post.user.profileImage ? (
-                    <img src={getMediaUrl(post.user.profileImage)} alt={post.user.username} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="font-bold uppercase text-[#0085ff] text-sm">{post.user.username[0]}</span>
-                  )}
-                </div>
+          posts.map((post) => {
+            const isRetweet = post.type === "RETWEET";
+            const displayPost = isRetweet && post.parent ? post.parent : post;
+            const retweeterUser = isRetweet ? post.user : null;
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  {/* Header */}
-                  <div className="flex items-center gap-1 flex-wrap">
-                    <span
-                      className="font-bold text-heading text-[15px] hover:underline cursor-pointer"
-                      onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
-                    >
-                      {post.user.username}
+            return (
+              <article key={post.id} onClick={() => router.push(`/post/${displayPost.id}`)} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
+                {isRetweet && (
+                  <div className="flex items-center gap-2 mb-2 ml-14 text-xs text-secondary-text font-bold tracking-wider">
+                    <Repeat2 className="w-3.5 h-3.5" />
+                    <span onClick={(e) => { e.stopPropagation(); router.push(`/profile/${retweeterUser.username}`); }} className="hover:underline cursor-pointer hover:text-heading transition-colors">
+                      {retweeterUser.username} {retweeterUser.isAi && <span className="bg-blue-50 text-[#0085ff] px-1 rounded-sm ml-0.5 text-[9px]">AI</span>} Reposted
                     </span>
-                    {post.user.isAi && (
-                      <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
+                  </div>
+                )}
+                <div className="flex gap-3">
+                  {/* Avatar */}
+                  <div
+                    className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity mt-1"
+                    onClick={(e) => { e.stopPropagation(); router.push(`/profile/${displayPost.user.username}`); }}
+                  >
+                    {displayPost.user.profileImage ? (
+                      <img src={getMediaUrl(displayPost.user.profileImage)} alt={displayPost.user.username} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="font-bold uppercase text-[#0085ff] text-sm">{displayPost.user.username[0]}</span>
                     )}
-                    <span
-                      className="text-secondary-text text-[15px] cursor-pointer hover:underline"
-                      onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
-                    >
-                      @{post.user.username}
-                    </span>
-                    <span className="text-secondary-text text-[15px]">·</span>
-                    <span className="text-secondary-text text-[15px] hover:underline">{formatDistanceToNow(new Date(post.createdAt))}</span>
-                    <div className="ml-auto relative group/more">
-                      <div className="p-1.5 hover:bg-blue-50 rounded-full transition-colors cursor-pointer">
-                        <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <div className="absolute right-0 top-full w-40 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden translate-y-2 group-hover/more:translate-y-0">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); alert("Post reported. Our moderation team will review it shortly."); }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
-                        >
-                          Report Post
-                        </button>
-                      </div>
-                    </div>
                   </div>
 
-                  {/* Post text + media */}
-                  <div className="mt-0.5">
-                    <PostContent content={post.content} media={post.media} />
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
-                    {/* Reply */}
-                    <div
-                      className="flex items-center gap-0.5 group/action cursor-pointer"
-                      onClick={(e) => handleOpenReply(e, post)}
-                    >
-                      <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
-                        <MessageCircle className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Header */}
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span
+                        className="font-bold text-heading text-[15px] hover:underline cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); router.push(`/profile/${displayPost.user.username}`); }}
+                      >
+                        {displayPost.user.username}
+                      </span>
+                      {displayPost.user.isAi && (
+                        <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
+                      )}
+                      <span
+                        className="text-secondary-text text-[15px] cursor-pointer hover:underline"
+                        onClick={(e) => { e.stopPropagation(); router.push(`/profile/${displayPost.user.username}`); }}
+                      >
+                        @{displayPost.user.username}
+                      </span>
+                      <span className="text-secondary-text text-[15px]">·</span>
+                      <span className="text-secondary-text text-[15px] hover:underline">{formatDistanceToNow(new Date(displayPost.createdAt))}</span>
+                      <div className="ml-auto relative group/more">
+                        <div className="p-1.5 hover:bg-blue-50 rounded-full transition-colors cursor-pointer">
+                          <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <div className="absolute right-0 top-full w-40 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden translate-y-2 group-hover/more:translate-y-0">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); alert("Post reported. Our moderation team will review it shortly."); }}
+                            className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
+                          >
+                            Report Post
+                          </button>
+                        </div>
                       </div>
-                      <span className="text-[13px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors">{post._count.children || ""}</span>
                     </div>
 
-                    {/* Retweet */}
-                    <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'RETWEET'); }}>
-                      <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
-                        <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
-                      </div>
-                      <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors"></span>
+                    {/* Post text + media */}
+                    <div className="mt-0.5">
+                      <PostContent content={displayPost.content} media={displayPost.media} />
                     </div>
 
-                    {/* Like */}
-                    <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(post.id, 'LIKE'); }}>
-                      <div className="p-2 rounded-full group-hover/action:bg-pink-50 transition-colors">
-                        <Heart className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
+                    {/* Actions */}
+                    <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
+                      {/* Reply */}
+                      <div
+                        className="flex items-center gap-0.5 group/action cursor-pointer"
+                        onClick={(e) => handleOpenReply(e, displayPost)}
+                      >
+                        <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                          <MessageCircle className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                        </div>
+                        <span className="text-[13px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors">{displayPost._count?.children || ""}</span>
                       </div>
-                      <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{post._count.interactions || ""}</span>
-                    </div>
 
-                    {/* Share */}
-                    <div className="flex items-center group/action cursor-pointer">
-                      <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
-                        <Share2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                      {/* Retweet */}
+                      <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(displayPost.id, 'RETWEET'); }}>
+                        <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
+                          <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
+                        </div>
+                        <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors"></span>
+                      </div>
+
+                      {/* Like */}
+                      <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(displayPost.id, 'LIKE'); }}>
+                        <div className="p-2 rounded-full group-hover/action:bg-pink-50 transition-colors">
+                          <Heart className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
+                        </div>
+                        <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{displayPost._count?.interactions || ""}</span>
+                      </div>
+
+                      {/* Share */}
+                      <div className="flex items-center group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.origin + '/post/' + displayPost.id); alert('Link copied!'); }}>
+                        <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                          <Share2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          ))
+              </article>
+            );
+          })
         )}
       </div>
 

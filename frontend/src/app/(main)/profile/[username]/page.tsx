@@ -1,11 +1,13 @@
 "use client";
 
-import { ArrowLeft, Calendar, Loader2, MoreHorizontal, MessageCircle, X } from "lucide-react";
+import { ArrowLeft, Calendar, Loader2, MoreHorizontal, MessageCircle, X, Repeat2, Heart, Share2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, use } from "react";
 import api from "@/utils/api";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { getMediaUrl } from "@/utils/media";
+import PostContent from "@/components/PostContent";
 import EditProfileModal from "@/components/EditProfileModal";
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
@@ -14,6 +16,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("Posts");
+
+    // Tab Feed State
+    const [tabData, setTabData] = useState<any[]>([]);
+    const [isTabLoading, setIsTabLoading] = useState(false);
+
+    // Hooks
+    const router = useRouter();
 
     const [isFollowing, setIsFollowing] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -43,6 +52,23 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     useEffect(() => {
         fetchData();
     }, [username]);
+
+    // Fetch feed data when tab changes
+    useEffect(() => {
+        const fetchTabFeed = async () => {
+            if (!profile?.username) return;
+            setIsTabLoading(true);
+            try {
+                const res = await api.get(`/social/profiles/${profile.username}/feed?tab=${activeTab.toLowerCase()}`);
+                setTabData(res.data);
+            } catch (err) {
+                console.error("Failed to fetch tab data", err);
+            } finally {
+                setIsTabLoading(false);
+            }
+        };
+        fetchTabFeed();
+    }, [activeTab, profile?.username]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -86,6 +112,29 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             }));
         } catch (err) {
             console.error("Follow/unfollow failed", err);
+        }
+    };
+
+    const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
+        try {
+            const res = await api.post("/social/interact", { postId, type });
+            const action = res.data.action;
+            // Optimistically update the exact post in the tabData array
+            setTabData(prev => prev.map(post => {
+                if (post.id === postId) {
+                    const count = post._count || { interactions: 0, children: 0 };
+                    return {
+                        ...post,
+                        _count: {
+                            ...count,
+                            interactions: action === "added" ? (count.interactions || 0) + 1 : Math.max(0, (count.interactions || 0) - 1)
+                        }
+                    };
+                }
+                return post;
+            }));
+        } catch (err) {
+            console.error("Failed to interact", err);
         }
     };
 
@@ -304,14 +353,113 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
             {/* Tab Content */}
             <div className="flex flex-col min-h-[200px]">
-                <div className="p-12 text-center text-secondary-text">
-                    <p className="text-base">
-                        {activeTab === "Posts" && "No posts to show yet."}
-                        {activeTab === "Replies" && "No replies yet."}
-                        {activeTab === "Media" && "No media posts yet."}
-                        {activeTab === "Likes" && "No liked posts yet."}
-                    </p>
-                </div>
+                {isTabLoading ? (
+                    <div className="p-12 flex justify-center">
+                        <Loader2 className="w-8 h-8 animate-spin text-[#0085ff]" />
+                    </div>
+                ) : tabData.length === 0 ? (
+                    <div className="p-12 text-center text-secondary-text">
+                        <p className="text-base">
+                            {activeTab === "Posts" && "No posts to show yet."}
+                            {activeTab === "Replies" && "No replies yet."}
+                            {activeTab === "Media" && "No media posts yet."}
+                            {activeTab === "Likes" && "No liked posts yet."}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="flex flex-col">
+                        {tabData.map((post) => {
+                            const isRetweet = post.type === "RETWEET";
+                            const displayPost = isRetweet && post.parent ? post.parent : post;
+                            const retweeterUser = isRetweet ? post.user : null;
+
+                            return (
+                                <article key={post.id} onClick={() => router.push(`/post/${displayPost.id}`)} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
+                                    {isRetweet && (
+                                        <div className="flex items-center gap-2 mb-2 ml-14 text-xs text-secondary-text font-bold tracking-wider">
+                                            <Repeat2 className="w-3.5 h-3.5" />
+                                            <span onClick={(e) => { e.stopPropagation(); router.push(`/profile/${retweeterUser.username}`); }} className="hover:underline cursor-pointer hover:text-heading transition-colors">
+                                                {retweeterUser.username} {retweeterUser.isAi && <span className="bg-blue-50 text-[#0085ff] px-1 rounded-sm ml-0.5 text-[9px]">AI</span>} Reposted
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex gap-3">
+                                        <div
+                                            className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity mt-1"
+                                            onClick={(e) => { e.stopPropagation(); router.push(`/profile/${displayPost.user.username}`); }}
+                                        >
+                                            {displayPost.user.profileImage ? (
+                                                <img src={getMediaUrl(displayPost.user.profileImage)} alt={displayPost.user.username} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="font-bold uppercase text-[#0085ff] text-sm">{displayPost.user.username[0]}</span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-1 flex-wrap">
+                                                <span
+                                                    className="font-bold text-heading text-[15px] hover:underline cursor-pointer"
+                                                    onClick={(e) => { e.stopPropagation(); router.push(`/profile/${displayPost.user.username}`); }}
+                                                >
+                                                    {displayPost.user.username}
+                                                </span>
+                                                {displayPost.user.isAi && (
+                                                    <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
+                                                )}
+                                                <span
+                                                    className="text-secondary-text text-[15px] cursor-pointer hover:underline"
+                                                    onClick={(e) => { e.stopPropagation(); router.push(`/profile/${displayPost.user.username}`); }}
+                                                >
+                                                    @{displayPost.user.username}
+                                                </span>
+                                                <span className="text-secondary-text text-[15px]">·</span>
+                                                <span className="text-secondary-text text-[15px] hover:underline">
+                                                    {formatDistanceToNow(new Date(displayPost.createdAt))}
+                                                </span>
+                                            </div>
+                                            <div className="mt-0.5">
+                                                <PostContent content={displayPost.content} media={displayPost.media} />
+                                            </div>
+                                            <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
+                                                {/* Reply */}
+                                                <div
+                                                    className="flex items-center gap-0.5 group/action cursor-pointer"
+                                                    onClick={(e) => { e.stopPropagation(); router.push(`/post/${displayPost.id}`); }}
+                                                >
+                                                    <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                                                        <MessageCircle className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                                                    </div>
+                                                    <span className="text-[13px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors">{displayPost._count?.children || ""}</span>
+                                                </div>
+
+                                                {/* Retweet */}
+                                                <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(displayPost.id, 'RETWEET'); }}>
+                                                    <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
+                                                        <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
+                                                    </div>
+                                                </div>
+
+                                                {/* Like */}
+                                                <div className="flex items-center gap-0.5 group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); handleInteract(displayPost.id, 'LIKE'); }}>
+                                                    <div className="p-2 rounded-full group-hover/action:bg-pink-50 transition-colors">
+                                                        <Heart className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
+                                                    </div>
+                                                    <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{displayPost._count?.interactions || ""}</span>
+                                                </div>
+
+                                                {/* Share */}
+                                                <div className="flex items-center group/action cursor-pointer" onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(window.location.origin + '/post/' + displayPost.id); alert('Link copied!'); }}>
+                                                    <div className="p-2 rounded-full group-hover/action:bg-blue-50 transition-colors">
+                                                        <Share2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-[#0085ff] transition-colors" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            )
+                        })}
+                    </div>
+                )}
             </div>
         </div >
     );
