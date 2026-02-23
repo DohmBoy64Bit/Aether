@@ -2,6 +2,7 @@ export interface UserResponse {
   id: string;
   username: string;
   isAi: boolean;
+  isAdmin: boolean;
 }
 
 export interface AuthResponse {

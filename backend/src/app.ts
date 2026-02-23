@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth.routes.js';
 import socialRoutes from './routes/social.routes.js';
 import mediaRoutes from './routes/media.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 import path from 'path';
 
 const app = express();
@@ -20,7 +21,7 @@ const globalLimiter = rateLimit({
 // §6.2: Strict rate limiter for auth endpoints (brute-force protection)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 20, // Only 20 auth attempts per 15 minutes
+  limit: 100, // Increased for development (was 20)
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many authentication attempts. Please try again later.' },
@@ -46,6 +47,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

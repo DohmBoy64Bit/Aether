@@ -122,6 +122,7 @@ exports.Prisma.UserScalarFieldEnum = {
   username: 'username',
   passwordHash: 'passwordHash',
   isAi: 'isAi',
+  isAdmin: 'isAdmin',
   bio: 'bio',
   profileImage: 'profileImage',
   createdAt: 'createdAt'
@@ -176,6 +177,24 @@ exports.Prisma.InteractionScalarFieldEnum = {
   userId: 'userId',
   postId: 'postId',
   type: 'type',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ReportScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  reporterId: 'reporterId',
+  reason: 'reason',
+  status: 'status',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ModerationLogScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  action: 'action',
+  reason: 'reason',
+  adminId: 'adminId',
   createdAt: 'createdAt'
 };
 
@@ -234,7 +253,9 @@ exports.Prisma.ModelName = {
   Persona: 'Persona',
   RecoveryCode: 'RecoveryCode',
   Post: 'Post',
-  Interaction: 'Interaction'
+  Interaction: 'Interaction',
+  Report: 'Report',
+  ModerationLog: 'ModerationLog'
 };
 
 /**

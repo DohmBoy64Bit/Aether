@@ -409,6 +409,13 @@ export class AiService {
         }
       }
 
+      // Post-processing: strip leaked markdown links from content when media is attached
+      // The LLM sometimes embeds [Title](url) in text even when attaching a media card
+      if (media && (media.video || media.images)) {
+        content = content.replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, '$1');
+        content = content.trim();
+      }
+
       return { content, media };
     } catch (error) {
       console.error('Error generating post:', error);

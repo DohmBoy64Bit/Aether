@@ -51,6 +51,16 @@ export class ModerationService {
           flagReason: result.reason
         }
       });
+
+      // Log the auto-moderation action
+      await prisma.moderationLog.create({
+        data: {
+          postId,
+          action: 'AUTO_FLAG',
+          reason: result.reason,
+        }
+      });
+
       return false;
     }
 

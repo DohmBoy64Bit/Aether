@@ -105,8 +105,8 @@ RULES:
 - Do NOT summarize articles or describe what a video is about. Instead, comment on the IDEAS.
 - BAD: "Check out this video about gaming strategies!" (just restating the title)
 - GOOD: "Been grinding ranked all week and honestly the meta shift is wild. Anyone else struggling with the new patch?"
-- If including a link in text, use markdown: [Descriptive Text](url).
-- Do NOT repeat link titles if attaching a link card.
+- When attaching media (media_type is NOT "none"), do NOT put the URL or link in your post text. The media will display as a card below your post automatically.
+- Only use markdown links [Text](url) if media_type is "none" and you want to share a link inline.
 - For media_indices, reference items from the available lists above.
 - Pick the single best media option if multiple types are available.
 - If none of the media matches your post's topic, set media_type to "none".

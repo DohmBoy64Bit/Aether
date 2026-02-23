@@ -48,6 +48,16 @@ export type Post = $Result.DefaultSelection<Prisma.$PostPayload>
  * 
  */
 export type Interaction = $Result.DefaultSelection<Prisma.$InteractionPayload>
+/**
+ * Model Report
+ * 
+ */
+export type Report = $Result.DefaultSelection<Prisma.$ReportPayload>
+/**
+ * Model ModerationLog
+ * 
+ */
+export type ModerationLog = $Result.DefaultSelection<Prisma.$ModerationLogPayload>
 
 /**
  * Enums
@@ -280,6 +290,26 @@ export class PrismaClient<
     * ```
     */
   get interaction(): Prisma.InteractionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.report`: Exposes CRUD operations for the **Report** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Reports
+    * const reports = await prisma.report.findMany()
+    * ```
+    */
+  get report(): Prisma.ReportDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.moderationLog`: Exposes CRUD operations for the **ModerationLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ModerationLogs
+    * const moderationLogs = await prisma.moderationLog.findMany()
+    * ```
+    */
+  get moderationLog(): Prisma.ModerationLogDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -720,7 +750,9 @@ export namespace Prisma {
     Persona: 'Persona',
     RecoveryCode: 'RecoveryCode',
     Post: 'Post',
-    Interaction: 'Interaction'
+    Interaction: 'Interaction',
+    Report: 'Report',
+    ModerationLog: 'ModerationLog'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -736,7 +768,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "relationship" | "follow" | "persona" | "recoveryCode" | "post" | "interaction"
+      modelProps: "user" | "relationship" | "follow" | "persona" | "recoveryCode" | "post" | "interaction" | "report" | "moderationLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1258,6 +1290,154 @@ export namespace Prisma {
           }
         }
       }
+      Report: {
+        payload: Prisma.$ReportPayload<ExtArgs>
+        fields: Prisma.ReportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ReportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ReportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>
+          }
+          findFirst: {
+            args: Prisma.ReportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ReportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>
+          }
+          findMany: {
+            args: Prisma.ReportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>[]
+          }
+          create: {
+            args: Prisma.ReportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>
+          }
+          createMany: {
+            args: Prisma.ReportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ReportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>[]
+          }
+          delete: {
+            args: Prisma.ReportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>
+          }
+          update: {
+            args: Prisma.ReportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>
+          }
+          deleteMany: {
+            args: Prisma.ReportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ReportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ReportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>[]
+          }
+          upsert: {
+            args: Prisma.ReportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportPayload>
+          }
+          aggregate: {
+            args: Prisma.ReportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateReport>
+          }
+          groupBy: {
+            args: Prisma.ReportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ReportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ReportCountArgs<ExtArgs>
+            result: $Utils.Optional<ReportCountAggregateOutputType> | number
+          }
+        }
+      }
+      ModerationLog: {
+        payload: Prisma.$ModerationLogPayload<ExtArgs>
+        fields: Prisma.ModerationLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ModerationLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ModerationLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>
+          }
+          findFirst: {
+            args: Prisma.ModerationLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ModerationLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>
+          }
+          findMany: {
+            args: Prisma.ModerationLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>[]
+          }
+          create: {
+            args: Prisma.ModerationLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>
+          }
+          createMany: {
+            args: Prisma.ModerationLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ModerationLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>[]
+          }
+          delete: {
+            args: Prisma.ModerationLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>
+          }
+          update: {
+            args: Prisma.ModerationLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.ModerationLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ModerationLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ModerationLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.ModerationLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ModerationLogPayload>
+          }
+          aggregate: {
+            args: Prisma.ModerationLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateModerationLog>
+          }
+          groupBy: {
+            args: Prisma.ModerationLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ModerationLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ModerationLogCountArgs<ExtArgs>
+            result: $Utils.Optional<ModerationLogCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1373,6 +1553,8 @@ export namespace Prisma {
     recoveryCode?: RecoveryCodeOmit
     post?: PostOmit
     interaction?: InteractionOmit
+    report?: ReportOmit
+    moderationLog?: ModerationLogOmit
   }
 
   /* Types for Logging */
@@ -1456,6 +1638,7 @@ export namespace Prisma {
     recoveryCodes: number
     posts: number
     interactions: number
+    reports: number
     relationshipsSent: number
     relationshipsReceived: number
     followers: number
@@ -1466,6 +1649,7 @@ export namespace Prisma {
     recoveryCodes?: boolean | UserCountOutputTypeCountRecoveryCodesArgs
     posts?: boolean | UserCountOutputTypeCountPostsArgs
     interactions?: boolean | UserCountOutputTypeCountInteractionsArgs
+    reports?: boolean | UserCountOutputTypeCountReportsArgs
     relationshipsSent?: boolean | UserCountOutputTypeCountRelationshipsSentArgs
     relationshipsReceived?: boolean | UserCountOutputTypeCountRelationshipsReceivedArgs
     followers?: boolean | UserCountOutputTypeCountFollowersArgs
@@ -1507,6 +1691,13 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountReportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountRelationshipsSentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RelationshipWhereInput
   }
@@ -1540,11 +1731,15 @@ export namespace Prisma {
   export type PostCountOutputType = {
     children: number
     interactions: number
+    reports: number
+    moderationLogs: number
   }
 
   export type PostCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     children?: boolean | PostCountOutputTypeCountChildrenArgs
     interactions?: boolean | PostCountOutputTypeCountInteractionsArgs
+    reports?: boolean | PostCountOutputTypeCountReportsArgs
+    moderationLogs?: boolean | PostCountOutputTypeCountModerationLogsArgs
   }
 
   // Custom InputTypes
@@ -1572,6 +1767,20 @@ export namespace Prisma {
     where?: InteractionWhereInput
   }
 
+  /**
+   * PostCountOutputType without action
+   */
+  export type PostCountOutputTypeCountReportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportWhereInput
+  }
+
+  /**
+   * PostCountOutputType without action
+   */
+  export type PostCountOutputTypeCountModerationLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ModerationLogWhereInput
+  }
+
 
   /**
    * Models
@@ -1592,6 +1801,7 @@ export namespace Prisma {
     username: string | null
     passwordHash: string | null
     isAi: boolean | null
+    isAdmin: boolean | null
     bio: string | null
     profileImage: string | null
     createdAt: Date | null
@@ -1602,6 +1812,7 @@ export namespace Prisma {
     username: string | null
     passwordHash: string | null
     isAi: boolean | null
+    isAdmin: boolean | null
     bio: string | null
     profileImage: string | null
     createdAt: Date | null
@@ -1612,6 +1823,7 @@ export namespace Prisma {
     username: number
     passwordHash: number
     isAi: number
+    isAdmin: number
     bio: number
     profileImage: number
     createdAt: number
@@ -1624,6 +1836,7 @@ export namespace Prisma {
     username?: true
     passwordHash?: true
     isAi?: true
+    isAdmin?: true
     bio?: true
     profileImage?: true
     createdAt?: true
@@ -1634,6 +1847,7 @@ export namespace Prisma {
     username?: true
     passwordHash?: true
     isAi?: true
+    isAdmin?: true
     bio?: true
     profileImage?: true
     createdAt?: true
@@ -1644,6 +1858,7 @@ export namespace Prisma {
     username?: true
     passwordHash?: true
     isAi?: true
+    isAdmin?: true
     bio?: true
     profileImage?: true
     createdAt?: true
@@ -1727,6 +1942,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi: boolean
+    isAdmin: boolean
     bio: string | null
     profileImage: string | null
     createdAt: Date
@@ -1754,6 +1970,7 @@ export namespace Prisma {
     username?: boolean
     passwordHash?: boolean
     isAi?: boolean
+    isAdmin?: boolean
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
@@ -1761,6 +1978,7 @@ export namespace Prisma {
     recoveryCodes?: boolean | User$recoveryCodesArgs<ExtArgs>
     posts?: boolean | User$postsArgs<ExtArgs>
     interactions?: boolean | User$interactionsArgs<ExtArgs>
+    reports?: boolean | User$reportsArgs<ExtArgs>
     relationshipsSent?: boolean | User$relationshipsSentArgs<ExtArgs>
     relationshipsReceived?: boolean | User$relationshipsReceivedArgs<ExtArgs>
     followers?: boolean | User$followersArgs<ExtArgs>
@@ -1773,6 +1991,7 @@ export namespace Prisma {
     username?: boolean
     passwordHash?: boolean
     isAi?: boolean
+    isAdmin?: boolean
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
@@ -1783,6 +2002,7 @@ export namespace Prisma {
     username?: boolean
     passwordHash?: boolean
     isAi?: boolean
+    isAdmin?: boolean
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
@@ -1793,17 +2013,19 @@ export namespace Prisma {
     username?: boolean
     passwordHash?: boolean
     isAi?: boolean
+    isAdmin?: boolean
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "isAi" | "bio" | "profileImage" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "isAi" | "isAdmin" | "bio" | "profileImage" | "createdAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     persona?: boolean | User$personaArgs<ExtArgs>
     recoveryCodes?: boolean | User$recoveryCodesArgs<ExtArgs>
     posts?: boolean | User$postsArgs<ExtArgs>
     interactions?: boolean | User$interactionsArgs<ExtArgs>
+    reports?: boolean | User$reportsArgs<ExtArgs>
     relationshipsSent?: boolean | User$relationshipsSentArgs<ExtArgs>
     relationshipsReceived?: boolean | User$relationshipsReceivedArgs<ExtArgs>
     followers?: boolean | User$followersArgs<ExtArgs>
@@ -1820,6 +2042,7 @@ export namespace Prisma {
       recoveryCodes: Prisma.$RecoveryCodePayload<ExtArgs>[]
       posts: Prisma.$PostPayload<ExtArgs>[]
       interactions: Prisma.$InteractionPayload<ExtArgs>[]
+      reports: Prisma.$ReportPayload<ExtArgs>[]
       relationshipsSent: Prisma.$RelationshipPayload<ExtArgs>[]
       relationshipsReceived: Prisma.$RelationshipPayload<ExtArgs>[]
       followers: Prisma.$FollowPayload<ExtArgs>[]
@@ -1830,6 +2053,7 @@ export namespace Prisma {
       username: string
       passwordHash: string
       isAi: boolean
+      isAdmin: boolean
       bio: string | null
       profileImage: string | null
       createdAt: Date
@@ -2231,6 +2455,7 @@ export namespace Prisma {
     recoveryCodes<T extends User$recoveryCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$recoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     posts<T extends User$postsArgs<ExtArgs> = {}>(args?: Subset<T, User$postsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     interactions<T extends User$interactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$interactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InteractionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reports<T extends User$reportsArgs<ExtArgs> = {}>(args?: Subset<T, User$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     relationshipsSent<T extends User$relationshipsSentArgs<ExtArgs> = {}>(args?: Subset<T, User$relationshipsSentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RelationshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     relationshipsReceived<T extends User$relationshipsReceivedArgs<ExtArgs> = {}>(args?: Subset<T, User$relationshipsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RelationshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     followers<T extends User$followersArgs<ExtArgs> = {}>(args?: Subset<T, User$followersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2268,6 +2493,7 @@ export namespace Prisma {
     readonly username: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly isAi: FieldRef<"User", 'Boolean'>
+    readonly isAdmin: FieldRef<"User", 'Boolean'>
     readonly bio: FieldRef<"User", 'String'>
     readonly profileImage: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
@@ -2745,6 +2971,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InteractionScalarFieldEnum | InteractionScalarFieldEnum[]
+  }
+
+  /**
+   * User.reports
+   */
+  export type User$reportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    where?: ReportWhereInput
+    orderBy?: ReportOrderByWithRelationInput | ReportOrderByWithRelationInput[]
+    cursor?: ReportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReportScalarFieldEnum | ReportScalarFieldEnum[]
   }
 
   /**
@@ -7324,6 +7574,8 @@ export namespace Prisma {
     parent?: boolean | Post$parentArgs<ExtArgs>
     children?: boolean | Post$childrenArgs<ExtArgs>
     interactions?: boolean | Post$interactionsArgs<ExtArgs>
+    reports?: boolean | Post$reportsArgs<ExtArgs>
+    moderationLogs?: boolean | Post$moderationLogsArgs<ExtArgs>
     _count?: boolean | PostCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["post"]>
 
@@ -7373,6 +7625,8 @@ export namespace Prisma {
     parent?: boolean | Post$parentArgs<ExtArgs>
     children?: boolean | Post$childrenArgs<ExtArgs>
     interactions?: boolean | Post$interactionsArgs<ExtArgs>
+    reports?: boolean | Post$reportsArgs<ExtArgs>
+    moderationLogs?: boolean | Post$moderationLogsArgs<ExtArgs>
     _count?: boolean | PostCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PostIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7391,6 +7645,8 @@ export namespace Prisma {
       parent: Prisma.$PostPayload<ExtArgs> | null
       children: Prisma.$PostPayload<ExtArgs>[]
       interactions: Prisma.$InteractionPayload<ExtArgs>[]
+      reports: Prisma.$ReportPayload<ExtArgs>[]
+      moderationLogs: Prisma.$ModerationLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7800,6 +8056,8 @@ export namespace Prisma {
     parent<T extends Post$parentArgs<ExtArgs> = {}>(args?: Subset<T, Post$parentArgs<ExtArgs>>): Prisma__PostClient<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     children<T extends Post$childrenArgs<ExtArgs> = {}>(args?: Subset<T, Post$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     interactions<T extends Post$interactionsArgs<ExtArgs> = {}>(args?: Subset<T, Post$interactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InteractionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reports<T extends Post$reportsArgs<ExtArgs> = {}>(args?: Subset<T, Post$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    moderationLogs<T extends Post$moderationLogsArgs<ExtArgs> = {}>(args?: Subset<T, Post$moderationLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8296,6 +8554,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InteractionScalarFieldEnum | InteractionScalarFieldEnum[]
+  }
+
+  /**
+   * Post.reports
+   */
+  export type Post$reportsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    where?: ReportWhereInput
+    orderBy?: ReportOrderByWithRelationInput | ReportOrderByWithRelationInput[]
+    cursor?: ReportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReportScalarFieldEnum | ReportScalarFieldEnum[]
+  }
+
+  /**
+   * Post.moderationLogs
+   */
+  export type Post$moderationLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    where?: ModerationLogWhereInput
+    orderBy?: ModerationLogOrderByWithRelationInput | ModerationLogOrderByWithRelationInput[]
+    cursor?: ModerationLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ModerationLogScalarFieldEnum | ModerationLogScalarFieldEnum[]
   }
 
   /**
@@ -9382,6 +9688,2152 @@ export namespace Prisma {
 
 
   /**
+   * Model Report
+   */
+
+  export type AggregateReport = {
+    _count: ReportCountAggregateOutputType | null
+    _min: ReportMinAggregateOutputType | null
+    _max: ReportMaxAggregateOutputType | null
+  }
+
+  export type ReportMinAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    reporterId: string | null
+    reason: string | null
+    status: string | null
+    createdAt: Date | null
+  }
+
+  export type ReportMaxAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    reporterId: string | null
+    reason: string | null
+    status: string | null
+    createdAt: Date | null
+  }
+
+  export type ReportCountAggregateOutputType = {
+    id: number
+    postId: number
+    reporterId: number
+    reason: number
+    status: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ReportMinAggregateInputType = {
+    id?: true
+    postId?: true
+    reporterId?: true
+    reason?: true
+    status?: true
+    createdAt?: true
+  }
+
+  export type ReportMaxAggregateInputType = {
+    id?: true
+    postId?: true
+    reporterId?: true
+    reason?: true
+    status?: true
+    createdAt?: true
+  }
+
+  export type ReportCountAggregateInputType = {
+    id?: true
+    postId?: true
+    reporterId?: true
+    reason?: true
+    status?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ReportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Report to aggregate.
+     */
+    where?: ReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Reports to fetch.
+     */
+    orderBy?: ReportOrderByWithRelationInput | ReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Reports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Reports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Reports
+    **/
+    _count?: true | ReportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ReportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ReportMaxAggregateInputType
+  }
+
+  export type GetReportAggregateType<T extends ReportAggregateArgs> = {
+        [P in keyof T & keyof AggregateReport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateReport[P]>
+      : GetScalarType<T[P], AggregateReport[P]>
+  }
+
+
+
+
+  export type ReportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportWhereInput
+    orderBy?: ReportOrderByWithAggregationInput | ReportOrderByWithAggregationInput[]
+    by: ReportScalarFieldEnum[] | ReportScalarFieldEnum
+    having?: ReportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ReportCountAggregateInputType | true
+    _min?: ReportMinAggregateInputType
+    _max?: ReportMaxAggregateInputType
+  }
+
+  export type ReportGroupByOutputType = {
+    id: string
+    postId: string
+    reporterId: string
+    reason: string
+    status: string
+    createdAt: Date
+    _count: ReportCountAggregateOutputType | null
+    _min: ReportMinAggregateOutputType | null
+    _max: ReportMaxAggregateOutputType | null
+  }
+
+  type GetReportGroupByPayload<T extends ReportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ReportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ReportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ReportGroupByOutputType[P]>
+            : GetScalarType<T[P], ReportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ReportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    reporterId?: boolean
+    reason?: boolean
+    status?: boolean
+    createdAt?: boolean
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    reporter?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["report"]>
+
+  export type ReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    reporterId?: boolean
+    reason?: boolean
+    status?: boolean
+    createdAt?: boolean
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    reporter?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["report"]>
+
+  export type ReportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    reporterId?: boolean
+    reason?: boolean
+    status?: boolean
+    createdAt?: boolean
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    reporter?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["report"]>
+
+  export type ReportSelectScalar = {
+    id?: boolean
+    postId?: boolean
+    reporterId?: boolean
+    reason?: boolean
+    status?: boolean
+    createdAt?: boolean
+  }
+
+  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "postId" | "reporterId" | "reason" | "status" | "createdAt", ExtArgs["result"]["report"]>
+  export type ReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    reporter?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ReportIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    reporter?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ReportIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | PostDefaultArgs<ExtArgs>
+    reporter?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ReportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Report"
+    objects: {
+      post: Prisma.$PostPayload<ExtArgs>
+      reporter: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      postId: string
+      reporterId: string
+      reason: string
+      status: string
+      createdAt: Date
+    }, ExtArgs["result"]["report"]>
+    composites: {}
+  }
+
+  type ReportGetPayload<S extends boolean | null | undefined | ReportDefaultArgs> = $Result.GetResult<Prisma.$ReportPayload, S>
+
+  type ReportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ReportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ReportCountAggregateInputType | true
+    }
+
+  export interface ReportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Report'], meta: { name: 'Report' } }
+    /**
+     * Find zero or one Report that matches the filter.
+     * @param {ReportFindUniqueArgs} args - Arguments to find a Report
+     * @example
+     * // Get one Report
+     * const report = await prisma.report.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ReportFindUniqueArgs>(args: SelectSubset<T, ReportFindUniqueArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Report that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ReportFindUniqueOrThrowArgs} args - Arguments to find a Report
+     * @example
+     * // Get one Report
+     * const report = await prisma.report.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ReportFindUniqueOrThrowArgs>(args: SelectSubset<T, ReportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Report that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportFindFirstArgs} args - Arguments to find a Report
+     * @example
+     * // Get one Report
+     * const report = await prisma.report.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ReportFindFirstArgs>(args?: SelectSubset<T, ReportFindFirstArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Report that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportFindFirstOrThrowArgs} args - Arguments to find a Report
+     * @example
+     * // Get one Report
+     * const report = await prisma.report.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ReportFindFirstOrThrowArgs>(args?: SelectSubset<T, ReportFindFirstOrThrowArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Reports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Reports
+     * const reports = await prisma.report.findMany()
+     * 
+     * // Get first 10 Reports
+     * const reports = await prisma.report.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const reportWithIdOnly = await prisma.report.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ReportFindManyArgs>(args?: SelectSubset<T, ReportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Report.
+     * @param {ReportCreateArgs} args - Arguments to create a Report.
+     * @example
+     * // Create one Report
+     * const Report = await prisma.report.create({
+     *   data: {
+     *     // ... data to create a Report
+     *   }
+     * })
+     * 
+     */
+    create<T extends ReportCreateArgs>(args: SelectSubset<T, ReportCreateArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Reports.
+     * @param {ReportCreateManyArgs} args - Arguments to create many Reports.
+     * @example
+     * // Create many Reports
+     * const report = await prisma.report.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ReportCreateManyArgs>(args?: SelectSubset<T, ReportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Reports and returns the data saved in the database.
+     * @param {ReportCreateManyAndReturnArgs} args - Arguments to create many Reports.
+     * @example
+     * // Create many Reports
+     * const report = await prisma.report.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Reports and only return the `id`
+     * const reportWithIdOnly = await prisma.report.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ReportCreateManyAndReturnArgs>(args?: SelectSubset<T, ReportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Report.
+     * @param {ReportDeleteArgs} args - Arguments to delete one Report.
+     * @example
+     * // Delete one Report
+     * const Report = await prisma.report.delete({
+     *   where: {
+     *     // ... filter to delete one Report
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ReportDeleteArgs>(args: SelectSubset<T, ReportDeleteArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Report.
+     * @param {ReportUpdateArgs} args - Arguments to update one Report.
+     * @example
+     * // Update one Report
+     * const report = await prisma.report.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ReportUpdateArgs>(args: SelectSubset<T, ReportUpdateArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Reports.
+     * @param {ReportDeleteManyArgs} args - Arguments to filter Reports to delete.
+     * @example
+     * // Delete a few Reports
+     * const { count } = await prisma.report.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ReportDeleteManyArgs>(args?: SelectSubset<T, ReportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Reports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Reports
+     * const report = await prisma.report.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ReportUpdateManyArgs>(args: SelectSubset<T, ReportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Reports and returns the data updated in the database.
+     * @param {ReportUpdateManyAndReturnArgs} args - Arguments to update many Reports.
+     * @example
+     * // Update many Reports
+     * const report = await prisma.report.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Reports and only return the `id`
+     * const reportWithIdOnly = await prisma.report.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ReportUpdateManyAndReturnArgs>(args: SelectSubset<T, ReportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Report.
+     * @param {ReportUpsertArgs} args - Arguments to update or create a Report.
+     * @example
+     * // Update or create a Report
+     * const report = await prisma.report.upsert({
+     *   create: {
+     *     // ... data to create a Report
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Report we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ReportUpsertArgs>(args: SelectSubset<T, ReportUpsertArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Reports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportCountArgs} args - Arguments to filter Reports to count.
+     * @example
+     * // Count the number of Reports
+     * const count = await prisma.report.count({
+     *   where: {
+     *     // ... the filter for the Reports we want to count
+     *   }
+     * })
+    **/
+    count<T extends ReportCountArgs>(
+      args?: Subset<T, ReportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ReportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Report.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ReportAggregateArgs>(args: Subset<T, ReportAggregateArgs>): Prisma.PrismaPromise<GetReportAggregateType<T>>
+
+    /**
+     * Group by Report.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReportGroupByArgs['orderBy'] }
+        : { orderBy?: ReportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Report model
+   */
+  readonly fields: ReportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Report.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ReportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    post<T extends PostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PostDefaultArgs<ExtArgs>>): Prisma__PostClient<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    reporter<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Report model
+   */
+  interface ReportFieldRefs {
+    readonly id: FieldRef<"Report", 'String'>
+    readonly postId: FieldRef<"Report", 'String'>
+    readonly reporterId: FieldRef<"Report", 'String'>
+    readonly reason: FieldRef<"Report", 'String'>
+    readonly status: FieldRef<"Report", 'String'>
+    readonly createdAt: FieldRef<"Report", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Report findUnique
+   */
+  export type ReportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * Filter, which Report to fetch.
+     */
+    where: ReportWhereUniqueInput
+  }
+
+  /**
+   * Report findUniqueOrThrow
+   */
+  export type ReportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * Filter, which Report to fetch.
+     */
+    where: ReportWhereUniqueInput
+  }
+
+  /**
+   * Report findFirst
+   */
+  export type ReportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * Filter, which Report to fetch.
+     */
+    where?: ReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Reports to fetch.
+     */
+    orderBy?: ReportOrderByWithRelationInput | ReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Reports.
+     */
+    cursor?: ReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Reports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Reports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Reports.
+     */
+    distinct?: ReportScalarFieldEnum | ReportScalarFieldEnum[]
+  }
+
+  /**
+   * Report findFirstOrThrow
+   */
+  export type ReportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * Filter, which Report to fetch.
+     */
+    where?: ReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Reports to fetch.
+     */
+    orderBy?: ReportOrderByWithRelationInput | ReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Reports.
+     */
+    cursor?: ReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Reports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Reports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Reports.
+     */
+    distinct?: ReportScalarFieldEnum | ReportScalarFieldEnum[]
+  }
+
+  /**
+   * Report findMany
+   */
+  export type ReportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * Filter, which Reports to fetch.
+     */
+    where?: ReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Reports to fetch.
+     */
+    orderBy?: ReportOrderByWithRelationInput | ReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Reports.
+     */
+    cursor?: ReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Reports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Reports.
+     */
+    skip?: number
+    distinct?: ReportScalarFieldEnum | ReportScalarFieldEnum[]
+  }
+
+  /**
+   * Report create
+   */
+  export type ReportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Report.
+     */
+    data: XOR<ReportCreateInput, ReportUncheckedCreateInput>
+  }
+
+  /**
+   * Report createMany
+   */
+  export type ReportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Reports.
+     */
+    data: ReportCreateManyInput | ReportCreateManyInput[]
+  }
+
+  /**
+   * Report createManyAndReturn
+   */
+  export type ReportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * The data used to create many Reports.
+     */
+    data: ReportCreateManyInput | ReportCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Report update
+   */
+  export type ReportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Report.
+     */
+    data: XOR<ReportUpdateInput, ReportUncheckedUpdateInput>
+    /**
+     * Choose, which Report to update.
+     */
+    where: ReportWhereUniqueInput
+  }
+
+  /**
+   * Report updateMany
+   */
+  export type ReportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Reports.
+     */
+    data: XOR<ReportUpdateManyMutationInput, ReportUncheckedUpdateManyInput>
+    /**
+     * Filter which Reports to update
+     */
+    where?: ReportWhereInput
+    /**
+     * Limit how many Reports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Report updateManyAndReturn
+   */
+  export type ReportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * The data used to update Reports.
+     */
+    data: XOR<ReportUpdateManyMutationInput, ReportUncheckedUpdateManyInput>
+    /**
+     * Filter which Reports to update
+     */
+    where?: ReportWhereInput
+    /**
+     * Limit how many Reports to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Report upsert
+   */
+  export type ReportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Report to update in case it exists.
+     */
+    where: ReportWhereUniqueInput
+    /**
+     * In case the Report found by the `where` argument doesn't exist, create a new Report with this data.
+     */
+    create: XOR<ReportCreateInput, ReportUncheckedCreateInput>
+    /**
+     * In case the Report was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ReportUpdateInput, ReportUncheckedUpdateInput>
+  }
+
+  /**
+   * Report delete
+   */
+  export type ReportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+    /**
+     * Filter which Report to delete.
+     */
+    where: ReportWhereUniqueInput
+  }
+
+  /**
+   * Report deleteMany
+   */
+  export type ReportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Reports to delete
+     */
+    where?: ReportWhereInput
+    /**
+     * Limit how many Reports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Report without action
+   */
+  export type ReportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Report
+     */
+    select?: ReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Report
+     */
+    omit?: ReportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ModerationLog
+   */
+
+  export type AggregateModerationLog = {
+    _count: ModerationLogCountAggregateOutputType | null
+    _min: ModerationLogMinAggregateOutputType | null
+    _max: ModerationLogMaxAggregateOutputType | null
+  }
+
+  export type ModerationLogMinAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    action: string | null
+    reason: string | null
+    adminId: string | null
+    createdAt: Date | null
+  }
+
+  export type ModerationLogMaxAggregateOutputType = {
+    id: string | null
+    postId: string | null
+    action: string | null
+    reason: string | null
+    adminId: string | null
+    createdAt: Date | null
+  }
+
+  export type ModerationLogCountAggregateOutputType = {
+    id: number
+    postId: number
+    action: number
+    reason: number
+    adminId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ModerationLogMinAggregateInputType = {
+    id?: true
+    postId?: true
+    action?: true
+    reason?: true
+    adminId?: true
+    createdAt?: true
+  }
+
+  export type ModerationLogMaxAggregateInputType = {
+    id?: true
+    postId?: true
+    action?: true
+    reason?: true
+    adminId?: true
+    createdAt?: true
+  }
+
+  export type ModerationLogCountAggregateInputType = {
+    id?: true
+    postId?: true
+    action?: true
+    reason?: true
+    adminId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ModerationLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ModerationLog to aggregate.
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ModerationLogs to fetch.
+     */
+    orderBy?: ModerationLogOrderByWithRelationInput | ModerationLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ModerationLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ModerationLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ModerationLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ModerationLogs
+    **/
+    _count?: true | ModerationLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ModerationLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ModerationLogMaxAggregateInputType
+  }
+
+  export type GetModerationLogAggregateType<T extends ModerationLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateModerationLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateModerationLog[P]>
+      : GetScalarType<T[P], AggregateModerationLog[P]>
+  }
+
+
+
+
+  export type ModerationLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ModerationLogWhereInput
+    orderBy?: ModerationLogOrderByWithAggregationInput | ModerationLogOrderByWithAggregationInput[]
+    by: ModerationLogScalarFieldEnum[] | ModerationLogScalarFieldEnum
+    having?: ModerationLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ModerationLogCountAggregateInputType | true
+    _min?: ModerationLogMinAggregateInputType
+    _max?: ModerationLogMaxAggregateInputType
+  }
+
+  export type ModerationLogGroupByOutputType = {
+    id: string
+    postId: string
+    action: string
+    reason: string | null
+    adminId: string | null
+    createdAt: Date
+    _count: ModerationLogCountAggregateOutputType | null
+    _min: ModerationLogMinAggregateOutputType | null
+    _max: ModerationLogMaxAggregateOutputType | null
+  }
+
+  type GetModerationLogGroupByPayload<T extends ModerationLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ModerationLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ModerationLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ModerationLogGroupByOutputType[P]>
+            : GetScalarType<T[P], ModerationLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ModerationLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    action?: boolean
+    reason?: boolean
+    adminId?: boolean
+    createdAt?: boolean
+    post?: boolean | PostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["moderationLog"]>
+
+  export type ModerationLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    action?: boolean
+    reason?: boolean
+    adminId?: boolean
+    createdAt?: boolean
+    post?: boolean | PostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["moderationLog"]>
+
+  export type ModerationLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    postId?: boolean
+    action?: boolean
+    reason?: boolean
+    adminId?: boolean
+    createdAt?: boolean
+    post?: boolean | PostDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["moderationLog"]>
+
+  export type ModerationLogSelectScalar = {
+    id?: boolean
+    postId?: boolean
+    action?: boolean
+    reason?: boolean
+    adminId?: boolean
+    createdAt?: boolean
+  }
+
+  export type ModerationLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "postId" | "action" | "reason" | "adminId" | "createdAt", ExtArgs["result"]["moderationLog"]>
+  export type ModerationLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | PostDefaultArgs<ExtArgs>
+  }
+  export type ModerationLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | PostDefaultArgs<ExtArgs>
+  }
+  export type ModerationLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    post?: boolean | PostDefaultArgs<ExtArgs>
+  }
+
+  export type $ModerationLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ModerationLog"
+    objects: {
+      post: Prisma.$PostPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      postId: string
+      action: string
+      reason: string | null
+      adminId: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["moderationLog"]>
+    composites: {}
+  }
+
+  type ModerationLogGetPayload<S extends boolean | null | undefined | ModerationLogDefaultArgs> = $Result.GetResult<Prisma.$ModerationLogPayload, S>
+
+  type ModerationLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ModerationLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ModerationLogCountAggregateInputType | true
+    }
+
+  export interface ModerationLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ModerationLog'], meta: { name: 'ModerationLog' } }
+    /**
+     * Find zero or one ModerationLog that matches the filter.
+     * @param {ModerationLogFindUniqueArgs} args - Arguments to find a ModerationLog
+     * @example
+     * // Get one ModerationLog
+     * const moderationLog = await prisma.moderationLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ModerationLogFindUniqueArgs>(args: SelectSubset<T, ModerationLogFindUniqueArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ModerationLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ModerationLogFindUniqueOrThrowArgs} args - Arguments to find a ModerationLog
+     * @example
+     * // Get one ModerationLog
+     * const moderationLog = await prisma.moderationLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ModerationLogFindUniqueOrThrowArgs>(args: SelectSubset<T, ModerationLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ModerationLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogFindFirstArgs} args - Arguments to find a ModerationLog
+     * @example
+     * // Get one ModerationLog
+     * const moderationLog = await prisma.moderationLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ModerationLogFindFirstArgs>(args?: SelectSubset<T, ModerationLogFindFirstArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ModerationLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogFindFirstOrThrowArgs} args - Arguments to find a ModerationLog
+     * @example
+     * // Get one ModerationLog
+     * const moderationLog = await prisma.moderationLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ModerationLogFindFirstOrThrowArgs>(args?: SelectSubset<T, ModerationLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ModerationLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ModerationLogs
+     * const moderationLogs = await prisma.moderationLog.findMany()
+     * 
+     * // Get first 10 ModerationLogs
+     * const moderationLogs = await prisma.moderationLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const moderationLogWithIdOnly = await prisma.moderationLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ModerationLogFindManyArgs>(args?: SelectSubset<T, ModerationLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ModerationLog.
+     * @param {ModerationLogCreateArgs} args - Arguments to create a ModerationLog.
+     * @example
+     * // Create one ModerationLog
+     * const ModerationLog = await prisma.moderationLog.create({
+     *   data: {
+     *     // ... data to create a ModerationLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends ModerationLogCreateArgs>(args: SelectSubset<T, ModerationLogCreateArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ModerationLogs.
+     * @param {ModerationLogCreateManyArgs} args - Arguments to create many ModerationLogs.
+     * @example
+     * // Create many ModerationLogs
+     * const moderationLog = await prisma.moderationLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ModerationLogCreateManyArgs>(args?: SelectSubset<T, ModerationLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ModerationLogs and returns the data saved in the database.
+     * @param {ModerationLogCreateManyAndReturnArgs} args - Arguments to create many ModerationLogs.
+     * @example
+     * // Create many ModerationLogs
+     * const moderationLog = await prisma.moderationLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ModerationLogs and only return the `id`
+     * const moderationLogWithIdOnly = await prisma.moderationLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ModerationLogCreateManyAndReturnArgs>(args?: SelectSubset<T, ModerationLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ModerationLog.
+     * @param {ModerationLogDeleteArgs} args - Arguments to delete one ModerationLog.
+     * @example
+     * // Delete one ModerationLog
+     * const ModerationLog = await prisma.moderationLog.delete({
+     *   where: {
+     *     // ... filter to delete one ModerationLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ModerationLogDeleteArgs>(args: SelectSubset<T, ModerationLogDeleteArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ModerationLog.
+     * @param {ModerationLogUpdateArgs} args - Arguments to update one ModerationLog.
+     * @example
+     * // Update one ModerationLog
+     * const moderationLog = await prisma.moderationLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ModerationLogUpdateArgs>(args: SelectSubset<T, ModerationLogUpdateArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ModerationLogs.
+     * @param {ModerationLogDeleteManyArgs} args - Arguments to filter ModerationLogs to delete.
+     * @example
+     * // Delete a few ModerationLogs
+     * const { count } = await prisma.moderationLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ModerationLogDeleteManyArgs>(args?: SelectSubset<T, ModerationLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ModerationLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ModerationLogs
+     * const moderationLog = await prisma.moderationLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ModerationLogUpdateManyArgs>(args: SelectSubset<T, ModerationLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ModerationLogs and returns the data updated in the database.
+     * @param {ModerationLogUpdateManyAndReturnArgs} args - Arguments to update many ModerationLogs.
+     * @example
+     * // Update many ModerationLogs
+     * const moderationLog = await prisma.moderationLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ModerationLogs and only return the `id`
+     * const moderationLogWithIdOnly = await prisma.moderationLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ModerationLogUpdateManyAndReturnArgs>(args: SelectSubset<T, ModerationLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ModerationLog.
+     * @param {ModerationLogUpsertArgs} args - Arguments to update or create a ModerationLog.
+     * @example
+     * // Update or create a ModerationLog
+     * const moderationLog = await prisma.moderationLog.upsert({
+     *   create: {
+     *     // ... data to create a ModerationLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ModerationLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ModerationLogUpsertArgs>(args: SelectSubset<T, ModerationLogUpsertArgs<ExtArgs>>): Prisma__ModerationLogClient<$Result.GetResult<Prisma.$ModerationLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ModerationLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogCountArgs} args - Arguments to filter ModerationLogs to count.
+     * @example
+     * // Count the number of ModerationLogs
+     * const count = await prisma.moderationLog.count({
+     *   where: {
+     *     // ... the filter for the ModerationLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends ModerationLogCountArgs>(
+      args?: Subset<T, ModerationLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ModerationLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ModerationLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ModerationLogAggregateArgs>(args: Subset<T, ModerationLogAggregateArgs>): Prisma.PrismaPromise<GetModerationLogAggregateType<T>>
+
+    /**
+     * Group by ModerationLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ModerationLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ModerationLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ModerationLogGroupByArgs['orderBy'] }
+        : { orderBy?: ModerationLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ModerationLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetModerationLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ModerationLog model
+   */
+  readonly fields: ModerationLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ModerationLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ModerationLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    post<T extends PostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PostDefaultArgs<ExtArgs>>): Prisma__PostClient<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ModerationLog model
+   */
+  interface ModerationLogFieldRefs {
+    readonly id: FieldRef<"ModerationLog", 'String'>
+    readonly postId: FieldRef<"ModerationLog", 'String'>
+    readonly action: FieldRef<"ModerationLog", 'String'>
+    readonly reason: FieldRef<"ModerationLog", 'String'>
+    readonly adminId: FieldRef<"ModerationLog", 'String'>
+    readonly createdAt: FieldRef<"ModerationLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ModerationLog findUnique
+   */
+  export type ModerationLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ModerationLog to fetch.
+     */
+    where: ModerationLogWhereUniqueInput
+  }
+
+  /**
+   * ModerationLog findUniqueOrThrow
+   */
+  export type ModerationLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ModerationLog to fetch.
+     */
+    where: ModerationLogWhereUniqueInput
+  }
+
+  /**
+   * ModerationLog findFirst
+   */
+  export type ModerationLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ModerationLog to fetch.
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ModerationLogs to fetch.
+     */
+    orderBy?: ModerationLogOrderByWithRelationInput | ModerationLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ModerationLogs.
+     */
+    cursor?: ModerationLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ModerationLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ModerationLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ModerationLogs.
+     */
+    distinct?: ModerationLogScalarFieldEnum | ModerationLogScalarFieldEnum[]
+  }
+
+  /**
+   * ModerationLog findFirstOrThrow
+   */
+  export type ModerationLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ModerationLog to fetch.
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ModerationLogs to fetch.
+     */
+    orderBy?: ModerationLogOrderByWithRelationInput | ModerationLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ModerationLogs.
+     */
+    cursor?: ModerationLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ModerationLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ModerationLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ModerationLogs.
+     */
+    distinct?: ModerationLogScalarFieldEnum | ModerationLogScalarFieldEnum[]
+  }
+
+  /**
+   * ModerationLog findMany
+   */
+  export type ModerationLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ModerationLogs to fetch.
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ModerationLogs to fetch.
+     */
+    orderBy?: ModerationLogOrderByWithRelationInput | ModerationLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ModerationLogs.
+     */
+    cursor?: ModerationLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ModerationLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ModerationLogs.
+     */
+    skip?: number
+    distinct?: ModerationLogScalarFieldEnum | ModerationLogScalarFieldEnum[]
+  }
+
+  /**
+   * ModerationLog create
+   */
+  export type ModerationLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ModerationLog.
+     */
+    data: XOR<ModerationLogCreateInput, ModerationLogUncheckedCreateInput>
+  }
+
+  /**
+   * ModerationLog createMany
+   */
+  export type ModerationLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ModerationLogs.
+     */
+    data: ModerationLogCreateManyInput | ModerationLogCreateManyInput[]
+  }
+
+  /**
+   * ModerationLog createManyAndReturn
+   */
+  export type ModerationLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many ModerationLogs.
+     */
+    data: ModerationLogCreateManyInput | ModerationLogCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ModerationLog update
+   */
+  export type ModerationLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ModerationLog.
+     */
+    data: XOR<ModerationLogUpdateInput, ModerationLogUncheckedUpdateInput>
+    /**
+     * Choose, which ModerationLog to update.
+     */
+    where: ModerationLogWhereUniqueInput
+  }
+
+  /**
+   * ModerationLog updateMany
+   */
+  export type ModerationLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ModerationLogs.
+     */
+    data: XOR<ModerationLogUpdateManyMutationInput, ModerationLogUncheckedUpdateManyInput>
+    /**
+     * Filter which ModerationLogs to update
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * Limit how many ModerationLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ModerationLog updateManyAndReturn
+   */
+  export type ModerationLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * The data used to update ModerationLogs.
+     */
+    data: XOR<ModerationLogUpdateManyMutationInput, ModerationLogUncheckedUpdateManyInput>
+    /**
+     * Filter which ModerationLogs to update
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * Limit how many ModerationLogs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ModerationLog upsert
+   */
+  export type ModerationLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ModerationLog to update in case it exists.
+     */
+    where: ModerationLogWhereUniqueInput
+    /**
+     * In case the ModerationLog found by the `where` argument doesn't exist, create a new ModerationLog with this data.
+     */
+    create: XOR<ModerationLogCreateInput, ModerationLogUncheckedCreateInput>
+    /**
+     * In case the ModerationLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ModerationLogUpdateInput, ModerationLogUncheckedUpdateInput>
+  }
+
+  /**
+   * ModerationLog delete
+   */
+  export type ModerationLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+    /**
+     * Filter which ModerationLog to delete.
+     */
+    where: ModerationLogWhereUniqueInput
+  }
+
+  /**
+   * ModerationLog deleteMany
+   */
+  export type ModerationLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ModerationLogs to delete
+     */
+    where?: ModerationLogWhereInput
+    /**
+     * Limit how many ModerationLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ModerationLog without action
+   */
+  export type ModerationLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ModerationLog
+     */
+    select?: ModerationLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ModerationLog
+     */
+    omit?: ModerationLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ModerationLogInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -9397,6 +11849,7 @@ export namespace Prisma {
     username: 'username',
     passwordHash: 'passwordHash',
     isAi: 'isAi',
+    isAdmin: 'isAdmin',
     bio: 'bio',
     profileImage: 'profileImage',
     createdAt: 'createdAt'
@@ -9473,6 +11926,30 @@ export namespace Prisma {
   };
 
   export type InteractionScalarFieldEnum = (typeof InteractionScalarFieldEnum)[keyof typeof InteractionScalarFieldEnum]
+
+
+  export const ReportScalarFieldEnum: {
+    id: 'id',
+    postId: 'postId',
+    reporterId: 'reporterId',
+    reason: 'reason',
+    status: 'status',
+    createdAt: 'createdAt'
+  };
+
+  export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+  export const ModerationLogScalarFieldEnum: {
+    id: 'id',
+    postId: 'postId',
+    action: 'action',
+    reason: 'reason',
+    adminId: 'adminId',
+    createdAt: 'createdAt'
+  };
+
+  export type ModerationLogScalarFieldEnum = (typeof ModerationLogScalarFieldEnum)[keyof typeof ModerationLogScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -9609,6 +12086,7 @@ export namespace Prisma {
     username?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
     isAi?: BoolFilter<"User"> | boolean
+    isAdmin?: BoolFilter<"User"> | boolean
     bio?: StringNullableFilter<"User"> | string | null
     profileImage?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
@@ -9616,6 +12094,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeListRelationFilter
     posts?: PostListRelationFilter
     interactions?: InteractionListRelationFilter
+    reports?: ReportListRelationFilter
     relationshipsSent?: RelationshipListRelationFilter
     relationshipsReceived?: RelationshipListRelationFilter
     followers?: FollowListRelationFilter
@@ -9627,6 +12106,7 @@ export namespace Prisma {
     username?: SortOrder
     passwordHash?: SortOrder
     isAi?: SortOrder
+    isAdmin?: SortOrder
     bio?: SortOrderInput | SortOrder
     profileImage?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -9634,6 +12114,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeOrderByRelationAggregateInput
     posts?: PostOrderByRelationAggregateInput
     interactions?: InteractionOrderByRelationAggregateInput
+    reports?: ReportOrderByRelationAggregateInput
     relationshipsSent?: RelationshipOrderByRelationAggregateInput
     relationshipsReceived?: RelationshipOrderByRelationAggregateInput
     followers?: FollowOrderByRelationAggregateInput
@@ -9648,6 +12129,7 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     passwordHash?: StringFilter<"User"> | string
     isAi?: BoolFilter<"User"> | boolean
+    isAdmin?: BoolFilter<"User"> | boolean
     bio?: StringNullableFilter<"User"> | string | null
     profileImage?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
@@ -9655,6 +12137,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeListRelationFilter
     posts?: PostListRelationFilter
     interactions?: InteractionListRelationFilter
+    reports?: ReportListRelationFilter
     relationshipsSent?: RelationshipListRelationFilter
     relationshipsReceived?: RelationshipListRelationFilter
     followers?: FollowListRelationFilter
@@ -9666,6 +12149,7 @@ export namespace Prisma {
     username?: SortOrder
     passwordHash?: SortOrder
     isAi?: SortOrder
+    isAdmin?: SortOrder
     bio?: SortOrderInput | SortOrder
     profileImage?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -9682,6 +12166,7 @@ export namespace Prisma {
     username?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     isAi?: BoolWithAggregatesFilter<"User"> | boolean
+    isAdmin?: BoolWithAggregatesFilter<"User"> | boolean
     bio?: StringNullableWithAggregatesFilter<"User"> | string | null
     profileImage?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -9934,6 +12419,8 @@ export namespace Prisma {
     parent?: XOR<PostNullableScalarRelationFilter, PostWhereInput> | null
     children?: PostListRelationFilter
     interactions?: InteractionListRelationFilter
+    reports?: ReportListRelationFilter
+    moderationLogs?: ModerationLogListRelationFilter
   }
 
   export type PostOrderByWithRelationInput = {
@@ -9950,6 +12437,8 @@ export namespace Prisma {
     parent?: PostOrderByWithRelationInput
     children?: PostOrderByRelationAggregateInput
     interactions?: InteractionOrderByRelationAggregateInput
+    reports?: ReportOrderByRelationAggregateInput
+    moderationLogs?: ModerationLogOrderByRelationAggregateInput
   }
 
   export type PostWhereUniqueInput = Prisma.AtLeast<{
@@ -9969,6 +12458,8 @@ export namespace Prisma {
     parent?: XOR<PostNullableScalarRelationFilter, PostWhereInput> | null
     children?: PostListRelationFilter
     interactions?: InteractionListRelationFilter
+    reports?: ReportListRelationFilter
+    moderationLogs?: ModerationLogListRelationFilter
   }, "id">
 
   export type PostOrderByWithAggregationInput = {
@@ -10060,11 +12551,136 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Interaction"> | Date | string
   }
 
+  export type ReportWhereInput = {
+    AND?: ReportWhereInput | ReportWhereInput[]
+    OR?: ReportWhereInput[]
+    NOT?: ReportWhereInput | ReportWhereInput[]
+    id?: StringFilter<"Report"> | string
+    postId?: StringFilter<"Report"> | string
+    reporterId?: StringFilter<"Report"> | string
+    reason?: StringFilter<"Report"> | string
+    status?: StringFilter<"Report"> | string
+    createdAt?: DateTimeFilter<"Report"> | Date | string
+    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+    reporter?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ReportOrderByWithRelationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    reporterId?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    post?: PostOrderByWithRelationInput
+    reporter?: UserOrderByWithRelationInput
+  }
+
+  export type ReportWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    reporterId_postId?: ReportReporterIdPostIdCompoundUniqueInput
+    AND?: ReportWhereInput | ReportWhereInput[]
+    OR?: ReportWhereInput[]
+    NOT?: ReportWhereInput | ReportWhereInput[]
+    postId?: StringFilter<"Report"> | string
+    reporterId?: StringFilter<"Report"> | string
+    reason?: StringFilter<"Report"> | string
+    status?: StringFilter<"Report"> | string
+    createdAt?: DateTimeFilter<"Report"> | Date | string
+    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+    reporter?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "reporterId_postId">
+
+  export type ReportOrderByWithAggregationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    reporterId?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    _count?: ReportCountOrderByAggregateInput
+    _max?: ReportMaxOrderByAggregateInput
+    _min?: ReportMinOrderByAggregateInput
+  }
+
+  export type ReportScalarWhereWithAggregatesInput = {
+    AND?: ReportScalarWhereWithAggregatesInput | ReportScalarWhereWithAggregatesInput[]
+    OR?: ReportScalarWhereWithAggregatesInput[]
+    NOT?: ReportScalarWhereWithAggregatesInput | ReportScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Report"> | string
+    postId?: StringWithAggregatesFilter<"Report"> | string
+    reporterId?: StringWithAggregatesFilter<"Report"> | string
+    reason?: StringWithAggregatesFilter<"Report"> | string
+    status?: StringWithAggregatesFilter<"Report"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Report"> | Date | string
+  }
+
+  export type ModerationLogWhereInput = {
+    AND?: ModerationLogWhereInput | ModerationLogWhereInput[]
+    OR?: ModerationLogWhereInput[]
+    NOT?: ModerationLogWhereInput | ModerationLogWhereInput[]
+    id?: StringFilter<"ModerationLog"> | string
+    postId?: StringFilter<"ModerationLog"> | string
+    action?: StringFilter<"ModerationLog"> | string
+    reason?: StringNullableFilter<"ModerationLog"> | string | null
+    adminId?: StringNullableFilter<"ModerationLog"> | string | null
+    createdAt?: DateTimeFilter<"ModerationLog"> | Date | string
+    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+  }
+
+  export type ModerationLogOrderByWithRelationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    action?: SortOrder
+    reason?: SortOrderInput | SortOrder
+    adminId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    post?: PostOrderByWithRelationInput
+  }
+
+  export type ModerationLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ModerationLogWhereInput | ModerationLogWhereInput[]
+    OR?: ModerationLogWhereInput[]
+    NOT?: ModerationLogWhereInput | ModerationLogWhereInput[]
+    postId?: StringFilter<"ModerationLog"> | string
+    action?: StringFilter<"ModerationLog"> | string
+    reason?: StringNullableFilter<"ModerationLog"> | string | null
+    adminId?: StringNullableFilter<"ModerationLog"> | string | null
+    createdAt?: DateTimeFilter<"ModerationLog"> | Date | string
+    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+  }, "id">
+
+  export type ModerationLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    action?: SortOrder
+    reason?: SortOrderInput | SortOrder
+    adminId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ModerationLogCountOrderByAggregateInput
+    _max?: ModerationLogMaxOrderByAggregateInput
+    _min?: ModerationLogMinOrderByAggregateInput
+  }
+
+  export type ModerationLogScalarWhereWithAggregatesInput = {
+    AND?: ModerationLogScalarWhereWithAggregatesInput | ModerationLogScalarWhereWithAggregatesInput[]
+    OR?: ModerationLogScalarWhereWithAggregatesInput[]
+    NOT?: ModerationLogScalarWhereWithAggregatesInput | ModerationLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ModerationLog"> | string
+    postId?: StringWithAggregatesFilter<"ModerationLog"> | string
+    action?: StringWithAggregatesFilter<"ModerationLog"> | string
+    reason?: StringNullableWithAggregatesFilter<"ModerationLog"> | string | null
+    adminId?: StringNullableWithAggregatesFilter<"ModerationLog"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ModerationLog"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -10072,6 +12688,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
@@ -10083,6 +12700,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -10090,6 +12708,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
@@ -10101,6 +12720,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10108,6 +12728,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
@@ -10119,6 +12740,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10126,6 +12748,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
@@ -10137,6 +12760,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -10147,6 +12771,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10157,6 +12782,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10392,6 +13018,8 @@ export namespace Prisma {
     parent?: PostCreateNestedOneWithoutChildrenInput
     children?: PostCreateNestedManyWithoutParentInput
     interactions?: InteractionCreateNestedManyWithoutPostInput
+    reports?: ReportCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateInput = {
@@ -10406,6 +13034,8 @@ export namespace Prisma {
     flagReason?: string | null
     children?: PostUncheckedCreateNestedManyWithoutParentInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutPostInput
+    reports?: ReportUncheckedCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostUpdateInput = {
@@ -10420,6 +13050,8 @@ export namespace Prisma {
     parent?: PostUpdateOneWithoutChildrenNestedInput
     children?: PostUpdateManyWithoutParentNestedInput
     interactions?: InteractionUpdateManyWithoutPostNestedInput
+    reports?: ReportUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateInput = {
@@ -10434,6 +13066,8 @@ export namespace Prisma {
     flagReason?: NullableStringFieldUpdateOperationsInput | string | null
     children?: PostUncheckedUpdateManyWithoutParentNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutPostNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostCreateManyInput = {
@@ -10524,6 +13158,129 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ReportCreateInput = {
+    id?: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+    post: PostCreateNestedOneWithoutReportsInput
+    reporter: UserCreateNestedOneWithoutReportsInput
+  }
+
+  export type ReportUncheckedCreateInput = {
+    id?: string
+    postId: string
+    reporterId: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+  }
+
+  export type ReportUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: PostUpdateOneRequiredWithoutReportsNestedInput
+    reporter?: UserUpdateOneRequiredWithoutReportsNestedInput
+  }
+
+  export type ReportUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    reporterId?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportCreateManyInput = {
+    id?: string
+    postId: string
+    reporterId: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+  }
+
+  export type ReportUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    reporterId?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ModerationLogCreateInput = {
+    id?: string
+    action: string
+    reason?: string | null
+    adminId?: string | null
+    createdAt?: Date | string
+    post: PostCreateNestedOneWithoutModerationLogsInput
+  }
+
+  export type ModerationLogUncheckedCreateInput = {
+    id?: string
+    postId: string
+    action: string
+    reason?: string | null
+    adminId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ModerationLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: PostUpdateOneRequiredWithoutModerationLogsNestedInput
+  }
+
+  export type ModerationLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ModerationLogCreateManyInput = {
+    id?: string
+    postId: string
+    action: string
+    reason?: string | null
+    adminId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ModerationLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ModerationLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -10591,6 +13348,12 @@ export namespace Prisma {
     none?: InteractionWhereInput
   }
 
+  export type ReportListRelationFilter = {
+    every?: ReportWhereInput
+    some?: ReportWhereInput
+    none?: ReportWhereInput
+  }
+
   export type RelationshipListRelationFilter = {
     every?: RelationshipWhereInput
     some?: RelationshipWhereInput
@@ -10620,6 +13383,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type ReportOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type RelationshipOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -10633,6 +13400,7 @@ export namespace Prisma {
     username?: SortOrder
     passwordHash?: SortOrder
     isAi?: SortOrder
+    isAdmin?: SortOrder
     bio?: SortOrder
     profileImage?: SortOrder
     createdAt?: SortOrder
@@ -10643,6 +13411,7 @@ export namespace Prisma {
     username?: SortOrder
     passwordHash?: SortOrder
     isAi?: SortOrder
+    isAdmin?: SortOrder
     bio?: SortOrder
     profileImage?: SortOrder
     createdAt?: SortOrder
@@ -10653,6 +13422,7 @@ export namespace Prisma {
     username?: SortOrder
     passwordHash?: SortOrder
     isAi?: SortOrder
+    isAdmin?: SortOrder
     bio?: SortOrder
     profileImage?: SortOrder
     createdAt?: SortOrder
@@ -10942,6 +13712,16 @@ export namespace Prisma {
     isNot?: PostWhereInput | null
   }
 
+  export type ModerationLogListRelationFilter = {
+    every?: ModerationLogWhereInput
+    some?: ModerationLogWhereInput
+    none?: ModerationLogWhereInput
+  }
+
+  export type ModerationLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type PostCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -11059,6 +13839,65 @@ export namespace Prisma {
     _max?: NestedEnumInteractionTypeFilter<$PrismaModel>
   }
 
+  export type ReportReporterIdPostIdCompoundUniqueInput = {
+    reporterId: string
+    postId: string
+  }
+
+  export type ReportCountOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    reporterId?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ReportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    reporterId?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ReportMinOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    reporterId?: SortOrder
+    reason?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ModerationLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    action?: SortOrder
+    reason?: SortOrder
+    adminId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ModerationLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    action?: SortOrder
+    reason?: SortOrder
+    adminId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ModerationLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    postId?: SortOrder
+    action?: SortOrder
+    reason?: SortOrder
+    adminId?: SortOrder
+    createdAt?: SortOrder
+  }
+
   export type PersonaCreateNestedOneWithoutUserInput = {
     create?: XOR<PersonaCreateWithoutUserInput, PersonaUncheckedCreateWithoutUserInput>
     connectOrCreate?: PersonaCreateOrConnectWithoutUserInput
@@ -11084,6 +13923,13 @@ export namespace Prisma {
     connectOrCreate?: InteractionCreateOrConnectWithoutUserInput | InteractionCreateOrConnectWithoutUserInput[]
     createMany?: InteractionCreateManyUserInputEnvelope
     connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+  }
+
+  export type ReportCreateNestedManyWithoutReporterInput = {
+    create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
+    createMany?: ReportCreateManyReporterInputEnvelope
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
   }
 
   export type RelationshipCreateNestedManyWithoutSourceInput = {
@@ -11139,6 +13985,13 @@ export namespace Prisma {
     connectOrCreate?: InteractionCreateOrConnectWithoutUserInput | InteractionCreateOrConnectWithoutUserInput[]
     createMany?: InteractionCreateManyUserInputEnvelope
     connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+  }
+
+  export type ReportUncheckedCreateNestedManyWithoutReporterInput = {
+    create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
+    createMany?: ReportCreateManyReporterInputEnvelope
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
   }
 
   export type RelationshipUncheckedCreateNestedManyWithoutSourceInput = {
@@ -11235,6 +14088,20 @@ export namespace Prisma {
     update?: InteractionUpdateWithWhereUniqueWithoutUserInput | InteractionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: InteractionUpdateManyWithWhereWithoutUserInput | InteractionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
+  }
+
+  export type ReportUpdateManyWithoutReporterNestedInput = {
+    create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
+    upsert?: ReportUpsertWithWhereUniqueWithoutReporterInput | ReportUpsertWithWhereUniqueWithoutReporterInput[]
+    createMany?: ReportCreateManyReporterInputEnvelope
+    set?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    disconnect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    delete?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    update?: ReportUpdateWithWhereUniqueWithoutReporterInput | ReportUpdateWithWhereUniqueWithoutReporterInput[]
+    updateMany?: ReportUpdateManyWithWhereWithoutReporterInput | ReportUpdateManyWithWhereWithoutReporterInput[]
+    deleteMany?: ReportScalarWhereInput | ReportScalarWhereInput[]
   }
 
   export type RelationshipUpdateManyWithoutSourceNestedInput = {
@@ -11343,6 +14210,20 @@ export namespace Prisma {
     update?: InteractionUpdateWithWhereUniqueWithoutUserInput | InteractionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: InteractionUpdateManyWithWhereWithoutUserInput | InteractionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
+  }
+
+  export type ReportUncheckedUpdateManyWithoutReporterNestedInput = {
+    create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
+    upsert?: ReportUpsertWithWhereUniqueWithoutReporterInput | ReportUpsertWithWhereUniqueWithoutReporterInput[]
+    createMany?: ReportCreateManyReporterInputEnvelope
+    set?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    disconnect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    delete?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    update?: ReportUpdateWithWhereUniqueWithoutReporterInput | ReportUpdateWithWhereUniqueWithoutReporterInput[]
+    updateMany?: ReportUpdateManyWithWhereWithoutReporterInput | ReportUpdateManyWithWhereWithoutReporterInput[]
+    deleteMany?: ReportScalarWhereInput | ReportScalarWhereInput[]
   }
 
   export type RelationshipUncheckedUpdateManyWithoutSourceNestedInput = {
@@ -11523,6 +14404,20 @@ export namespace Prisma {
     connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
   }
 
+  export type ReportCreateNestedManyWithoutPostInput = {
+    create?: XOR<ReportCreateWithoutPostInput, ReportUncheckedCreateWithoutPostInput> | ReportCreateWithoutPostInput[] | ReportUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutPostInput | ReportCreateOrConnectWithoutPostInput[]
+    createMany?: ReportCreateManyPostInputEnvelope
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+  }
+
+  export type ModerationLogCreateNestedManyWithoutPostInput = {
+    create?: XOR<ModerationLogCreateWithoutPostInput, ModerationLogUncheckedCreateWithoutPostInput> | ModerationLogCreateWithoutPostInput[] | ModerationLogUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ModerationLogCreateOrConnectWithoutPostInput | ModerationLogCreateOrConnectWithoutPostInput[]
+    createMany?: ModerationLogCreateManyPostInputEnvelope
+    connect?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+  }
+
   export type PostUncheckedCreateNestedManyWithoutParentInput = {
     create?: XOR<PostCreateWithoutParentInput, PostUncheckedCreateWithoutParentInput> | PostCreateWithoutParentInput[] | PostUncheckedCreateWithoutParentInput[]
     connectOrCreate?: PostCreateOrConnectWithoutParentInput | PostCreateOrConnectWithoutParentInput[]
@@ -11535,6 +14430,20 @@ export namespace Prisma {
     connectOrCreate?: InteractionCreateOrConnectWithoutPostInput | InteractionCreateOrConnectWithoutPostInput[]
     createMany?: InteractionCreateManyPostInputEnvelope
     connect?: InteractionWhereUniqueInput | InteractionWhereUniqueInput[]
+  }
+
+  export type ReportUncheckedCreateNestedManyWithoutPostInput = {
+    create?: XOR<ReportCreateWithoutPostInput, ReportUncheckedCreateWithoutPostInput> | ReportCreateWithoutPostInput[] | ReportUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutPostInput | ReportCreateOrConnectWithoutPostInput[]
+    createMany?: ReportCreateManyPostInputEnvelope
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+  }
+
+  export type ModerationLogUncheckedCreateNestedManyWithoutPostInput = {
+    create?: XOR<ModerationLogCreateWithoutPostInput, ModerationLogUncheckedCreateWithoutPostInput> | ModerationLogCreateWithoutPostInput[] | ModerationLogUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ModerationLogCreateOrConnectWithoutPostInput | ModerationLogCreateOrConnectWithoutPostInput[]
+    createMany?: ModerationLogCreateManyPostInputEnvelope
+    connect?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
   }
 
   export type EnumPostTypeFieldUpdateOperationsInput = {
@@ -11587,6 +14496,34 @@ export namespace Prisma {
     deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
   }
 
+  export type ReportUpdateManyWithoutPostNestedInput = {
+    create?: XOR<ReportCreateWithoutPostInput, ReportUncheckedCreateWithoutPostInput> | ReportCreateWithoutPostInput[] | ReportUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutPostInput | ReportCreateOrConnectWithoutPostInput[]
+    upsert?: ReportUpsertWithWhereUniqueWithoutPostInput | ReportUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: ReportCreateManyPostInputEnvelope
+    set?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    disconnect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    delete?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    update?: ReportUpdateWithWhereUniqueWithoutPostInput | ReportUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: ReportUpdateManyWithWhereWithoutPostInput | ReportUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: ReportScalarWhereInput | ReportScalarWhereInput[]
+  }
+
+  export type ModerationLogUpdateManyWithoutPostNestedInput = {
+    create?: XOR<ModerationLogCreateWithoutPostInput, ModerationLogUncheckedCreateWithoutPostInput> | ModerationLogCreateWithoutPostInput[] | ModerationLogUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ModerationLogCreateOrConnectWithoutPostInput | ModerationLogCreateOrConnectWithoutPostInput[]
+    upsert?: ModerationLogUpsertWithWhereUniqueWithoutPostInput | ModerationLogUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: ModerationLogCreateManyPostInputEnvelope
+    set?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    disconnect?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    delete?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    connect?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    update?: ModerationLogUpdateWithWhereUniqueWithoutPostInput | ModerationLogUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: ModerationLogUpdateManyWithWhereWithoutPostInput | ModerationLogUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: ModerationLogScalarWhereInput | ModerationLogScalarWhereInput[]
+  }
+
   export type PostUncheckedUpdateManyWithoutParentNestedInput = {
     create?: XOR<PostCreateWithoutParentInput, PostUncheckedCreateWithoutParentInput> | PostCreateWithoutParentInput[] | PostUncheckedCreateWithoutParentInput[]
     connectOrCreate?: PostCreateOrConnectWithoutParentInput | PostCreateOrConnectWithoutParentInput[]
@@ -11613,6 +14550,34 @@ export namespace Prisma {
     update?: InteractionUpdateWithWhereUniqueWithoutPostInput | InteractionUpdateWithWhereUniqueWithoutPostInput[]
     updateMany?: InteractionUpdateManyWithWhereWithoutPostInput | InteractionUpdateManyWithWhereWithoutPostInput[]
     deleteMany?: InteractionScalarWhereInput | InteractionScalarWhereInput[]
+  }
+
+  export type ReportUncheckedUpdateManyWithoutPostNestedInput = {
+    create?: XOR<ReportCreateWithoutPostInput, ReportUncheckedCreateWithoutPostInput> | ReportCreateWithoutPostInput[] | ReportUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ReportCreateOrConnectWithoutPostInput | ReportCreateOrConnectWithoutPostInput[]
+    upsert?: ReportUpsertWithWhereUniqueWithoutPostInput | ReportUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: ReportCreateManyPostInputEnvelope
+    set?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    disconnect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    delete?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    connect?: ReportWhereUniqueInput | ReportWhereUniqueInput[]
+    update?: ReportUpdateWithWhereUniqueWithoutPostInput | ReportUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: ReportUpdateManyWithWhereWithoutPostInput | ReportUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: ReportScalarWhereInput | ReportScalarWhereInput[]
+  }
+
+  export type ModerationLogUncheckedUpdateManyWithoutPostNestedInput = {
+    create?: XOR<ModerationLogCreateWithoutPostInput, ModerationLogUncheckedCreateWithoutPostInput> | ModerationLogCreateWithoutPostInput[] | ModerationLogUncheckedCreateWithoutPostInput[]
+    connectOrCreate?: ModerationLogCreateOrConnectWithoutPostInput | ModerationLogCreateOrConnectWithoutPostInput[]
+    upsert?: ModerationLogUpsertWithWhereUniqueWithoutPostInput | ModerationLogUpsertWithWhereUniqueWithoutPostInput[]
+    createMany?: ModerationLogCreateManyPostInputEnvelope
+    set?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    disconnect?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    delete?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    connect?: ModerationLogWhereUniqueInput | ModerationLogWhereUniqueInput[]
+    update?: ModerationLogUpdateWithWhereUniqueWithoutPostInput | ModerationLogUpdateWithWhereUniqueWithoutPostInput[]
+    updateMany?: ModerationLogUpdateManyWithWhereWithoutPostInput | ModerationLogUpdateManyWithWhereWithoutPostInput[]
+    deleteMany?: ModerationLogScalarWhereInput | ModerationLogScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutInteractionsInput = {
@@ -11645,6 +14610,48 @@ export namespace Prisma {
     upsert?: PostUpsertWithoutInteractionsInput
     connect?: PostWhereUniqueInput
     update?: XOR<XOR<PostUpdateToOneWithWhereWithoutInteractionsInput, PostUpdateWithoutInteractionsInput>, PostUncheckedUpdateWithoutInteractionsInput>
+  }
+
+  export type PostCreateNestedOneWithoutReportsInput = {
+    create?: XOR<PostCreateWithoutReportsInput, PostUncheckedCreateWithoutReportsInput>
+    connectOrCreate?: PostCreateOrConnectWithoutReportsInput
+    connect?: PostWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutReportsInput = {
+    create?: XOR<UserCreateWithoutReportsInput, UserUncheckedCreateWithoutReportsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type PostUpdateOneRequiredWithoutReportsNestedInput = {
+    create?: XOR<PostCreateWithoutReportsInput, PostUncheckedCreateWithoutReportsInput>
+    connectOrCreate?: PostCreateOrConnectWithoutReportsInput
+    upsert?: PostUpsertWithoutReportsInput
+    connect?: PostWhereUniqueInput
+    update?: XOR<XOR<PostUpdateToOneWithWhereWithoutReportsInput, PostUpdateWithoutReportsInput>, PostUncheckedUpdateWithoutReportsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutReportsNestedInput = {
+    create?: XOR<UserCreateWithoutReportsInput, UserUncheckedCreateWithoutReportsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportsInput
+    upsert?: UserUpsertWithoutReportsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReportsInput, UserUpdateWithoutReportsInput>, UserUncheckedUpdateWithoutReportsInput>
+  }
+
+  export type PostCreateNestedOneWithoutModerationLogsInput = {
+    create?: XOR<PostCreateWithoutModerationLogsInput, PostUncheckedCreateWithoutModerationLogsInput>
+    connectOrCreate?: PostCreateOrConnectWithoutModerationLogsInput
+    connect?: PostWhereUniqueInput
+  }
+
+  export type PostUpdateOneRequiredWithoutModerationLogsNestedInput = {
+    create?: XOR<PostCreateWithoutModerationLogsInput, PostUncheckedCreateWithoutModerationLogsInput>
+    connectOrCreate?: PostCreateOrConnectWithoutModerationLogsInput
+    upsert?: PostUpsertWithoutModerationLogsInput
+    connect?: PostWhereUniqueInput
+    update?: XOR<XOR<PostUpdateToOneWithWhereWithoutModerationLogsInput, PostUpdateWithoutModerationLogsInput>, PostUncheckedUpdateWithoutModerationLogsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -11936,6 +14943,8 @@ export namespace Prisma {
     parent?: PostCreateNestedOneWithoutChildrenInput
     children?: PostCreateNestedManyWithoutParentInput
     interactions?: InteractionCreateNestedManyWithoutPostInput
+    reports?: ReportCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateWithoutUserInput = {
@@ -11949,6 +14958,8 @@ export namespace Prisma {
     flagReason?: string | null
     children?: PostUncheckedCreateNestedManyWithoutParentInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutPostInput
+    reports?: ReportUncheckedCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostCreateOrConnectWithoutUserInput = {
@@ -11981,6 +14992,31 @@ export namespace Prisma {
 
   export type InteractionCreateManyUserInputEnvelope = {
     data: InteractionCreateManyUserInput | InteractionCreateManyUserInput[]
+  }
+
+  export type ReportCreateWithoutReporterInput = {
+    id?: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+    post: PostCreateNestedOneWithoutReportsInput
+  }
+
+  export type ReportUncheckedCreateWithoutReporterInput = {
+    id?: string
+    postId: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+  }
+
+  export type ReportCreateOrConnectWithoutReporterInput = {
+    where: ReportWhereUniqueInput
+    create: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput>
+  }
+
+  export type ReportCreateManyReporterInputEnvelope = {
+    data: ReportCreateManyReporterInput | ReportCreateManyReporterInput[]
   }
 
   export type RelationshipCreateWithoutSourceInput = {
@@ -12186,6 +15222,34 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Interaction"> | Date | string
   }
 
+  export type ReportUpsertWithWhereUniqueWithoutReporterInput = {
+    where: ReportWhereUniqueInput
+    update: XOR<ReportUpdateWithoutReporterInput, ReportUncheckedUpdateWithoutReporterInput>
+    create: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput>
+  }
+
+  export type ReportUpdateWithWhereUniqueWithoutReporterInput = {
+    where: ReportWhereUniqueInput
+    data: XOR<ReportUpdateWithoutReporterInput, ReportUncheckedUpdateWithoutReporterInput>
+  }
+
+  export type ReportUpdateManyWithWhereWithoutReporterInput = {
+    where: ReportScalarWhereInput
+    data: XOR<ReportUpdateManyMutationInput, ReportUncheckedUpdateManyWithoutReporterInput>
+  }
+
+  export type ReportScalarWhereInput = {
+    AND?: ReportScalarWhereInput | ReportScalarWhereInput[]
+    OR?: ReportScalarWhereInput[]
+    NOT?: ReportScalarWhereInput | ReportScalarWhereInput[]
+    id?: StringFilter<"Report"> | string
+    postId?: StringFilter<"Report"> | string
+    reporterId?: StringFilter<"Report"> | string
+    reason?: StringFilter<"Report"> | string
+    status?: StringFilter<"Report"> | string
+    createdAt?: DateTimeFilter<"Report"> | Date | string
+  }
+
   export type RelationshipUpsertWithWhereUniqueWithoutSourceInput = {
     where: RelationshipWhereUniqueInput
     update: XOR<RelationshipUpdateWithoutSourceInput, RelationshipUncheckedUpdateWithoutSourceInput>
@@ -12277,6 +15341,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12284,6 +15349,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
     following?: FollowCreateNestedManyWithoutFollowerInput
@@ -12294,6 +15360,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12301,6 +15368,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -12316,6 +15384,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12323,6 +15392,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
     following?: FollowCreateNestedManyWithoutFollowerInput
@@ -12333,6 +15403,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12340,6 +15411,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -12366,6 +15438,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12373,6 +15446,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
     following?: FollowUpdateManyWithoutFollowerNestedInput
@@ -12383,6 +15457,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12390,6 +15465,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -12411,6 +15487,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12418,6 +15495,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
     following?: FollowUpdateManyWithoutFollowerNestedInput
@@ -12428,6 +15506,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12435,6 +15514,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -12445,6 +15525,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12452,6 +15533,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
@@ -12462,6 +15544,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12469,6 +15552,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
@@ -12484,6 +15568,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12491,6 +15576,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     following?: FollowCreateNestedManyWithoutFollowerInput
@@ -12501,6 +15587,7 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
@@ -12508,6 +15595,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
@@ -12534,6 +15622,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12541,6 +15630,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
@@ -12551,6 +15641,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12558,6 +15649,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
@@ -12579,6 +15671,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12586,6 +15679,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     following?: FollowUpdateManyWithoutFollowerNestedInput
@@ -12596,6 +15690,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12603,6 +15698,7 @@ export namespace Prisma {
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
@@ -12613,12 +15709,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
@@ -12630,12 +15728,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
@@ -12663,12 +15763,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
@@ -12680,12 +15782,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
@@ -12697,12 +15801,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     persona?: PersonaCreateNestedOneWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
@@ -12714,12 +15820,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
@@ -12747,12 +15855,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     persona?: PersonaUpdateOneWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
@@ -12764,12 +15874,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
@@ -12781,12 +15893,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
@@ -12798,12 +15912,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
@@ -12826,6 +15942,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutPostsInput
     parent?: PostCreateNestedOneWithoutChildrenInput
     interactions?: InteractionCreateNestedManyWithoutPostInput
+    reports?: ReportCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateWithoutChildrenInput = {
@@ -12839,6 +15957,8 @@ export namespace Prisma {
     flagged?: boolean
     flagReason?: string | null
     interactions?: InteractionUncheckedCreateNestedManyWithoutPostInput
+    reports?: ReportUncheckedCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostCreateOrConnectWithoutChildrenInput = {
@@ -12857,6 +15977,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutPostsInput
     children?: PostCreateNestedManyWithoutParentInput
     interactions?: InteractionCreateNestedManyWithoutPostInput
+    reports?: ReportCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateWithoutParentInput = {
@@ -12870,6 +15992,8 @@ export namespace Prisma {
     flagReason?: string | null
     children?: PostUncheckedCreateNestedManyWithoutParentInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutPostInput
+    reports?: ReportUncheckedCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostCreateOrConnectWithoutParentInput = {
@@ -12904,6 +16028,56 @@ export namespace Prisma {
     data: InteractionCreateManyPostInput | InteractionCreateManyPostInput[]
   }
 
+  export type ReportCreateWithoutPostInput = {
+    id?: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+    reporter: UserCreateNestedOneWithoutReportsInput
+  }
+
+  export type ReportUncheckedCreateWithoutPostInput = {
+    id?: string
+    reporterId: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+  }
+
+  export type ReportCreateOrConnectWithoutPostInput = {
+    where: ReportWhereUniqueInput
+    create: XOR<ReportCreateWithoutPostInput, ReportUncheckedCreateWithoutPostInput>
+  }
+
+  export type ReportCreateManyPostInputEnvelope = {
+    data: ReportCreateManyPostInput | ReportCreateManyPostInput[]
+  }
+
+  export type ModerationLogCreateWithoutPostInput = {
+    id?: string
+    action: string
+    reason?: string | null
+    adminId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ModerationLogUncheckedCreateWithoutPostInput = {
+    id?: string
+    action: string
+    reason?: string | null
+    adminId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ModerationLogCreateOrConnectWithoutPostInput = {
+    where: ModerationLogWhereUniqueInput
+    create: XOR<ModerationLogCreateWithoutPostInput, ModerationLogUncheckedCreateWithoutPostInput>
+  }
+
+  export type ModerationLogCreateManyPostInputEnvelope = {
+    data: ModerationLogCreateManyPostInput | ModerationLogCreateManyPostInput[]
+  }
+
   export type UserUpsertWithoutPostsInput = {
     update: XOR<UserUpdateWithoutPostsInput, UserUncheckedUpdateWithoutPostsInput>
     create: XOR<UserCreateWithoutPostsInput, UserUncheckedCreateWithoutPostsInput>
@@ -12920,12 +16094,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
@@ -12937,12 +16113,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
@@ -12971,6 +16149,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutPostsNestedInput
     parent?: PostUpdateOneWithoutChildrenNestedInput
     interactions?: InteractionUpdateManyWithoutPostNestedInput
+    reports?: ReportUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateWithoutChildrenInput = {
@@ -12984,6 +16164,8 @@ export namespace Prisma {
     flagged?: BoolFieldUpdateOperationsInput | boolean
     flagReason?: NullableStringFieldUpdateOperationsInput | string | null
     interactions?: InteractionUncheckedUpdateManyWithoutPostNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostUpsertWithWhereUniqueWithoutParentInput = {
@@ -13018,17 +16200,63 @@ export namespace Prisma {
     data: XOR<InteractionUpdateManyMutationInput, InteractionUncheckedUpdateManyWithoutPostInput>
   }
 
+  export type ReportUpsertWithWhereUniqueWithoutPostInput = {
+    where: ReportWhereUniqueInput
+    update: XOR<ReportUpdateWithoutPostInput, ReportUncheckedUpdateWithoutPostInput>
+    create: XOR<ReportCreateWithoutPostInput, ReportUncheckedCreateWithoutPostInput>
+  }
+
+  export type ReportUpdateWithWhereUniqueWithoutPostInput = {
+    where: ReportWhereUniqueInput
+    data: XOR<ReportUpdateWithoutPostInput, ReportUncheckedUpdateWithoutPostInput>
+  }
+
+  export type ReportUpdateManyWithWhereWithoutPostInput = {
+    where: ReportScalarWhereInput
+    data: XOR<ReportUpdateManyMutationInput, ReportUncheckedUpdateManyWithoutPostInput>
+  }
+
+  export type ModerationLogUpsertWithWhereUniqueWithoutPostInput = {
+    where: ModerationLogWhereUniqueInput
+    update: XOR<ModerationLogUpdateWithoutPostInput, ModerationLogUncheckedUpdateWithoutPostInput>
+    create: XOR<ModerationLogCreateWithoutPostInput, ModerationLogUncheckedCreateWithoutPostInput>
+  }
+
+  export type ModerationLogUpdateWithWhereUniqueWithoutPostInput = {
+    where: ModerationLogWhereUniqueInput
+    data: XOR<ModerationLogUpdateWithoutPostInput, ModerationLogUncheckedUpdateWithoutPostInput>
+  }
+
+  export type ModerationLogUpdateManyWithWhereWithoutPostInput = {
+    where: ModerationLogScalarWhereInput
+    data: XOR<ModerationLogUpdateManyMutationInput, ModerationLogUncheckedUpdateManyWithoutPostInput>
+  }
+
+  export type ModerationLogScalarWhereInput = {
+    AND?: ModerationLogScalarWhereInput | ModerationLogScalarWhereInput[]
+    OR?: ModerationLogScalarWhereInput[]
+    NOT?: ModerationLogScalarWhereInput | ModerationLogScalarWhereInput[]
+    id?: StringFilter<"ModerationLog"> | string
+    postId?: StringFilter<"ModerationLog"> | string
+    action?: StringFilter<"ModerationLog"> | string
+    reason?: StringNullableFilter<"ModerationLog"> | string | null
+    adminId?: StringNullableFilter<"ModerationLog"> | string | null
+    createdAt?: DateTimeFilter<"ModerationLog"> | Date | string
+  }
+
   export type UserCreateWithoutInteractionsInput = {
     id?: string
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
+    reports?: ReportCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
     followers?: FollowCreateNestedManyWithoutFollowingInput
@@ -13040,12 +16268,14 @@ export namespace Prisma {
     username: string
     passwordHash: string
     isAi?: boolean
+    isAdmin?: boolean
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
     relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
     followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
@@ -13068,6 +16298,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutPostsInput
     parent?: PostCreateNestedOneWithoutChildrenInput
     children?: PostCreateNestedManyWithoutParentInput
+    reports?: ReportCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutPostInput
   }
 
   export type PostUncheckedCreateWithoutInteractionsInput = {
@@ -13081,6 +16313,8 @@ export namespace Prisma {
     flagged?: boolean
     flagReason?: string | null
     children?: PostUncheckedCreateNestedManyWithoutParentInput
+    reports?: ReportUncheckedCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutPostInput
   }
 
   export type PostCreateOrConnectWithoutInteractionsInput = {
@@ -13104,12 +16338,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
+    reports?: ReportUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
     followers?: FollowUpdateManyWithoutFollowingNestedInput
@@ -13121,12 +16357,14 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
     relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
     followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
@@ -13155,6 +16393,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutPostsNestedInput
     parent?: PostUpdateOneWithoutChildrenNestedInput
     children?: PostUpdateManyWithoutParentNestedInput
+    reports?: ReportUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateWithoutInteractionsInput = {
@@ -13168,6 +16408,252 @@ export namespace Prisma {
     flagged?: BoolFieldUpdateOperationsInput | boolean
     flagReason?: NullableStringFieldUpdateOperationsInput | string | null
     children?: PostUncheckedUpdateManyWithoutParentNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutPostNestedInput
+  }
+
+  export type PostCreateWithoutReportsInput = {
+    id?: string
+    content: string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type: $Enums.PostType
+    createdAt?: Date | string
+    flagged?: boolean
+    flagReason?: string | null
+    user: UserCreateNestedOneWithoutPostsInput
+    parent?: PostCreateNestedOneWithoutChildrenInput
+    children?: PostCreateNestedManyWithoutParentInput
+    interactions?: InteractionCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogCreateNestedManyWithoutPostInput
+  }
+
+  export type PostUncheckedCreateWithoutReportsInput = {
+    id?: string
+    userId: string
+    content: string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type: $Enums.PostType
+    parentId?: string | null
+    createdAt?: Date | string
+    flagged?: boolean
+    flagReason?: string | null
+    children?: PostUncheckedCreateNestedManyWithoutParentInput
+    interactions?: InteractionUncheckedCreateNestedManyWithoutPostInput
+    moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutPostInput
+  }
+
+  export type PostCreateOrConnectWithoutReportsInput = {
+    where: PostWhereUniqueInput
+    create: XOR<PostCreateWithoutReportsInput, PostUncheckedCreateWithoutReportsInput>
+  }
+
+  export type UserCreateWithoutReportsInput = {
+    id?: string
+    username: string
+    passwordHash: string
+    isAi?: boolean
+    isAdmin?: boolean
+    bio?: string | null
+    profileImage?: string | null
+    createdAt?: Date | string
+    persona?: PersonaCreateNestedOneWithoutUserInput
+    recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
+    posts?: PostCreateNestedManyWithoutUserInput
+    interactions?: InteractionCreateNestedManyWithoutUserInput
+    relationshipsSent?: RelationshipCreateNestedManyWithoutSourceInput
+    relationshipsReceived?: RelationshipCreateNestedManyWithoutTargetInput
+    followers?: FollowCreateNestedManyWithoutFollowingInput
+    following?: FollowCreateNestedManyWithoutFollowerInput
+  }
+
+  export type UserUncheckedCreateWithoutReportsInput = {
+    id?: string
+    username: string
+    passwordHash: string
+    isAi?: boolean
+    isAdmin?: boolean
+    bio?: string | null
+    profileImage?: string | null
+    createdAt?: Date | string
+    persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
+    recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    posts?: PostUncheckedCreateNestedManyWithoutUserInput
+    interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
+    relationshipsSent?: RelationshipUncheckedCreateNestedManyWithoutSourceInput
+    relationshipsReceived?: RelationshipUncheckedCreateNestedManyWithoutTargetInput
+    followers?: FollowUncheckedCreateNestedManyWithoutFollowingInput
+    following?: FollowUncheckedCreateNestedManyWithoutFollowerInput
+  }
+
+  export type UserCreateOrConnectWithoutReportsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutReportsInput, UserUncheckedCreateWithoutReportsInput>
+  }
+
+  export type PostUpsertWithoutReportsInput = {
+    update: XOR<PostUpdateWithoutReportsInput, PostUncheckedUpdateWithoutReportsInput>
+    create: XOR<PostCreateWithoutReportsInput, PostUncheckedCreateWithoutReportsInput>
+    where?: PostWhereInput
+  }
+
+  export type PostUpdateToOneWithWhereWithoutReportsInput = {
+    where?: PostWhereInput
+    data: XOR<PostUpdateWithoutReportsInput, PostUncheckedUpdateWithoutReportsInput>
+  }
+
+  export type PostUpdateWithoutReportsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    flagged?: BoolFieldUpdateOperationsInput | boolean
+    flagReason?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutPostsNestedInput
+    parent?: PostUpdateOneWithoutChildrenNestedInput
+    children?: PostUpdateManyWithoutParentNestedInput
+    interactions?: InteractionUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutPostNestedInput
+  }
+
+  export type PostUncheckedUpdateWithoutReportsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    flagged?: BoolFieldUpdateOperationsInput | boolean
+    flagReason?: NullableStringFieldUpdateOperationsInput | string | null
+    children?: PostUncheckedUpdateManyWithoutParentNestedInput
+    interactions?: InteractionUncheckedUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutPostNestedInput
+  }
+
+  export type UserUpsertWithoutReportsInput = {
+    update: XOR<UserUpdateWithoutReportsInput, UserUncheckedUpdateWithoutReportsInput>
+    create: XOR<UserCreateWithoutReportsInput, UserUncheckedCreateWithoutReportsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutReportsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutReportsInput, UserUncheckedUpdateWithoutReportsInput>
+  }
+
+  export type UserUpdateWithoutReportsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    persona?: PersonaUpdateOneWithoutUserNestedInput
+    recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
+    posts?: PostUpdateManyWithoutUserNestedInput
+    interactions?: InteractionUpdateManyWithoutUserNestedInput
+    relationshipsSent?: RelationshipUpdateManyWithoutSourceNestedInput
+    relationshipsReceived?: RelationshipUpdateManyWithoutTargetNestedInput
+    followers?: FollowUpdateManyWithoutFollowingNestedInput
+    following?: FollowUpdateManyWithoutFollowerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutReportsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    isAi?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
+    recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    posts?: PostUncheckedUpdateManyWithoutUserNestedInput
+    interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
+    relationshipsSent?: RelationshipUncheckedUpdateManyWithoutSourceNestedInput
+    relationshipsReceived?: RelationshipUncheckedUpdateManyWithoutTargetNestedInput
+    followers?: FollowUncheckedUpdateManyWithoutFollowingNestedInput
+    following?: FollowUncheckedUpdateManyWithoutFollowerNestedInput
+  }
+
+  export type PostCreateWithoutModerationLogsInput = {
+    id?: string
+    content: string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type: $Enums.PostType
+    createdAt?: Date | string
+    flagged?: boolean
+    flagReason?: string | null
+    user: UserCreateNestedOneWithoutPostsInput
+    parent?: PostCreateNestedOneWithoutChildrenInput
+    children?: PostCreateNestedManyWithoutParentInput
+    interactions?: InteractionCreateNestedManyWithoutPostInput
+    reports?: ReportCreateNestedManyWithoutPostInput
+  }
+
+  export type PostUncheckedCreateWithoutModerationLogsInput = {
+    id?: string
+    userId: string
+    content: string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type: $Enums.PostType
+    parentId?: string | null
+    createdAt?: Date | string
+    flagged?: boolean
+    flagReason?: string | null
+    children?: PostUncheckedCreateNestedManyWithoutParentInput
+    interactions?: InteractionUncheckedCreateNestedManyWithoutPostInput
+    reports?: ReportUncheckedCreateNestedManyWithoutPostInput
+  }
+
+  export type PostCreateOrConnectWithoutModerationLogsInput = {
+    where: PostWhereUniqueInput
+    create: XOR<PostCreateWithoutModerationLogsInput, PostUncheckedCreateWithoutModerationLogsInput>
+  }
+
+  export type PostUpsertWithoutModerationLogsInput = {
+    update: XOR<PostUpdateWithoutModerationLogsInput, PostUncheckedUpdateWithoutModerationLogsInput>
+    create: XOR<PostCreateWithoutModerationLogsInput, PostUncheckedCreateWithoutModerationLogsInput>
+    where?: PostWhereInput
+  }
+
+  export type PostUpdateToOneWithWhereWithoutModerationLogsInput = {
+    where?: PostWhereInput
+    data: XOR<PostUpdateWithoutModerationLogsInput, PostUncheckedUpdateWithoutModerationLogsInput>
+  }
+
+  export type PostUpdateWithoutModerationLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    flagged?: BoolFieldUpdateOperationsInput | boolean
+    flagReason?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutPostsNestedInput
+    parent?: PostUpdateOneWithoutChildrenNestedInput
+    children?: PostUpdateManyWithoutParentNestedInput
+    interactions?: InteractionUpdateManyWithoutPostNestedInput
+    reports?: ReportUpdateManyWithoutPostNestedInput
+  }
+
+  export type PostUncheckedUpdateWithoutModerationLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    media?: NullableJsonNullValueInput | InputJsonValue
+    type?: EnumPostTypeFieldUpdateOperationsInput | $Enums.PostType
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    flagged?: BoolFieldUpdateOperationsInput | boolean
+    flagReason?: NullableStringFieldUpdateOperationsInput | string | null
+    children?: PostUncheckedUpdateManyWithoutParentNestedInput
+    interactions?: InteractionUncheckedUpdateManyWithoutPostNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type RecoveryCodeCreateManyUserInput = {
@@ -13191,6 +16677,14 @@ export namespace Prisma {
     id?: string
     postId: string
     type: $Enums.InteractionType
+    createdAt?: Date | string
+  }
+
+  export type ReportCreateManyReporterInput = {
+    id?: string
+    postId: string
+    reason: string
+    status?: string
     createdAt?: Date | string
   }
 
@@ -13251,6 +16745,8 @@ export namespace Prisma {
     parent?: PostUpdateOneWithoutChildrenNestedInput
     children?: PostUpdateManyWithoutParentNestedInput
     interactions?: InteractionUpdateManyWithoutPostNestedInput
+    reports?: ReportUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateWithoutUserInput = {
@@ -13264,6 +16760,8 @@ export namespace Prisma {
     flagReason?: NullableStringFieldUpdateOperationsInput | string | null
     children?: PostUncheckedUpdateManyWithoutParentNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutPostNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateManyWithoutUserInput = {
@@ -13295,6 +16793,30 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     postId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportUpdateWithoutReporterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    post?: PostUpdateOneRequiredWithoutReportsNestedInput
+  }
+
+  export type ReportUncheckedUpdateWithoutReporterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportUncheckedUpdateManyWithoutReporterInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    postId?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13400,6 +16922,22 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type ReportCreateManyPostInput = {
+    id?: string
+    reporterId: string
+    reason: string
+    status?: string
+    createdAt?: Date | string
+  }
+
+  export type ModerationLogCreateManyPostInput = {
+    id?: string
+    action: string
+    reason?: string | null
+    adminId?: string | null
+    createdAt?: Date | string
+  }
+
   export type PostUpdateWithoutParentInput = {
     id?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
@@ -13411,6 +16949,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutPostsNestedInput
     children?: PostUpdateManyWithoutParentNestedInput
     interactions?: InteractionUpdateManyWithoutPostNestedInput
+    reports?: ReportUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateWithoutParentInput = {
@@ -13424,6 +16964,8 @@ export namespace Prisma {
     flagReason?: NullableStringFieldUpdateOperationsInput | string | null
     children?: PostUncheckedUpdateManyWithoutParentNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutPostNestedInput
+    reports?: ReportUncheckedUpdateManyWithoutPostNestedInput
+    moderationLogs?: ModerationLogUncheckedUpdateManyWithoutPostNestedInput
   }
 
   export type PostUncheckedUpdateManyWithoutParentInput = {
@@ -13455,6 +16997,54 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumInteractionTypeFieldUpdateOperationsInput | $Enums.InteractionType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reporter?: UserUpdateOneRequiredWithoutReportsNestedInput
+  }
+
+  export type ReportUncheckedUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reporterId?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReportUncheckedUpdateManyWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reporterId?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ModerationLogUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ModerationLogUncheckedUpdateWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ModerationLogUncheckedUpdateManyWithoutPostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

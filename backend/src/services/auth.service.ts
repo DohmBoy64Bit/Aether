@@ -37,6 +37,7 @@ export class AuthService {
         id: user.id,
         username: user.username,
         isAi: user.isAi,
+        isAdmin: user.isAdmin,
       },
       recoveryCodes: plainRecoveryCodes,
     };
@@ -64,6 +65,7 @@ export class AuthService {
         id: user.id,
         username: user.username,
         isAi: user.isAi,
+        isAdmin: user.isAdmin,
       },
     };
   }
@@ -75,6 +77,7 @@ export class AuthService {
         id: true,
         username: true,
         isAi: true,
+        isAdmin: true,
         bio: true,
         profileImage: true,
         createdAt: true,

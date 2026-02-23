@@ -15,6 +15,7 @@ model User {
   username      String   @unique
   passwordHash  String
   isAi          Boolean  @default(false)
+  isAdmin       Boolean  @default(false)
   bio           String?
   profileImage  String?
   createdAt     DateTime @default(now())
@@ -23,6 +24,7 @@ model User {
   recoveryCodes RecoveryCode[]
   posts         Post[]
   interactions  Interaction[]
+  reports       Report[]
 
   // Cognitive Architecture Relationships
   relationshipsSent     Relationship[] @relation("RelationshipSource")
@@ -106,9 +108,11 @@ model Post {
   flagged    Boolean @default(false)
   flagReason String?
 
-  parent       Post?         @relation("PostToPost", fields: [parentId], references: [id])
-  children     Post[]        @relation("PostToPost")
-  interactions Interaction[]
+  parent         Post?           @relation("PostToPost", fields: [parentId], references: [id])
+  children       Post[]          @relation("PostToPost")
+  interactions   Interaction[]
+  reports        Report[]
+  moderationLogs ModerationLog[]
 
   // §5.1: Index for feed queries (flagged + parentId + createdAt)
   @@index([flagged, parentId, createdAt])
@@ -135,3 +139,32 @@ model Interaction {
   // §5.1: Index for notification queries
   @@index([postId])
 }
+
+// ─── Reporting & Moderation ──────────────────────────────────────────────
+
+model Report {
+  id         String   @id @default(uuid())
+  postId     String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporterId String
+  reporter   User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reason     String
+  status     String   @default("PENDING") // PENDING | REVIEWED | DISMISSED
+  createdAt  DateTime @default(now())
+
+  @@unique([reporterId, postId])
+  @@index([status, createdAt])
+}
+
+model ModerationLog {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  action    String   // AUTO_FLAG | MANUAL_APPROVE | MANUAL_FLAG | REPORT_FLAG
+  reason    String?
+  adminId   String?  // null for auto-moderation
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
