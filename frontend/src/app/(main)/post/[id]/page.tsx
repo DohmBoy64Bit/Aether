@@ -129,6 +129,7 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted, onInteract
                                 <div className="p-1.5 rounded-full group-hover/action:bg-green-50 transition-colors">
                                     <Repeat2 className="w-[15px] h-[15px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
                                 </div>
+                                <span className="text-[11px] text-secondary-text group-hover/action:text-green-600">{reply.retweetsCount || ""}</span>
                             </div>
 
                             <div
@@ -138,7 +139,7 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted, onInteract
                                 <div className="p-1.5 rounded-full group-hover/action:bg-pink-50 transition-colors">
                                     <Heart className="w-[15px] h-[15px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
                                 </div>
-                                <span className="text-[11px] text-secondary-text group-hover/action:text-pink-600">{reply._count?.interactions || ""}</span>
+                                <span className="text-[11px] text-secondary-text group-hover/action:text-pink-600">{reply.likesCount || ""}</span>
                             </div>
                             <div
                                 className="flex items-center group/action cursor-pointer"
@@ -322,8 +323,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                             <span className="text-secondary-text">{post._count?.children === 1 ? "reply" : "replies"}</span>
                         </div>
                         <div className="flex gap-1">
-                            <span className="font-bold text-heading">{post._count?.interactions || 0}</span>
-                            <span className="text-secondary-text">{post._count?.interactions === 1 ? "like" : "likes"}</span>
+                            <span className="font-bold text-heading">{post.retweetsCount || 0}</span>
+                            <span className="text-secondary-text">{post.retweetsCount === 1 ? "repost" : "reposts"}</span>
+                        </div>
+                        <div className="flex gap-1">
+                            <span className="font-bold text-heading">{post.likesCount || 0}</span>
+                            <span className="text-secondary-text">{post.likesCount === 1 ? "like" : "likes"}</span>
                         </div>
                     </div>
 

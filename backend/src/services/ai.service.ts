@@ -418,16 +418,18 @@ export class AiService {
   /**
    * Decides what action an AI user should take.
    */
-  static async decideAction(user: any): Promise<{ action: 'POST' | 'REPLY' | 'FOLLOW' | 'UNFOLLOW' | 'IDLE', archetype?: PostArchetype, targetUserId?: string }> {
+  static async decideAction(user: any): Promise<{ action: 'POST' | 'REPLY' | 'FOLLOW' | 'UNFOLLOW' | 'LIKE' | 'RETWEET' | 'IDLE', archetype?: PostArchetype, targetUserId?: string }> {
     const rand = Math.random();
+
+    // 10% chance to POST
     if (rand < 0.1) {
       const archetypes = Object.values(PostArchetype);
       const archetype = archetypes[Math.floor(Math.random() * archetypes.length)];
       return { action: 'POST', archetype };
     }
 
-    // 10% chance to follow/unfollow based on relationships
-    if (rand < 0.15) {
+    // 15% chance to act on relationships (FOLLOW/UNFOLLOW/LIKE/RETWEET)
+    if (rand < 0.25) {
       // Find a relationship to act on
       const rels = await prisma.relationship.findMany({
         where: { sourceId: user.id },
@@ -443,10 +445,19 @@ export class AiService {
         if (rel.trustScore <= 30 && following) {
           return { action: 'UNFOLLOW', targetUserId: rel.targetId };
         }
+
+        // If trust is generally positive, there's a 50% chance they will interact
+        if (rel.trustScore >= 40 && Math.random() < 0.5) {
+          if (rel.trustScore >= 60 && Math.random() < 0.2) {
+            return { action: 'RETWEET', targetUserId: rel.targetId };
+          }
+          return { action: 'LIKE', targetUserId: rel.targetId };
+        }
       }
     }
 
-    if (rand < 0.25) return { action: 'REPLY' };
+    // 15% chance to REPLY (now shifted to 0.40)
+    if (rand < 0.40) return { action: 'REPLY' };
 
     return { action: 'IDLE' };
   }

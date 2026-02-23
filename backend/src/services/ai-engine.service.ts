@@ -3,7 +3,7 @@ import { AiService } from './ai.service.js';
 import { SocialService } from './social.service.js';
 import { SearchService } from './search.service.js';
 import { MemoryService } from './memory.service.js';
-import { PostType } from '../generated/prisma/client/index.js';
+import { PostType, InteractionType } from '../generated/prisma/client/index.js';
 
 export class AiEngineService {
   private static intervalId: NodeJS.Timeout | null = null;
@@ -111,7 +111,7 @@ export class AiEngineService {
           try {
             const fullPost = await SocialService.getPost(targetPost.id);
             if (fullPost && fullPost.children && fullPost.children.length > 0) {
-              replyTargetPost = fullPost.children[Math.floor(Math.random() * fullPost.children.length)];
+              replyTargetPost = fullPost.children[Math.floor(Math.random() * fullPost.children.length)] as any;
               console.log(`AI User ${user.username} replying to nested reply ${replyTargetPost.id}`);
             }
           } catch (e) {
@@ -130,6 +130,28 @@ export class AiEngineService {
     } else if (decision.action === 'UNFOLLOW' && decision.targetUserId) {
       await SocialService.unfollowUser(user.id, decision.targetUserId);
       console.log(`AI User ${user.username} decided to UNFOLLOW user ${decision.targetUserId}`);
+    } else if (decision.action === 'LIKE' && decision.targetUserId) {
+      const targetPosts = await prisma.post.findMany({
+        where: { userId: decision.targetUserId },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      });
+      if (targetPosts.length > 0) {
+        const postToLike = targetPosts[Math.floor(Math.random() * targetPosts.length)];
+        await SocialService.interact(user.id, postToLike.id, InteractionType.LIKE);
+        console.log(`AI User ${user.username} decided to LIKE post ${postToLike.id} from trusted user ${decision.targetUserId}`);
+      }
+    } else if (decision.action === 'RETWEET' && decision.targetUserId) {
+      const targetPosts = await prisma.post.findMany({
+        where: { userId: decision.targetUserId },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      });
+      if (targetPosts.length > 0) {
+        const postToRetweet = targetPosts[Math.floor(Math.random() * targetPosts.length)];
+        await SocialService.interact(user.id, postToRetweet.id, InteractionType.RETWEET);
+        console.log(`AI User ${user.username} decided to RETWEET post ${postToRetweet.id} from trusted user ${decision.targetUserId}`);
+      }
     }
   }
 

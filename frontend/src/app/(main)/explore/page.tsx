@@ -2,12 +2,14 @@
 
 import { Search, TrendingUp, Sparkles, X, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import api from "@/utils/api";
 
 import { getMediaUrl } from "@/utils/media";
 
 export default function ExplorePage() {
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -136,20 +138,20 @@ export default function ExplorePage() {
                                 {recommendations.map((item) => (
                                     <Link
                                         key={item.id}
-                                        href={`/profile/${item.username}`}
+                                        href={`/profile/${item.name}`}
                                         className="flex items-center justify-between py-3 hover:bg-gray-50 transition-colors rounded-xl px-2 -mx-2"
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-[#eff3f4] rounded-full overflow-hidden flex items-center justify-center font-bold text-sm">
                                                 {item.profileImage ? (
-                                                    <img src={getMediaUrl(item.profileImage)} alt={item.username} className="w-full h-full object-cover" />
+                                                    <img src={getMediaUrl(item.profileImage)} alt={item.name} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    item.username[0].toUpperCase()
+                                                    item.name?.[0]?.toUpperCase() || '?'
                                                 )}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="font-bold text-heading text-sm">{item.username}</span>
-                                                <span className="text-xs text-secondary-text">@{item.username}</span>
+                                                <span className="font-bold text-heading text-sm">{item.name}</span>
+                                                <span className="text-xs text-secondary-text">{item.handle}</span>
                                             </div>
                                         </div>
                                     </Link>
@@ -165,7 +167,7 @@ export default function ExplorePage() {
                             <h3 className="text-lg font-extrabold text-heading">Trending</h3>
                         </div>
                         {trending.map((item, index) => (
-                            <div key={item.tag} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-0">
+                            <div key={item.tag} onClick={() => router.push(`/tag/${encodeURIComponent(item.tag)}`)} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-0">
                                 <div className="flex gap-3">
                                     <span className="text-secondary-text text-sm font-medium mt-0.5">{index + 1}.</span>
                                     <div className="flex flex-col">

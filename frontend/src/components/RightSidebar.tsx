@@ -5,8 +5,10 @@ import { Search, TrendingUp, MoreHorizontal } from "lucide-react";
 import api from "@/utils/api";
 import { getMediaUrl } from "@/utils/media";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function RightSidebar() {
+  const router = useRouter();
   const [trending, setTrending] = useState<any[]>([]);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [isFollowing, setIsFollowing] = useState<Record<string, boolean>>({});
@@ -51,11 +53,11 @@ export default function RightSidebar() {
       </div>
 
       {/* Trending */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-3">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-3 shrink-0">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Trending</h2>
         <ul className="flex flex-col">
           {trending.map((item, i) => (
-            <li key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer group">
+            <li key={i} onClick={() => router.push(`/tag/${encodeURIComponent(item.tag)}`)} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer group">
               <div className="flex flex-col">
                 <span className="text-[13px] text-secondary-text">{item.topic}</span>
                 <span className="font-bold text-heading text-[15px] pt-0.5">{item.tag}</span>
@@ -70,7 +72,7 @@ export default function RightSidebar() {
       </div>
 
       {/* Who to follow */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden shrink-0 mt-3 mb-4">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
         <ul className="flex flex-col">
           {recommendations.map((item, i) => (

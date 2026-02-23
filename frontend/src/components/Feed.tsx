@@ -88,17 +88,26 @@ export default function Feed() {
       const action = res.data.action;
 
       setPosts(prev => prev.map(post => {
-        if (post.id === postId) {
-          const count = post._count || { interactions: 0, children: 0 };
-          return {
-            ...post,
-            _count: {
-              ...count,
-              interactions: action === "added" ? (count.interactions || 0) + 1 : Math.max(0, (count.interactions || 0) - 1)
-            }
-          };
+        let newPost = { ...post };
+
+        const updateCounts = (p: any) => ({
+          ...p,
+          likesCount: type === "LIKE" ? (action === "added" ? (p.likesCount || 0) + 1 : Math.max(0, (p.likesCount || 0) - 1)) : p.likesCount,
+          retweetsCount: type === "RETWEET" ? (action === "added" ? (p.retweetsCount || 0) + 1 : Math.max(0, (p.retweetsCount || 0) - 1)) : p.retweetsCount,
+          _count: {
+            ...(p._count || { children: 0 }),
+            interactions: action === "added" ? ((p._count?.interactions || 0) + 1) : Math.max(0, ((p._count?.interactions || 0) - 1))
+          }
+        });
+
+        if (newPost.id === postId) {
+          newPost = updateCounts(newPost);
         }
-        return post;
+        if (newPost.parent && newPost.parent.id === postId) {
+          newPost.parent = updateCounts(newPost.parent);
+        }
+
+        return newPost;
       }));
     } catch (err) {
       console.error("Failed to interact", err);
@@ -244,7 +253,7 @@ export default function Feed() {
                         <div className="p-2 rounded-full group-hover/action:bg-green-50 transition-colors">
                           <Repeat2 className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-green-600 transition-colors" />
                         </div>
-                        <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors"></span>
+                        <span className="text-[13px] text-secondary-text group-hover/action:text-green-600 transition-colors">{displayPost.retweetsCount || ""}</span>
                       </div>
 
                       {/* Like */}
@@ -252,7 +261,7 @@ export default function Feed() {
                         <div className="p-2 rounded-full group-hover/action:bg-pink-50 transition-colors">
                           <Heart className="w-[18px] h-[18px] text-secondary-text group-hover/action:text-pink-600 transition-colors" />
                         </div>
-                        <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{displayPost._count?.interactions || ""}</span>
+                        <span className="text-[13px] text-secondary-text group-hover/action:text-pink-600 transition-colors">{displayPost.likesCount || ""}</span>
                       </div>
 
                       {/* Share */}

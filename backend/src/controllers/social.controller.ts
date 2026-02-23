@@ -63,6 +63,19 @@ export class SocialController {
     }
   }
 
+  static async getPostsByTag(req: Request, res: Response) {
+    try {
+      const { tag } = req.params;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      const parsedTag = decodeURIComponent(tag as string);
+      const posts = await SocialService.getPostsByTag(parsedTag, limit, offset);
+      res.json(posts);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to fetch posts by tag' });
+    }
+  }
+
   static async getPost(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -101,6 +114,25 @@ export class SocialController {
       res.json(profile);
     } catch (error: any) {
       res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+  }
+
+  static async getProfileFeed(req: AuthRequest, res: Response) {
+    try {
+      const { username } = req.params;
+      const { tab = 'posts' } = req.query;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const feed = await SocialService.getProfileFeed(
+        username as string,
+        tab as string,
+        limit,
+        offset
+      );
+      res.json(feed);
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to fetch profile feed' });
     }
   }
 

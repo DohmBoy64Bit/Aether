@@ -2,6 +2,21 @@ import prisma from '../utils/prisma.js';
 import { PostType, InteractionType } from '../generated/prisma/client/index.js';
 import { ModerationService } from './moderation.service.js';
 
+function injectInteractionCounts(post: any) {
+  if (!post) return post;
+  if (post.interactions) {
+    post.likesCount = post.interactions.filter((i: any) => i.type === 'LIKE').length;
+    post.retweetsCount = post.interactions.filter((i: any) => i.type === 'RETWEET').length;
+    delete post.interactions;
+  } else {
+    post.likesCount = 0;
+    post.retweetsCount = 0;
+  }
+  if (post.parent) injectInteractionCounts(post.parent);
+  if (post.children) post.children.forEach(injectInteractionCounts);
+  return post;
+}
+
 export class SocialService {
   static async createPost(userId: string, content: string, type: PostType = PostType.TWEET, parentId?: string, media?: string | null) {
     const post = await prisma.post.create({
@@ -25,6 +40,9 @@ export class SocialService {
             interactions: true,
             children: true,
           }
+        },
+        interactions: {
+          select: { type: true, userId: true }
         }
       }
     });
@@ -38,14 +56,17 @@ export class SocialService {
       console.error(`Moderation failed for post ${post.id}:`, err);
     });
 
-    return post;
+    return injectInteractionCounts(post);
   }
 
   static async getFeed(limit = 20, offset = 0) {
-    return prisma.post.findMany({
+    const posts = await prisma.post.findMany({
       where: {
         flagged: false,
-        parentId: null, // Only top-level posts, not replies
+        OR: [
+          { parentId: null }, // Top level posts
+          { type: PostType.RETWEET } // And retweets
+        ]
       },
       orderBy: {
         createdAt: 'desc',
@@ -60,14 +81,95 @@ export class SocialService {
             isAi: true,
           }
         },
+        parent: {
+          include: {
+            user: {
+              select: {
+                username: true,
+                profileImage: true,
+                isAi: true,
+              }
+            },
+            _count: {
+              select: {
+                interactions: true,
+                children: true,
+              }
+            },
+            interactions: {
+              select: { type: true, userId: true }
+            }
+          }
+        },
         _count: {
           select: {
             interactions: true,
             children: true,
           }
+        },
+        interactions: {
+          select: { type: true, userId: true }
         }
       }
     });
+
+    return posts.map(injectInteractionCounts);
+  }
+
+  static async getPostsByTag(tag: string, limit = 20, offset = 0) {
+    const posts = await prisma.post.findMany({
+      where: {
+        flagged: false,
+        content: {
+          contains: tag
+        }
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: offset,
+      include: {
+        user: {
+          select: {
+            username: true,
+            profileImage: true,
+            isAi: true,
+          }
+        },
+        parent: {
+          include: {
+            user: {
+              select: {
+                username: true,
+                profileImage: true,
+                isAi: true,
+              }
+            },
+            _count: {
+              select: {
+                interactions: true,
+                children: true,
+              }
+            },
+            interactions: {
+              select: { type: true, userId: true }
+            }
+          }
+        },
+        _count: {
+          select: {
+            interactions: true,
+            children: true,
+          }
+        },
+        interactions: {
+          select: { type: true, userId: true }
+        }
+      }
+    });
+
+    return posts.map(injectInteractionCounts);
   }
 
   static async getPost(postId: string) {
@@ -84,6 +186,9 @@ export class SocialService {
           interactions: true,
           children: true,
         }
+      },
+      interactions: {
+        select: { type: true, userId: true }
       }
     };
 
@@ -105,6 +210,15 @@ export class SocialService {
                 profileImage: true,
                 isAi: true,
               }
+            },
+            _count: {
+              select: {
+                interactions: true,
+                children: true,
+              }
+            },
+            interactions: {
+              select: { type: true, userId: true }
             }
           }
         },
@@ -139,6 +253,9 @@ export class SocialService {
             interactions: true,
             children: true,
           }
+        },
+        interactions: {
+          select: { type: true, userId: true }
         }
       }
     });
@@ -147,25 +264,170 @@ export class SocialService {
       return null;
     }
 
-    return post;
+    return injectInteractionCounts(post);
+  }
+
+  static async getProfileFeed(username: string, tab: string, limit: number, offset: number) {
+    let whereClause: any = { user: { username } };
+
+    switch (tab) {
+      case 'posts':
+        whereClause = {
+          ...whereClause,
+          OR: [
+            { parentId: null },
+            { type: PostType.RETWEET }
+          ]
+        };
+        break;
+      case 'replies':
+        whereClause.parentId = { not: null };
+        break;
+      case 'media':
+        whereClause.media = { not: null };
+        break;
+      case 'likes':
+        // For likes, we find the interactions of type LIKE by this user,
+        // and return the associated posts.
+        const likedInteractions = await prisma.interaction.findMany({
+          where: {
+            user: { username },
+            type: 'LIKE'
+          },
+          select: { postId: true },
+          skip: offset,
+          take: limit
+        });
+
+        const postIds = likedInteractions.map(i => i.postId);
+
+        const posts = await prisma.post.findMany({
+          where: { id: { in: postIds } },
+          orderBy: { createdAt: 'desc' },
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                profileImage: true,
+                isAi: true,
+              }
+            },
+            _count: {
+              select: {
+                interactions: true,
+                children: true,
+              }
+            },
+            interactions: {
+              select: { type: true, userId: true }
+            }
+          }
+        });
+
+        return posts.map(injectInteractionCounts);
+      default:
+        whereClause.parentId = null; // Default to posts
+    }
+
+    const posts = await prisma.post.findMany({
+      where: whereClause,
+      take: limit,
+      skip: offset,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            profileImage: true,
+            isAi: true,
+          }
+        },
+        parent: {
+          include: {
+            user: {
+              select: {
+                username: true,
+                profileImage: true,
+                isAi: true,
+              }
+            },
+            _count: {
+              select: {
+                interactions: true,
+                children: true,
+              }
+            },
+            interactions: {
+              select: { type: true, userId: true }
+            }
+          }
+        },
+        _count: {
+          select: {
+            interactions: true,
+            children: true,
+          }
+        },
+        interactions: {
+          select: { type: true, userId: true }
+        }
+      }
+    });
+
+    return posts.map(injectInteractionCounts);
   }
 
   static async interact(userId: string, postId: string, type: InteractionType) {
-    return prisma.interaction.upsert({
+    const existing = await prisma.interaction.findUnique({
       where: {
         userId_postId_type: {
           userId,
           postId,
           type,
         }
-      },
-      update: {},
-      create: {
-        userId,
-        postId,
-        type,
       }
     });
+
+    if (existing) {
+      await prisma.interaction.delete({
+        where: { id: existing.id }
+      });
+
+      if (type === InteractionType.RETWEET) {
+        await prisma.post.deleteMany({
+          where: {
+            userId,
+            type: PostType.RETWEET,
+            parentId: postId
+          }
+        });
+      }
+
+      return { action: 'removed', type };
+    } else {
+      await prisma.interaction.create({
+        data: {
+          userId,
+          postId,
+          type,
+        }
+      });
+
+      if (type === InteractionType.RETWEET) {
+        await prisma.post.create({
+          data: {
+            userId,
+            type: PostType.RETWEET,
+            parentId: postId,
+            content: '',
+          }
+        });
+      }
+
+      return { action: 'added', type };
+    }
   }
 
   static async updateProfile(userId: string, data: { bio?: string, profileImage?: string }) {

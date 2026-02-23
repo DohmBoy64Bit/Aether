@@ -9,6 +9,7 @@ router.get('/posts', SocialController.getFeed as any);
 router.get('/posts/:id', SocialController.getPost as any);
 router.post('/interact', authMiddleware as any, SocialController.interact as any);
 router.get('/profiles/:username', SocialController.getProfile as any);
+router.get('/profiles/:username/feed', authMiddleware as any, SocialController.getProfileFeed as any);
 router.post('/update-profile', authMiddleware as any, SocialController.updateProfile as any);
 router.get('/search', SocialController.search as any);
 router.post('/persona', authMiddleware as any, SocialController.updatePersona as any);
@@ -21,5 +22,6 @@ router.get('/trending', SocialController.getTrending as any);
 router.get('/recommendations', authMiddleware as any, SocialController.getRecommendations as any);
 router.get('/saved', authMiddleware as any, SocialController.getSavedPosts as any);
 router.get('/notifications', authMiddleware as any, SocialController.getNotifications as any);
+router.get('/tags/:tag', SocialController.getPostsByTag as any);
 
 export default router;
