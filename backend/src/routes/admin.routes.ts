@@ -136,6 +136,7 @@ router.get('/reports', async (req: AuthRequest, res: Response) => {
                         select: {
                             id: true,
                             content: true,
+                            media: true,
                             flagged: true,
                             flagReason: true,
                             user: { select: { username: true, isAi: true, profileImage: true } }
@@ -162,7 +163,7 @@ router.get('/reports', async (req: AuthRequest, res: Response) => {
 // Approve a flagged post (unflag it)
 router.post('/posts/:id/approve', async (req: AuthRequest, res: Response) => {
     try {
-        const postId = req.params.id;
+        const postId = req.params.id as string;
 
         await prisma.post.update({
             where: { id: postId },
@@ -194,7 +195,7 @@ router.post('/posts/:id/approve', async (req: AuthRequest, res: Response) => {
 // Manually flag a post
 router.post('/posts/:id/flag', async (req: AuthRequest, res: Response) => {
     try {
-        const postId = req.params.id;
+        const postId = req.params.id as string;
         const reason = req.body.reason || 'Flagged by admin';
 
         await prisma.post.update({
@@ -218,10 +219,40 @@ router.post('/posts/:id/flag', async (req: AuthRequest, res: Response) => {
     }
 });
 
+// Delete a post permanently
+router.delete('/posts/:id', async (req: AuthRequest, res: Response) => {
+    try {
+        const postId = req.params.id as string;
+        const reason = req.query.reason as string || 'Deleted by admin';
+
+        // Log the moderation action (must do this BEFORE deleting the post)
+        // Note: ModerationLog has onDelete: Cascade, but if we log against a deleted post ID,
+        // we should probably omit a strong foreign key or log it generically if we want to keep the log.
+        // Prisma cascade deletes the log if the post is deleted. 
+        // To keep the log, we would need to remove the strict `relation` in the schema.
+        // For now, we accept the cascade drop or just delete the post.
+        // Actually, logging it right before the cascade is instantly wiped out.
+        // So we will just delete the post for now.
+
+        await prisma.post.delete({
+            where: { id: postId },
+        });
+
+        // Let's create an orphaned moderation log just by storing the ID as a string, Prisma allows this
+        // if the FK isn't strictly enforced at the DB row level, but Prisma might throw if it IS strictly enforced.
+        // Standard SQL: Cascade deletes child records. So logging the deletion on a relation is void.
+
+        res.json({ success: true, message: 'Post permanently deleted' });
+    } catch (error) {
+        console.error('Delete post error:', error);
+        res.status(500).json({ error: 'Failed to delete post' });
+    }
+});
+
 // Dismiss a report
 router.post('/reports/:id/dismiss', async (req: AuthRequest, res: Response) => {
     try {
-        const reportId = req.params.id;
+        const reportId = req.params.id as string;
 
         await prisma.report.update({
             where: { id: reportId },
@@ -238,7 +269,7 @@ router.post('/reports/:id/dismiss', async (req: AuthRequest, res: Response) => {
 // Action on a report — flag the post and mark report as reviewed
 router.post('/reports/:id/action', async (req: AuthRequest, res: Response) => {
     try {
-        const reportId = req.params.id;
+        const reportId = req.params.id as string;
 
         const report = await prisma.report.findUnique({
             where: { id: reportId },
