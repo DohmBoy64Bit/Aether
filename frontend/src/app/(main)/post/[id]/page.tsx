@@ -75,7 +75,10 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted, onInteract
             >
                 <div className="flex gap-3 relative">
                     {/* Avatar center matches container's border-left */}
-                    <div className="w-9 h-9 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center relative z-20 border-2 border-white shadow-sm transition-transform group-hover/post:scale-105">
+                    <div
+                        className="w-9 h-9 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center relative z-20 border-2 border-white shadow-sm transition-transform cursor-pointer hover:opacity-80"
+                        onClick={(e) => { e.stopPropagation(); router.push(`/profile/${reply.user.username}`); }}
+                    >
                         {reply.user.profileImage ? (
                             <img src={reply.user.profileImage} alt={reply.user.username} className="w-full h-full object-cover" />
                         ) : (
@@ -85,13 +88,19 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted, onInteract
 
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1 flex-wrap">
-                            <span className="font-bold text-heading text-[14px] hover:underline whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]">
+                            <span
+                                className="font-bold text-heading text-[14px] hover:underline whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] cursor-pointer"
+                                onClick={(e) => { e.stopPropagation(); router.push(`/profile/${reply.user.username}`); }}
+                            >
                                 {reply.user.username}
                             </span>
                             {reply.user.isAi && (
                                 <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
                             )}
-                            <span className="text-secondary-text text-[13px] whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
+                            <span
+                                className="text-secondary-text text-[13px] whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px] cursor-pointer hover:underline"
+                                onClick={(e) => { e.stopPropagation(); router.push(`/profile/${reply.user.username}`); }}
+                            >
                                 @{reply.user.username}
                             </span>
                             <span className="text-secondary-text text-[13px]">·</span>
@@ -182,6 +191,7 @@ function ReplyItem({ reply, depth = 0, isLast = false, onReplyPosted, onInteract
 
 export default function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
+    const router = useRouter();
     const [post, setPost] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedPost, setSelectedPost] = useState<any>(null);
@@ -249,7 +259,10 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                 <div className="px-4 pt-3 pb-0 relative">
                     {/* Author */}
                     <div className="flex items-center gap-3 mb-3">
-                        <div className="w-12 h-12 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center relative z-10">
+                        <div
+                            className="w-12 h-12 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center relative z-10 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
+                        >
                             {post.user.profileImage ? (
                                 <img src={post.user.profileImage} alt={post.user.username} className="w-full h-full object-cover" />
                             ) : (
@@ -258,12 +271,22 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                         </div>
                         <div className="flex flex-col">
                             <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-heading text-[15px] hover:underline">{post.user.username}</span>
+                                <span
+                                    className="font-bold text-heading text-[15px] hover:underline cursor-pointer"
+                                    onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
+                                >
+                                    {post.user.username}
+                                </span>
                                 {post.user.isAi && (
                                     <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
                                 )}
                             </div>
-                            <span className="text-secondary-text text-sm">@{post.user.username}</span>
+                            <span
+                                className="text-secondary-text text-sm cursor-pointer hover:underline"
+                                onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
+                            >
+                                @{post.user.username}
+                            </span>
                         </div>
                         <div className="ml-auto relative group/more">
                             <div className="p-2 hover:bg-blue-50 rounded-full transition-colors cursor-pointer">

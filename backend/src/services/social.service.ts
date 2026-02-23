@@ -336,17 +336,60 @@ export class SocialService {
   }
 
   static async getTrendingTopics() {
-    const [totalPosts, totalInteractions, aiUsers] = await Promise.all([
-      prisma.post.count(),
-      prisma.interaction.count(),
-      prisma.user.count({ where: { isAi: true } })
-    ]);
-    return [
-      { topic: "Network Activity", tag: "#GlobalFeed", posts: `${totalPosts} posts` },
-      { topic: "Engagement", tag: "Community", posts: `${totalInteractions} interactions` },
-      { topic: "Entities", tag: "AI Personas", posts: `${aiUsers} active agents` },
-      { topic: "Technology", tag: "OllamaLocal", posts: "Trending" },
-    ];
+    // 1. Fetch recent posts to analyze for trends
+    const recentPosts = await prisma.post.findMany({
+      take: 100, // Look at the last 100 posts for trending
+      orderBy: { createdAt: 'desc' },
+      select: { content: true }
+    });
+
+    // 2. Extract and count hashtags
+    const hashtagCounts: Record<string, number> = {};
+    const hashtagRegex = /#[\w]+/g;
+
+    recentPosts.forEach(post => {
+      const tags = post.content?.match(hashtagRegex) || [];
+      // Use Set to only count each tag once per post
+      const uniqueTags = new Set(tags.map(t => t.toLowerCase()));
+
+      uniqueTags.forEach(tag => {
+        hashtagCounts[tag] = (hashtagCounts[tag] || 0) + 1;
+      });
+    });
+
+    // 3. Sort by popularity and get the top 4 real trends
+    const sortedTags = Object.entries(hashtagCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 4);
+
+    // 4. Map to the expected UI format, or provide fallbacks if no tags exist
+    const dynamicTrends = sortedTags.map(([tag, count], index) => {
+      // Assign a pseudo-category based on rank just for UI variety
+      const topics = ["Trending Worldwide", "Technology", "Gaming", "Entertainment"];
+      return {
+        topic: topics[index % topics.length],
+        tag: tag, // Keep the # symbol
+        posts: `${count} recent posts`
+      };
+    });
+
+    // 5. Fill remaining slots with platform stats if not enough hashtags exist 
+    //    (Useful for empty or newly wiped databases)
+    const platformTrends = [];
+    if (dynamicTrends.length < 5) {
+      const [totalPosts, aiUsers] = await Promise.all([
+        prisma.post.count(),
+        prisma.user.count({ where: { isAi: true } })
+      ]);
+
+      if (dynamicTrends.length < 1) platformTrends.push({ topic: "Network Activity", tag: "#GlobalFeed", posts: `${totalPosts} posts total` });
+      if (dynamicTrends.length < 2) platformTrends.push({ topic: "Entities", tag: "AI Personas", posts: `${aiUsers} active agents` });
+      if (dynamicTrends.length < 3) platformTrends.push({ topic: "Technology", tag: "OllamaLocal", posts: "Running Llama models locally" });
+      if (dynamicTrends.length < 4) platformTrends.push({ topic: "Platform", tag: "AetherCore", posts: "System online" });
+      if (dynamicTrends.length < 5) platformTrends.push({ topic: "Community", tag: "Welcome", posts: "Join the conversation" });
+    }
+
+    return [...dynamicTrends, ...platformTrends].slice(0, 5);
   }
 
   static async getUserRecommendations(userId?: string) {

@@ -6,6 +6,7 @@ import api from "@/utils/api";
 import { formatDistanceToNow } from "date-fns";
 import PostComposer from "./PostComposer";
 import { useMediaComposer } from "@/hooks/useMediaComposer";
+import { useRouter } from "next/navigation";
 
 interface ReplyModalProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ export default function ReplyModal({ isOpen, onClose, parentPost, onReplyPosted 
     const [isPosting, setIsPosting] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
     const composer = useMediaComposer();
+    const router = useRouter();
 
     useEffect(() => {
         if (isOpen) {
@@ -44,6 +46,7 @@ export default function ReplyModal({ isOpen, onClose, parentPost, onReplyPosted 
             composer.clearComposer();
             onReplyPosted?.();
             onClose();
+            router.push(`/post/${parentPost.id}`);
         } catch (err) {
             console.error("Failed to reply", err);
         } finally {

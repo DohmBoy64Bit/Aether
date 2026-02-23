@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, TrendingUp, MoreHorizontal } from "lucide-react";
 import api from "@/utils/api";
 import { getMediaUrl } from "@/utils/media";
+import Link from "next/link";
 
 export default function RightSidebar() {
   const [trending, setTrending] = useState<any[]>([]);
@@ -50,48 +51,54 @@ export default function RightSidebar() {
       </div>
 
       {/* Trending */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-3">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Trending</h2>
         <ul className="flex flex-col">
           {trending.map((item, i) => (
-            <li key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
+            <li key={i} className="flex justify-between items-start px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer group">
               <div className="flex flex-col">
-                <span className="text-xs text-secondary-text">{item.topic}</span>
-                <span className="font-bold text-heading text-[15px]">{item.tag}</span>
-                <span className="text-xs text-secondary-text">{item.posts}</span>
+                <span className="text-[13px] text-secondary-text">{item.topic}</span>
+                <span className="font-bold text-heading text-[15px] pt-0.5">{item.tag}</span>
+                <span className="text-[13px] text-secondary-text pt-0.5">{item.posts}</span>
               </div>
-              <MoreHorizontal className="w-[18px] h-[18px] text-secondary-text mt-1" />
+              <div className="p-2 -mr-2 -mt-2 rounded-full hover:bg-blue-50 transition-colors group-hover:block text-secondary-text hover:text-[#0085ff]">
+                <MoreHorizontal className="w-5 h-5 flex-shrink-0" />
+              </div>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Who to follow */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
         <ul className="flex flex-col">
           {recommendations.map((item, i) => (
             <li key={item.id || i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#eff3f4] overflow-hidden rounded-full flex items-center justify-center text-heading font-bold text-sm">
+                <Link href={`/profile/${item.name}`} className="w-10 h-10 bg-[#eff3f4] overflow-hidden rounded-full flex items-center justify-center text-heading font-bold text-sm shrink-0 hover:opacity-80 transition-opacity">
                   {item.profileImage ? (
                     <img src={getMediaUrl(item.profileImage)} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
                     item.name[0]
                   )}
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-heading text-sm hover:underline cursor-pointer">{item.name}</span>
-                    <span className="text-[10px] bg-[#eff3f4] px-1.5 py-0.5 rounded text-secondary-text font-semibold uppercase">{item.category}</span>
+                </Link>
+                <div className="flex flex-col overflow-hidden mr-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <Link href={`/profile/${item.name}`} className="font-bold text-heading text-[15px] hover:underline truncate">
+                      {item.name}
+                    </Link>
+                    {item.category === "AI Persona" && (
+                      <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold border border-[#0085ff]/10">AI</span>
+                    )}
                   </div>
-                  <span className="text-xs text-secondary-text">{item.handle}</span>
+                  <span className="text-[15px] text-secondary-text truncate">{item.handle}</span>
                 </div>
               </div>
               <button
                 onClick={() => handleFollow(item.id)}
                 disabled={isFollowing[item.id]}
-                className="bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4 disabled:opacity-50"
+                className="shrink-0 bg-heading hover:bg-black text-white font-bold rounded-full transition-colors text-sm py-1.5 px-4 disabled:opacity-50"
               >
                 {isFollowing[item.id] ? "Following" : "Follow"}
               </button>

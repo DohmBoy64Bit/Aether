@@ -2,6 +2,7 @@
 
 import { ExternalLink, Play } from "lucide-react";
 import { getMediaUrl } from "@/utils/media";
+import Link from "next/link";
 
 // Types matching backend PostMedia
 interface PostMediaLink {
@@ -34,30 +35,67 @@ interface PostMedia {
  * Returns React elements with clickable links
  */
 function parseContentWithLinks(content: string): React.ReactNode[] {
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    if (!content) return [];
+
+    // Matches markdown links [text](url), @mentions, and #hashtags
+    const regex = /(\[[^\]]+\]\([^)]+\)|@[\w]+|#[\w]+)/g;
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
     let match;
 
-    while ((match = linkRegex.exec(content)) !== null) {
-        // Add text before the link
+    while ((match = regex.exec(content)) !== null) {
+        // Add text before the matched token
         if (match.index > lastIndex) {
             parts.push(content.slice(lastIndex, match.index));
         }
-        // Add the link
-        const [, text, url] = match;
-        parts.push(
-            <a
-                key={`link-${match.index}`}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#0085ff] hover:underline"
-                onClick={(e) => e.stopPropagation()}
-            >
-                {text}
-            </a>
-        );
+
+        const token = match[0];
+
+        if (token.startsWith('[')) {
+            // It's a markdown link
+            const linkMatch = /\[([^\]]+)\]\(([^)]+)\)/.exec(token);
+            if (linkMatch) {
+                parts.push(
+                    <a
+                        key={`link-${match.index}`}
+                        href={linkMatch[2]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#0085ff] hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {linkMatch[1]}
+                    </a>
+                );
+            } else {
+                parts.push(token);
+            }
+        } else if (token.startsWith('@')) {
+            // It's a mention
+            parts.push(
+                <Link
+                    key={`mention-${match.index}`}
+                    href={`/profile/${token.slice(1)}`}
+                    className="text-[#0085ff] hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {token}
+                </Link>
+            );
+        } else if (token.startsWith('#')) {
+            // It's a hashtag
+            parts.push(
+                <Link
+                    key={`tag-${match.index}`}
+                    href={`/explore?q=${encodeURIComponent(token)}`}
+                    className="text-[#0085ff] hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {token}
+                </Link>
+            );
+        }
+
         lastIndex = match.index + match[0].length;
     }
 

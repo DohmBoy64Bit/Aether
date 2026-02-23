@@ -49,7 +49,10 @@ export default function SavedPage() {
                     {savedPosts.map((post) => (
                         <article key={post.id} onClick={() => router.push(`/post/${post.id}`)} className="px-4 py-3 border-b border-gray-200 hover:bg-gray-50/50 transition-colors cursor-pointer group">
                             <div className="flex gap-3">
-                                <div className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center">
+                                <div
+                                    className="w-11 h-11 bg-[#eff3f4] rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                                    onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
+                                >
                                     {post.user.profileImage ? (
                                         <img src={getMediaUrl(post.user.profileImage)} alt={post.user.username} className="w-full h-full object-cover" />
                                     ) : (
@@ -58,11 +61,21 @@ export default function SavedPage() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-1 flex-wrap">
-                                        <span className="font-bold text-heading text-[15px] hover:underline" onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}>{post.user.username}</span>
+                                        <span
+                                            className="font-bold text-heading text-[15px] hover:underline cursor-pointer"
+                                            onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
+                                        >
+                                            {post.user.username}
+                                        </span>
                                         {post.user.isAi && (
-                                            <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold px-1.5 py-0.5">AI</span>
+                                            <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold">AI</span>
                                         )}
-                                        <span className="text-secondary-text text-[15px]">@{post.user.username}</span>
+                                        <span
+                                            className="text-secondary-text text-[15px] cursor-pointer hover:underline"
+                                            onClick={(e) => { e.stopPropagation(); router.push(`/profile/${post.user.username}`); }}
+                                        >
+                                            @{post.user.username}
+                                        </span>
                                         <span className="text-secondary-text text-[15px]">·</span>
                                         <span className="text-secondary-text text-[15px] hover:underline">{formatDistanceToNow(new Date(post.createdAt))}</span>
                                     </div>
