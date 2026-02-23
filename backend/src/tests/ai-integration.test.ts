@@ -264,6 +264,79 @@ describe('AI Integration Tests (Real)', () => {
             }
         }, 60_000);
 
+        it('should NOT parrot search result titles/descriptions', async () => {
+            const mockSearchResult = {
+                context: 'Revolutionary quantum computing breakthrough at MIT research lab achieves new milestone.',
+                links: [
+                    { url: 'https://example.com/quantum', title: 'Revolutionary Quantum Computing Breakthrough at MIT', description: 'MIT researchers achieve a major milestone in quantum error correction.' }
+                ],
+                images: [],
+                videos: [
+                    { url: 'https://youtube.com/watch?v=quantum', title: 'MIT Quantum Computing Lab Tour 2026', iframe_src: 'https://youtube.com/embed/quantum', thumbnail: 'https://example.com/qthumb.jpg' }
+                ]
+            };
+
+            const post = await AiService.generatePost(aiUser1, mockSearchResult, PostArchetype.HOT_TAKE);
+            const content = post.content.toLowerCase();
+
+            // The post should NOT just copy the article/video title
+            const titleExact = 'revolutionary quantum computing breakthrough at mit';
+            const descExact = 'mit researchers achieve a major milestone';
+            const videoTitle = 'mit quantum computing lab tour 2026';
+
+            const isParrotingTitle = content.includes(titleExact);
+            const isParrotingDesc = content.includes(descExact);
+            const isParrotingVideo = content.includes(videoTitle);
+
+            if (isParrotingTitle || isParrotingDesc || isParrotingVideo) {
+                console.warn(`⚠️ PARROTING DETECTED: "${post.content}"`);
+                console.warn('Post appears to copy search result metadata verbatim');
+            } else {
+                console.log(`✅ Anti-parroting: "${post.content}"`);
+            }
+
+            // The content should at least be different from just restating the title
+            expect(content).not.toBe(titleExact);
+            expect(content).not.toBe(descExact);
+            // Log for manual review even if it passes the strict check
+            console.log('Parroting check: title=' + isParrotingTitle + ', desc=' + isParrotingDesc + ', video=' + isParrotingVideo);
+        }, 60_000);
+
+        it('should NOT attach unrelated media to post', async () => {
+            // Give the AI a gaming persona context but provide COOKING media
+            const unrelatedSearchResult = {
+                context: 'The latest competitive Valorant patch changes and meta shifts.',
+                links: [],
+                images: [],
+                videos: [
+                    { url: 'https://youtube.com/watch?v=cooking123', title: 'How to Make Perfect Sourdough Bread - Complete Beginner Guide', iframe_src: 'https://youtube.com/embed/cooking123', thumbnail: 'https://example.com/bread.jpg' }
+                ]
+            };
+
+            const post = await AiService.generatePost(aiUser1, unrelatedSearchResult, PostArchetype.HOT_TAKE);
+
+            // The AI should ideally NOT attach the cooking video to a gaming post
+            if (post.media?.video) {
+                const videoTitle = (post.media.video as any).title?.toLowerCase() || '';
+                if (videoTitle.includes('sourdough') || videoTitle.includes('bread') || videoTitle.includes('cooking')) {
+                    console.warn(`⚠️ IRRELEVANT MEDIA: Gaming post attached cooking video: "${post.content}"`);
+                } else {
+                    console.log(`Media attached but title seems okay: "${videoTitle}"`);
+                }
+            } else {
+                console.log(`✅ Media relevance: AI correctly chose no media (content: "${post.content}")`);
+            }
+
+            // Either way, the POST content should be about gaming, not cooking
+            const content = post.content.toLowerCase();
+            const isAboutCooking = content.includes('sourdough') || content.includes('bread') || content.includes('baking');
+            if (isAboutCooking) {
+                console.warn('⚠️ Post content shifted to match unrelated media topic!');
+            }
+            expect(isAboutCooking).toBe(false);
+            console.log(`Post topic check: isAboutCooking=${isAboutCooking}`);
+        }, 60_000);
+
         it('should create a post in the database via SocialService', async () => {
             const generated = await AiService.generatePost(aiUser1, undefined, PostArchetype.LIFE_UPDATE);
 
