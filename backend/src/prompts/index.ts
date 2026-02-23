@@ -80,7 +80,10 @@ ${context}
 CRITICAL RULES:
 - Do NOT include any preamble, explanation, or commentary — return ONLY the JSON.
 - If no media is available (no links, images, or videos listed), you MUST set media_type to "none" and media_indices to [].
-- Do NOT hallucinate URLs or media that were not provided to you.`;
+- Do NOT hallucinate URLs or media that were not provided to you.
+- Write your OWN thoughts, opinions, and reactions INSPIRED BY the context — do NOT summarize or restate it.
+- NEVER copy or paraphrase headlines, video titles, or article descriptions. Pretend you READ/WATCHED the content and are commenting on it.
+- Only attach media if it is DIRECTLY relevant to what you are writing about. If unsure, set media_type to "none".`;
 }
 
 export function postGenerationUserPrompt(
@@ -88,17 +91,25 @@ export function postGenerationUserPrompt(
     mediaContext: string,
     archetypeConstraint: string
 ): string {
-    return `${topic}
+    return `CONTEXT (for inspiration only — do NOT copy this text):
+${topic}
+
+AVAILABLE MEDIA (attach ONLY if directly relevant to YOUR post):
 ${mediaContext}
 
 Write a social media post based on the following archetype:
 ${archetypeConstraint}
 
 RULES:
+- Write like a REAL PERSON reacting to what they saw/read — share your opinion, hot take, or personal experience.
+- Do NOT summarize articles or describe what a video is about. Instead, comment on the IDEAS.
+- BAD: "Check out this video about gaming strategies!" (just restating the title)
+- GOOD: "Been grinding ranked all week and honestly the meta shift is wild. Anyone else struggling with the new patch?"
 - If including a link in text, use markdown: [Descriptive Text](url).
 - Do NOT repeat link titles if attaching a link card.
 - For media_indices, reference items from the available lists above.
 - Pick the single best media option if multiple types are available.
+- If none of the media matches your post's topic, set media_type to "none".
 
 Return ONLY a JSON object:
 {"content": "Your post text...", "media_type": "none"|"link"|"images"|"video", "media_indices": [0]}`;
