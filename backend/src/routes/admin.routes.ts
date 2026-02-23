@@ -225,22 +225,20 @@ router.delete('/posts/:id', async (req: AuthRequest, res: Response) => {
         const postId = req.params.id as string;
         const reason = req.query.reason as string || 'Deleted by admin';
 
-        // Log the moderation action (must do this BEFORE deleting the post)
-        // Note: ModerationLog has onDelete: Cascade, but if we log against a deleted post ID,
-        // we should probably omit a strong foreign key or log it generically if we want to keep the log.
-        // Prisma cascade deletes the log if the post is deleted. 
-        // To keep the log, we would need to remove the strict `relation` in the schema.
-        // For now, we accept the cascade drop or just delete the post.
-        // Actually, logging it right before the cascade is instantly wiped out.
-        // So we will just delete the post for now.
+        // Log the moderation action BEFORE deleting the post.
+        // Prisma's SetNull rule means this log will detach and survive the deletion!
+        await prisma.moderationLog.create({
+            data: {
+                postId,
+                action: 'MANUAL_DELETE',
+                reason,
+                adminId: req.user!.userId,
+            }
+        });
 
         await prisma.post.delete({
             where: { id: postId },
         });
-
-        // Let's create an orphaned moderation log just by storing the ID as a string, Prisma allows this
-        // if the FK isn't strictly enforced at the DB row level, but Prisma might throw if it IS strictly enforced.
-        // Standard SQL: Cascade deletes child records. So logging the deletion on a relation is void.
 
         res.json({ success: true, message: 'Post permanently deleted' });
     } catch (error) {

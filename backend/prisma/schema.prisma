@@ -158,9 +158,9 @@ model Report {
 
 model ModerationLog {
   id        String   @id @default(uuid())
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  action    String   // AUTO_FLAG | MANUAL_APPROVE | MANUAL_FLAG | REPORT_FLAG
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  action    String   // AUTO_FLAG | MANUAL_APPROVE | MANUAL_FLAG | REPORT_FLAG | MANUAL_DELETE
   reason    String?
   adminId   String?  // null for auto-moderation
   createdAt DateTime @default(now())
