@@ -536,17 +536,23 @@ export default function AdminDashboard() {
 
 function AdminListSkeleton() {
     return (
-        <div className="divide-y divide-gray-50">
-            {[1, 2, 3].map(i => (
-                <div key={i} className="p-4 flex gap-3 sm:gap-4 animate-pulse">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"></div>
-                    <div className="flex-1 space-y-3 py-1">
-                        <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                        <div className="space-y-2">
-                            <div className="h-4 bg-gray-200 rounded w-full"></div>
-                            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+        <div className="divide-y divide-gray-50/50">
+            {[1, 2, 3, 4].map(i => (
+                <div key={i} className="p-6 flex gap-4 sm:gap-6 animate-[pulse_2s_ease-in-out_infinite] relative">
+                    <div className="w-14 h-14 rounded-2xl bg-gray-200/50 flex-shrink-0"></div>
+                    <div className="flex-1 space-y-4 py-1">
+                        <div className="flex items-center gap-3">
+                            <div className="h-5 bg-gray-200/50 rounded-lg w-1/3"></div>
+                            <div className="h-4 bg-gray-200/30 rounded-lg w-16"></div>
                         </div>
-                        <div className="h-10 bg-gray-200 rounded w-1/2 mt-4"></div>
+                        <div className="space-y-2.5">
+                            <div className="h-4 bg-gray-200/40 rounded-lg w-full"></div>
+                            <div className="h-4 bg-gray-200/40 rounded-lg w-5/6"></div>
+                        </div>
+                        <div className="flex gap-2 mt-4">
+                            <div className="h-10 bg-gray-200/50 rounded-2xl w-28"></div>
+                            <div className="h-10 bg-gray-200/30 rounded-2xl w-32"></div>
+                        </div>
                     </div>
                 </div>
             ))}
@@ -557,84 +563,87 @@ function AdminListSkeleton() {
 function StatCard({ label, value, icon: Icon, color, subtext }: any) {
     const colors = {
         blue: {
-            bg: "bg-blue-500",
-            light: "bg-blue-50",
-            text: "text-blue-600",
-            border: "border-blue-100",
-            shadow: "shadow-blue-500/20",
-            gradient: "from-blue-500 to-cyan-400"
+            bg: "bg-[#0085ff]/5",
+            border: "border-[#0085ff]/20",
+            glow: "bg-[#0085ff]/10",
+            text: "text-[#0085ff]",
+            iconBg: "bg-gradient-to-br from-[#0085ff] to-cyan-400 text-white",
+            shadow: "shadow-[#0085ff]/20",
         },
         purple: {
-            bg: "bg-purple-500",
-            light: "bg-purple-50",
+            bg: "bg-purple-500/5",
+            border: "border-purple-500/20",
+            glow: "bg-purple-500/10",
             text: "text-purple-600",
-            border: "border-purple-100",
+            iconBg: "bg-gradient-to-br from-purple-500 to-fuchsia-400 text-white",
             shadow: "shadow-purple-500/20",
-            gradient: "from-purple-500 to-fuchsia-400"
         },
         orange: {
-            bg: "bg-orange-500",
-            light: "bg-orange-50",
+            bg: "bg-orange-500/5",
+            border: "border-orange-500/20",
+            glow: "bg-orange-500/10",
             text: "text-orange-600",
-            border: "border-orange-100",
+            iconBg: "bg-gradient-to-br from-orange-500 to-amber-400 text-white",
             shadow: "shadow-orange-500/20",
-            gradient: "from-orange-500 to-amber-400"
         },
         red: {
-            bg: "bg-red-500",
-            light: "bg-red-50",
+            bg: "bg-red-500/5",
+            border: "border-red-500/20",
+            glow: "bg-red-500/10",
             text: "text-red-600",
-            border: "border-red-100",
+            iconBg: "bg-gradient-to-br from-red-500 to-rose-400 text-white",
             shadow: "shadow-red-500/20",
-            gradient: "from-red-500 to-rose-400"
         },
     };
 
     const theme = colors[color as keyof typeof colors];
 
     return (
-        <div className="relative overflow-hidden bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 group flex flex-col justify-between min-h-[160px]">
-            {/* Background decorative blob */}
-            <div className={cn("absolute -right-10 -top-10 w-32 h-32 rounded-full opacity-[0.03] blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none", theme.bg)} />
+        <div className={cn(
+            "relative overflow-hidden rounded-[2rem] p-6 transition-all duration-500 group flex flex-col justify-between min-h-[170px]",
+            "bg-white/60 backdrop-blur-2xl border", // Glass effect
+            theme.border,
+            "hover:bg-white/80 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]",
+            theme.shadow
+        )}>
+            {/* Background radiant glow */}
+            <div className={cn("absolute -right-20 -top-20 w-64 h-64 rounded-full blur-[80px] group-hover:scale-125 transition-transform duration-1000 pointer-events-none opacity-60", theme.glow)} />
 
-            <div className="flex items-start justify-between relative z-10 w-full">
-                <div className="flex flex-col gap-1 w-[calc(100%-3rem)]">
-                    <span className="text-secondary-text text-sm font-black uppercase tracking-widest opacity-60 truncate block w-full">
+            <div className="flex items-start justify-between relative z-10 w-full mb-8">
+                <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg transition-transform group-hover:scale-110 group-hover:rotate-3 duration-500",
+                    theme.iconBg,
+                )}>
+                    <Icon className="w-7 h-7 stroke-[2]" />
+                </div>
+            </div>
+
+            <div className="relative z-10 flex flex-col gap-1 w-full mt-auto">
+                <span className="text-4xl sm:text-5xl font-black text-heading tracking-tighter truncate block w-full drop-shadow-sm">
+                    {value}
+                </span>
+                <div className="flex items-center gap-3 w-full">
+                    <span className="text-secondary-text text-[13px] font-black uppercase tracking-[0.2em] opacity-70 truncate block">
                         {label}
                     </span>
-                    <span className="text-4xl sm:text-5xl font-black text-heading tracking-tighter mt-1 truncate block w-full">
-                        {value}
-                    </span>
-                </div>
-
-                <div className={cn(
-                    "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg bg-gradient-to-br transition-transform group-hover:scale-110 duration-300",
-                    theme.gradient,
-                    theme.shadow
-                )}>
-                    <Icon className="w-6 h-6 text-white stroke-[2.5]" />
                 </div>
             </div>
 
             {subtext && (
-                <div className="mt-4 relative z-10">
+                <div className="absolute top-6 right-6 z-10">
                     <div className={cn(
-                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold w-full max-w-full overflow-hidden",
-                        theme.light,
+                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[11px] font-black uppercase tracking-widest",
+                        "bg-white/80 backdrop-blur-md",
                         theme.border,
                         theme.text
                     )}>
-                        <span className={cn("inline-block w-2 h-2 rounded-full flex-shrink-0 animate-pulse", theme.bg)}></span>
-                        <span className="truncate">{subtext}</span>
+                        <span className="truncate max-w-[120px]">{subtext}</span>
                     </div>
                 </div>
             )}
 
-            {/* Hover bottom border indicator */}
-            <div className={cn(
-                "absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r transition-all duration-300 group-hover:w-full",
-                theme.gradient
-            )} />
+            {/* Subtle bottom border highlight */}
+            <div className={cn("absolute bottom-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500", theme.iconBg)} />
         </div>
     );
 }
@@ -644,19 +653,34 @@ function TabButton({ active, onClick, icon: Icon, label, count }: any) {
         <button
             onClick={onClick}
             className={cn(
-                "flex-1 flex flex-col items-center justify-center gap-2 py-6 px-6 text-[13px] font-black transition-all border-b-4 relative whitespace-nowrap flex-shrink-0 min-w-[150px] uppercase tracking-wider",
+                "flex-1 flex flex-col items-center justify-center gap-1.5 py-5 px-6 text-[12px] font-black transition-all relative flex-shrink-0 min-w-[150px] uppercase tracking-widest overflow-hidden group outline-none",
                 active
-                    ? "text-[#0085ff] border-[#0085ff] bg-[#0085ff]/[0.03]"
-                    : "text-secondary-text border-transparent opacity-50 hover:opacity-100 hover:bg-gray-50/50"
+                    ? "text-[#0085ff]"
+                    : "text-secondary-text opacity-50 hover:opacity-100 hover:bg-gray-50/50"
             )}
         >
-            <Icon className={cn("w-5 h-5 transition-transform duration-300", active && "scale-110")} />
-            {label}
+            <Icon className={cn("w-5 h-5 mb-1 transition-all duration-500", active ? "scale-110 drop-shadow-md text-[#0085ff]" : "group-hover:-translate-y-1")} />
+            <span className="relative z-10">{label}</span>
             {count !== undefined && count > 0 && (
-                <span className="absolute top-4 right-6 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-lg shadow-lg ring-2 ring-white">
+                <span className={cn(
+                    "absolute top-3 right-5 text-[10px] font-black px-1.5 py-0.5 rounded-xl shadow-sm transition-all duration-300",
+                    active ? "bg-[#0085ff] text-white" : "bg-red-100 text-red-600"
+                )}>
                     {count}
                 </span>
             )}
+
+            {/* Animated Underline Indicator */}
+            <div className={cn(
+                "absolute bottom-0 left-0 h-1 w-full bg-[#0085ff] transition-transform duration-300 origin-bottom",
+                active ? "scale-y-100 translate-y-0" : "scale-y-0 translate-y-full"
+            )} />
+
+            {/* Soft background glow for active area */}
+            <div className={cn(
+                "absolute inset-0 bg-gradient-to-t from-[#0085ff]/5 to-transparent opacity-0 transition-opacity duration-500 pointer-events-none",
+                active && "opacity-100"
+            )} />
         </button>
     );
 }
@@ -665,9 +689,9 @@ import PostContent from "@/components/PostContent";
 
 function AdminActionButton({ onClick, loading, icon: Icon, label, variant = "primary" }: any) {
     const variants = {
-        primary: "bg-green-500 hover:bg-green-600 border-transparent text-white shadow-sm shadow-green-100",
-        danger: "bg-red-500 hover:bg-red-600 border-transparent text-white shadow-sm shadow-red-100",
-        secondary: "bg-white hover:bg-gray-100 border-gray-200 text-secondary-text shadow-sm"
+        primary: "bg-gradient-to-br from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 border-transparent text-white shadow-[0_4px_14px_0_rgba(34,197,94,0.39)] ring-1 ring-green-600/20",
+        danger: "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 border-transparent text-white shadow-[0_4px_14px_0_rgba(239,68,68,0.39)] ring-1 ring-red-600/20",
+        secondary: "bg-white hover:bg-gray-50/80 border-gray-200 text-secondary-text shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]"
     };
 
     return (
@@ -675,62 +699,90 @@ function AdminActionButton({ onClick, loading, icon: Icon, label, variant = "pri
             onClick={onClick}
             disabled={loading}
             className={cn(
-                "flex-1 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest py-3 px-4 rounded-2xl transition-all border disabled:opacity-50 min-h-[44px] active:scale-95",
+                "relative overflow-hidden flex-1 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest py-3 px-5 rounded-[1rem] transition-all border disabled:opacity-50 min-h-[44px] hover:-translate-y-[1px] active:scale-[0.98] active:translate-y-0 group",
                 variants[variant as keyof typeof variants]
             )}
         >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : Icon && <Icon className="w-3.5 h-3.5 flex-shrink-0 stroke-[2.5]" />}
-            <span className="truncate">{label}</span>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin relative z-10" /> : Icon && <Icon className="w-4 h-4 flex-shrink-0 stroke-[2.5] relative z-10 group-hover:scale-110 transition-transform duration-300" />}
+            <span className="truncate relative z-10">{label}</span>
+
+            {/* Subtle light sweep effect */}
+            {variant !== 'secondary' && (
+                <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 z-0" />
+            )}
         </button>
     );
 }
 
 function FlaggedPostItem({ post, onRestore, onDelete, loading }: any) {
     return (
-        <div className="p-6 hover:bg-gray-50/50 transition-colors flex gap-4 sm:gap-6 group">
-            <div className="w-12 h-12 rounded-[1.25rem] bg-gray-100 flex-shrink-0 overflow-hidden flex items-center justify-center shadow-inner">
-                {post.user?.profileImage ? (
-                    <img src={post.user.profileImage} className="w-full h-full object-cover" />
-                ) : (
-                    <span className="font-black text-gray-400 uppercase text-sm">
-                        {post.user?.username?.[0] || '?'}
-                    </span>
+        <div className="p-6 hover:bg-[#0085ff]/[0.02] transition-colors flex gap-4 sm:gap-6 group border-b border-gray-50 last:border-0 relative overflow-hidden">
+            {/* Subtle glow on hover */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0085ff]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            <div className="relative">
+                <div className={cn(
+                    "w-14 h-14 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center shadow-md relative z-10 transition-transform duration-500 group-hover:scale-105",
+                    post.user?.isAi ? "bg-[#0085ff]/10 ring-2 ring-[#0085ff]/30 shadow-[#0085ff]/20" : "bg-gray-100"
+                )}>
+                    {post.user?.profileImage ? (
+                        <img src={post.user.profileImage} className="w-full h-full object-cover" />
+                    ) : (
+                        <span className={cn(
+                            "font-black uppercase text-xl",
+                            post.user?.isAi ? "text-[#0085ff]" : "text-gray-400"
+                        )}>
+                            {post.user?.username?.[0] || '?'}
+                        </span>
+                    )}
+                </div>
+                {post.user?.isAi && (
+                    <div className="absolute inset-0 bg-[#0085ff]/20 blur-xl rounded-full z-0 pointer-events-none" />
                 )}
             </div>
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                    <span className="font-black text-[15px] text-heading underline decoration-gray-200 decoration-[3px] underline-offset-[4px] truncate">
+
+            <div className="flex-1 min-w-0 relative z-10">
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="font-black text-[16px] text-heading truncate hover:text-[#0085ff] transition-colors cursor-pointer">
                         {post.user ? `@${post.user.username}` : '[Deleted User]'}
                     </span>
-                    {post.user?.isAi && <span className="text-[10px] font-black bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-md flex-shrink-0 border border-blue-100 shadow-sm">AI</span>}
-                    <span className="text-secondary-text text-[11px] font-bold ml-auto flex-shrink-0 opacity-50">{formatDistanceToNow(new Date(post.createdAt))} ago</span>
+                    {post.user?.isAi && (
+                        <span className="text-[10px] font-black bg-gradient-to-r from-[#0085ff] to-cyan-400 text-white px-2 py-0.5 rounded-md flex-shrink-0 shadow-sm shadow-[#0085ff]/30 border border-white/10 uppercase tracking-widest">
+                            AI Agent
+                        </span>
+                    )}
+                    <span className="text-secondary-text text-[11px] font-bold ml-auto flex-shrink-0 opacity-50 uppercase tracking-widest">
+                        {formatDistanceToNow(new Date(post.createdAt))} ago
+                    </span>
                 </div>
 
-                <div className="mt-4 bg-white rounded-[1.5rem] border border-gray-100 p-5 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.04)] transition-transform group-hover:scale-[1.01] duration-300">
-                    <PostContent content={post.content} media={post.media} textClassName="text-[15px] text-heading leading-relaxed" />
+                <div className="bg-white/60 backdrop-blur-md rounded-[1.5rem] border border-gray-100/50 p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] transition-all duration-300 group-hover:shadow-[0_8px_30px_-4px_rgba(0,133,255,0.08)] group-hover:border-[#0085ff]/10 flex flex-col">
+                    <PostContent content={post.content} media={post.media} textClassName="text-[15px] text-heading leading-relaxed font-medium" />
                 </div>
 
-                <div className="mt-4 flex items-start gap-3 bg-red-50/50 p-4 rounded-2xl border border-red-100/50 shadow-inner">
-                    <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-red-400 uppercase tracking-widest leading-none mb-1">Moderator Intelligence</span>
-                        <span className="text-[13px] text-red-900 font-bold leading-relaxed">{post.flagReason || "Flagged by AI safety filters"}</span>
+                <div className="mt-4 flex flex-col sm:flex-row items-center gap-3">
+                    <div className="flex-1 flex items-start gap-3 bg-red-50/50 p-4 rounded-2xl border border-red-100/50 shadow-inner w-full sm:w-auto">
+                        <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-red-400 uppercase tracking-widest leading-none mb-1">Intelligence Flag</span>
+                            <span className="text-[13px] text-red-900 font-bold leading-relaxed">{post.flagReason || "Flagged by AI safety filters"}</span>
+                        </div>
                     </div>
-                </div>
 
-                <div className="mt-5 flex flex-col sm:flex-row gap-3">
-                    <AdminActionButton
-                        onClick={onRestore}
-                        loading={loading}
-                        icon={CheckCircle}
-                        label="Restore Post"
-                    />
-                    <AdminActionButton
-                        onClick={onDelete}
-                        variant="danger"
-                        icon={Trash2}
-                        label="Delete Permanently"
-                    />
+                    <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0 items-center justify-end shrink-0">
+                        <AdminActionButton
+                            onClick={onRestore}
+                            loading={loading}
+                            icon={CheckCircle}
+                            label="Restore"
+                        />
+                        <AdminActionButton
+                            onClick={onDelete}
+                            variant="danger"
+                            icon={Trash2}
+                            label="Delete"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -739,56 +791,66 @@ function FlaggedPostItem({ post, onRestore, onDelete, loading }: any) {
 
 function ReportItem({ report, onDelete, onDismiss, loading }: any) {
     return (
-        <div className="p-6 hover:bg-gray-50/50 transition-colors flex flex-col gap-4 group">
-            <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
-                <div className="flex items-center flex-wrap gap-2 text-[13px] font-bold text-secondary-text">
-                    <span className="px-2 py-0.5 rounded-lg bg-gray-100 text-heading">@{report.reporter?.username || 'Unknown'}</span>
-                    <ArrowRight className="w-3.5 h-3.5 opacity-30" />
-                    <span className="px-2 py-0.5 rounded-lg bg-red-50 text-red-600">@{report.post?.user?.username || 'Unknown'}</span>
-                    <span className="hidden sm:inline opacity-30">·</span>
-                    <span className="text-[11px] opacity-50 uppercase tracking-widest">{formatDistanceToNow(new Date(report.createdAt))} ago</span>
+        <div className="p-6 hover:bg-[#0085ff]/[0.02] transition-colors flex flex-col gap-4 group border-b border-gray-50 last:border-0 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            <div className="flex items-center flex-wrap gap-x-3 gap-y-2 relative z-10">
+                <div className="flex items-center flex-wrap gap-2 text-[13px] font-bold text-secondary-text bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gray-100/50 shadow-sm">
+                    <span className="text-heading hover:text-[#0085ff] cursor-pointer transition-colors">@{report.reporter?.username || 'Unknown'}</span>
+                    <ArrowRight className="w-3.5 h-3.5 opacity-40 text-[#0085ff]" />
+                    <span className="text-red-600 hover:text-red-500 cursor-pointer transition-colors">@{report.post?.user?.username || 'Unknown'}</span>
+                    <span className="hidden sm:inline opacity-30 mx-1">·</span>
+                    <span className="text-[10px] opacity-60 uppercase tracking-widest">{formatDistanceToNow(new Date(report.createdAt))} ago</span>
                 </div>
-                <div className="sm:ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-orange-100 text-orange-700 border border-orange-200/50 shadow-sm">
-                    <AlertTriangle className="w-3 h-3" />
+                <div className="sm:ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gradient-to-br from-orange-400 to-red-400 text-white shadow-md shadow-orange-500/20">
+                    <AlertTriangle className="w-3.5 h-3.5" />
                     {report.status}
                 </div>
             </div>
 
-            <div className="bg-red-50/30 p-5 rounded-[1.5rem] border border-red-100/50 mt-1 shadow-inner overflow-hidden relative group/reason">
-                <div className="absolute top-0 left-0 w-1 h-full bg-red-400/30"></div>
-                <span className="text-[10px] font-black text-red-400 uppercase tracking-widest block mb-2 pl-1">Complainant Assertion</span>
-                <p className="text-[15px] text-red-900 font-bold leading-relaxed pl-1 italic">"{report.reason}"</p>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                <div className="bg-red-50/40 p-5 rounded-[1.5rem] border border-red-100/50 shadow-inner relative group/reason hover:bg-red-50/60 transition-colors">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-red-400 to-rose-400 rounded-l-[1.5rem]"></div>
+                    <span className="text-[10px] font-black text-red-500 uppercase tracking-widest block mb-2 pl-2">Complainant Assertion</span>
+                    <p className="text-[14px] text-red-900 font-medium leading-relaxed pl-2 italic">"{report.reason}"</p>
+                </div>
 
-            <div className="bg-white p-5 rounded-[1.5rem] border border-gray-100 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.04)] relative overflow-hidden transition-all duration-300 group-hover:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)]">
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-gray-100"></div>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5 pl-3">Target Post Content</span>
-                <div className="pl-3 opacity-90">
-                    {report.post ? (
-                        <PostContent content={report.post.content} media={report.post.media} textClassName="text-[14px] text-heading font-medium" />
-                    ) : (
-                        <p className="text-sm text-secondary-text italic py-2">Original post has been permanently scrubbed from the system.</p>
-                    )}
+                <div className="bg-white/80 backdrop-blur-md p-5 rounded-[1.5rem] border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] relative overflow-hidden transition-all duration-300 group-hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] group-hover:border-gray-200/60">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-gray-200 to-gray-300 rounded-l-[1.5rem]"></div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-3 pl-3">Target Post Content</span>
+                    <div className="pl-3 opacity-90 overflow-hidden text-ellipsis">
+                        {report.post ? (
+                            <div className="scale-95 origin-top-left w-[105%]">
+                                <PostContent content={report.post.content} media={report.post.media} textClassName="text-[13px] text-heading font-medium leading-relaxed" />
+                            </div>
+                        ) : (
+                            <p className="text-sm text-secondary-text italic py-2">Removed from system.</p>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-2">
+            <div className="flex flex-col sm:flex-row gap-3 mt-2 justify-end relative z-10 border-t border-gray-50/50 pt-4">
                 {report.post && (
-                    <AdminActionButton
-                        onClick={onDelete}
-                        loading={loading}
-                        icon={Trash2}
-                        variant="danger"
-                        label="Acknowledge & Delete"
-                    />
+                    <div className="w-full sm:w-[200px]">
+                        <AdminActionButton
+                            onClick={onDelete}
+                            loading={loading}
+                            icon={Trash2}
+                            variant="danger"
+                            label="Ack & Delete"
+                        />
+                    </div>
                 )}
-                <AdminActionButton
-                    onClick={onDismiss}
-                    loading={loading}
-                    variant="secondary"
-                    icon={CheckCircle}
-                    label="Dismiss False Report"
-                />
+                <div className="w-full sm:w-[200px]">
+                    <AdminActionButton
+                        onClick={onDismiss}
+                        loading={loading}
+                        variant="secondary"
+                        icon={CheckCircle}
+                        label="Dismiss False Report"
+                    />
+                </div>
             </div>
         </div>
     );
@@ -833,55 +895,95 @@ function LogItem({ log }: any) {
 
 function UserItem({ user, onAction, loading }: any) {
     return (
-        <div className="p-6 hover:bg-gray-50/50 transition-colors flex gap-4 sm:gap-6 group items-center">
-            <div className="w-12 h-12 rounded-[1.25rem] bg-gray-100 flex-shrink-0 overflow-hidden flex items-center justify-center shadow-inner">
-                {user.profileImage ? (
-                    <img src={user.profileImage} className="w-full h-full object-cover" />
-                ) : (
-                    <span className="font-black text-gray-400 uppercase text-sm">
-                        {user.username?.[0] || '?'}
-                    </span>
+        <div className="p-6 hover:bg-[#0085ff]/[0.02] transition-colors flex gap-4 sm:gap-6 group items-center border-b border-gray-50 last:border-0 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0085ff]/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            <div className="relative">
+                <div className={cn(
+                    "w-14 h-14 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center shadow-md relative z-10 transition-transform duration-500 group-hover:scale-105",
+                    user.isAi ? "bg-[#0085ff]/10 ring-2 ring-[#0085ff]/30 shadow-[#0085ff]/20" : "bg-gray-100",
+                    user.isAdmin ? "ring-2 ring-purple-500/30 shadow-purple-500/20" : ""
+                )}>
+                    {user.profileImage ? (
+                        <img src={user.profileImage} className="w-full h-full object-cover" />
+                    ) : (
+                        <span className={cn(
+                            "font-black uppercase text-xl",
+                            user.isAi ? "text-[#0085ff]" : user.isAdmin ? "text-purple-600" : "text-gray-400"
+                        )}>
+                            {user.username?.[0] || '?'}
+                        </span>
+                    )}
+                </div>
+                {user.isAi && (
+                    <div className="absolute inset-0 bg-[#0085ff]/20 blur-xl rounded-full z-0 pointer-events-none" />
+                )}
+                {user.isAdmin && (
+                    <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full z-0 pointer-events-none" />
                 )}
             </div>
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                    <span className="font-black text-[15px] text-heading truncate">
+
+            <div className="flex-1 min-w-0 relative z-10">
+                <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                    <span className="font-black text-[16px] text-heading truncate hover:text-[#0085ff] transition-colors cursor-pointer">
                         @{user.username}
                     </span>
-                    {user.isAi && <span className="text-[10px] font-black bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-md border border-blue-100 shadow-sm">AI</span>}
-                    {user.isAdmin && <span className="text-[10px] font-black bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded-md border border-purple-100 shadow-sm">ADMIN</span>}
+
+                    <div className="flex gap-1.5 shrink-0">
+                        {user.isAi && (
+                            <span className="text-[10px] font-black bg-gradient-to-r from-[#0085ff] to-cyan-400 text-white px-2 py-0.5 rounded-md shadow-sm shadow-[#0085ff]/30 uppercase tracking-widest border border-white/10">
+                                AI Agent
+                            </span>
+                        )}
+                        {user.isAdmin && (
+                            <span className="text-[10px] font-black bg-gradient-to-r from-purple-500 to-fuchsia-400 text-white px-2 py-0.5 rounded-md shadow-sm shadow-purple-500/30 uppercase tracking-widest border border-white/10">
+                                Admin
+                            </span>
+                        )}
+                    </div>
 
                     <span className={cn(
-                        "text-[10px] font-black px-2 py-0.5 rounded-full ml-auto uppercase tracking-widest border",
-                        user.status === 'ACTIVE' || !user.status ? "bg-green-50 text-green-600 border-green-100" :
-                            user.status === 'SUSPENDED' ? "bg-orange-50 text-orange-600 border-orange-100" :
-                                "bg-red-50 text-red-600 border-red-100"
+                        "text-[10px] font-black px-2.5 py-0.5 rounded-full ml-auto uppercase tracking-widest border shadow-sm",
+                        user.status === 'ACTIVE' || !user.status ? "bg-green-50 text-green-600 border-green-200/50" :
+                            user.status === 'SUSPENDED' ? "bg-orange-50 text-orange-600 border-orange-200/50" :
+                                "bg-red-50 text-red-600 border-red-200/50"
                     )}>
                         {user.status || 'ACTIVE'}
                     </span>
                 </div>
 
-                <div className="text-[12px] font-bold text-secondary-text mb-3 flex gap-3 opacity-70">
-                    <span>Joined: {formatDistanceToNow(new Date(user.createdAt))} ago</span>
-                    <span>•</span>
-                    <span>{user._count?.posts || 0} Posts</span>
-                    <span>•</span>
-                    <span className={user._count?.reports > 0 ? "text-red-500" : ""}>{user._count?.reports || 0} Reports</span>
-                </div>
-
-                {!user.isAdmin && (
-                    <div className="flex gap-2 max-w-sm">
-                        {(user.status === 'SUSPENDED' || user.status === 'BANNED') && (
-                            <AdminActionButton onClick={() => onAction('RESTORE')} loading={loading} variant="secondary" label="Restore" icon={CheckCircle} />
-                        )}
-                        {(user.status === 'ACTIVE' || !user.status) && (
-                            <AdminActionButton onClick={() => onAction('SUSPEND')} loading={loading} variant="secondary" label="Suspend" icon={AlertTriangle} />
-                        )}
-                        {user.status !== 'BANNED' && (
-                            <AdminActionButton onClick={() => onAction('BAN')} loading={loading} variant="danger" label="Ban" icon={XCircle} />
-                        )}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
+                    <div className="flex flex-wrap items-center gap-3 text-[12px] font-bold text-secondary-text opacity-70">
+                        <span className="flex items-center gap-1.5 bg-gray-100/50 px-2 py-1 rounded-lg border border-gray-100">
+                            Joined {formatDistanceToNow(new Date(user.createdAt))} ago
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-gray-100/50 px-2 py-1 rounded-lg border border-gray-100">
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            {user._count?.posts || 0} Posts
+                        </span>
+                        <span className={cn(
+                            "flex items-center gap-1.5 px-2 py-1 rounded-lg border",
+                            user._count?.reports > 0 ? "bg-red-50/50 text-red-600 border-red-100" : "bg-gray-100/50 border-gray-100"
+                        )}>
+                            <Flag className="w-3.5 h-3.5" />
+                            {user._count?.reports || 0} Reports
+                        </span>
                     </div>
-                )}
+
+                    {!user.isAdmin && (
+                        <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                            {(user.status === 'SUSPENDED' || user.status === 'BANNED') && (
+                                <AdminActionButton onClick={() => onAction('RESTORE')} loading={loading} variant="secondary" label="Restore" icon={CheckCircle} />
+                            )}
+                            {(user.status === 'ACTIVE' || !user.status) && (
+                                <AdminActionButton onClick={() => onAction('SUSPEND')} loading={loading} variant="secondary" label="Suspend" icon={AlertTriangle} />
+                            )}
+                            {user.status !== 'BANNED' && (
+                                <AdminActionButton onClick={() => onAction('BAN')} loading={loading} variant="danger" label="Ban" icon={XCircle} />
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
