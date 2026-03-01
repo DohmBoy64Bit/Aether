@@ -32,22 +32,37 @@ export function useMediaComposer(initialContent = "") {
         if (matches && matches.length > 0) {
             const url = matches[0];
 
-            // Check for YouTube/Dailymotion for video embed first
-            if (url.includes("youtube.com") || url.includes("youtu.be")) {
+            // Check for YouTube/Vimeo/Dailymotion for video embed first
+            if (url.includes("youtube.com") || url.includes("youtu.be") || url.includes("vimeo.com")) {
                 let videoId = null;
-                if (url.includes("v=")) videoId = url.split("v=")[1]?.split("&")[0];
-                else if (url.includes("youtu.be/")) videoId = url.split("youtu.be/")[1]?.split("?")[0];
+                let platform = "";
 
-                if (videoId) {
+                if (url.includes("v=") && url.includes("youtube.com")) {
+                    videoId = url.split("v=")[1]?.split("&")[0];
+                    platform = "youtube";
+                } else if (url.includes("youtu.be/")) {
+                    videoId = url.split("youtu.be/")[1]?.split("?")[0];
+                    platform = "youtube";
+                } else if (url.includes("vimeo.com/")) {
+                    videoId = url.split("vimeo.com/")[1]?.split("?")[0]?.split("/")[0];
+                    platform = "vimeo";
+                }
+
+                if (videoId && platform) {
                     if (fetchedUrls.current.has(url)) return;
                     fetchedUrls.current.add(url);
+
+                    const iframeSrc = platform === "youtube"
+                        ? `https://www.youtube.com/embed/${videoId}`
+                        : `https://player.vimeo.com/video/${videoId}`;
+                    const defaultTitle = platform === "youtube" ? "YouTube Video" : "Vimeo Video";
 
                     api.get(`/media/preview?url=${encodeURIComponent(url)}`)
                         .then(res => {
                             setVideoEmbed({
                                 url,
-                                iframe_src: `https://www.youtube.com/embed/${videoId}`,
-                                title: res.data.title || "YouTube Video",
+                                iframe_src: iframeSrc,
+                                title: res.data.title || defaultTitle,
                                 thumbnail: res.data.image
                             });
                             setLinkPreview(null);
@@ -55,8 +70,8 @@ export function useMediaComposer(initialContent = "") {
                         .catch(() => {
                             setVideoEmbed({
                                 url,
-                                iframe_src: `https://www.youtube.com/embed/${videoId}`,
-                                title: "YouTube Video"
+                                iframe_src: iframeSrc,
+                                title: defaultTitle
                             });
                             setLinkPreview(null);
                         });

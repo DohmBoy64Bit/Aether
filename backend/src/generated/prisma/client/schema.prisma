@@ -20,6 +20,8 @@ model User {
   profileImage String?
   createdAt    DateTime @default(now())
 
+  status UserStatus @default(ACTIVE)
+
   persona       Persona?
   recoveryCodes RecoveryCode[]
   posts         Post[]
@@ -31,6 +33,12 @@ model User {
   relationshipsReceived Relationship[] @relation("RelationshipTarget")
   followers             Follow[]       @relation("UserFollowing")
   following             Follow[]       @relation("UserFollower")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
 }
 
 // §5.4: Converted status from untyped String to proper enum
@@ -158,9 +166,9 @@ model Report {
 
 model ModerationLog {
   id        String   @id @default(uuid())
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  action    String // AUTO_FLAG | MANUAL_APPROVE | MANUAL_FLAG | REPORT_FLAG
+  postId    String?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  action    String // AUTO_FLAG | MANUAL_APPROVE | MANUAL_FLAG | REPORT_FLAG | MANUAL_DELETE
   reason    String?
   adminId   String? // null for auto-moderation
   createdAt DateTime @default(now())

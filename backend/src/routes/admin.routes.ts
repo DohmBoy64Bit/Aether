@@ -158,6 +158,87 @@ router.get('/reports', async (req: AuthRequest, res: Response) => {
     }
 });
 
+// ─── Users ─────────────────────────────────────────────────────────────
+
+router.get('/users', async (req: AuthRequest, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+        const search = req.query.search as string || '';
+        const status = req.query.status as string;
+        const skip = (page - 1) * limit;
+
+        const where: any = {};
+        if (search) {
+            where.username = { contains: search };
+        }
+        if (status) {
+            where.status = status;
+        }
+
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit,
+                select: {
+                    id: true,
+                    username: true,
+                    isAi: true,
+                    isAdmin: true,
+                    profileImage: true,
+                    createdAt: true,
+                    status: true,
+                    _count: { select: { posts: true, reports: true } }
+                }
+            }),
+            prisma.user.count({ where }),
+        ]);
+
+        res.json({
+            users,
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+        });
+    } catch (error) {
+        console.error('Users fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch users' });
+    }
+});
+
+router.post('/users/:id/action', async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.params.id as string;
+        const { action, reason } = req.body; // action: 'WARN', 'SUSPEND', 'BAN', 'RESTORE'
+
+        let newStatus = 'ACTIVE';
+        if (action === 'SUSPEND') newStatus = 'SUSPENDED';
+        if (action === 'BAN') newStatus = 'BANNED';
+
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (user.isAdmin) return res.status(403).json({ error: 'Cannot moderate admin users' });
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { status: newStatus as any }
+        });
+
+        await prisma.moderationLog.create({
+            data: {
+                action: `${action}_USER`,
+                reason: reason || `User ${action.toLowerCase()}ed by admin`,
+                adminId: req.user!.userId,
+            }
+        });
+
+        res.json({ success: true, message: `User action ${action} applied successfully` });
+    } catch (error) {
+        console.error('User action error:', error);
+        res.status(500).json({ error: 'Failed to apply user action' });
+    }
+});
+
 // ─── Admin Actions ───────────────────────────────────────────────────────
 
 // Approve a flagged post (unflag it)
@@ -189,6 +270,90 @@ router.post('/posts/:id/approve', async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Approve post error:', error);
         res.status(500).json({ error: 'Failed to approve post' });
+    }
+});
+
+// Bulk approve flagged posts
+router.post('/posts/bulk-approve', async (req: AuthRequest, res: Response) => {
+    try {
+        const { postIds } = req.body;
+        if (!Array.isArray(postIds)) return res.status(400).json({ error: 'Post IDs array is required' });
+
+        await prisma.post.updateMany({
+            where: { id: { in: postIds } },
+            data: { flagged: false, flagReason: null }
+        });
+
+        const logs = postIds.map(postId => ({
+            postId,
+            action: 'MANUAL_APPROVE',
+            reason: 'Bulk approved by admin',
+            adminId: req.user!.userId,
+        }));
+        await prisma.moderationLog.createMany({ data: logs });
+
+        await prisma.report.updateMany({
+            where: { postId: { in: postIds }, status: 'PENDING' },
+            data: { status: 'REVIEWED' }
+        });
+
+        res.json({ success: true, message: `${postIds.length} posts approved` });
+    } catch (error) {
+        console.error('Bulk approve posts error:', error);
+        res.status(500).json({ error: 'Failed to bulk approve posts' });
+    }
+});
+
+// Bulk flag posts
+router.post('/posts/bulk-flag', async (req: AuthRequest, res: Response) => {
+    try {
+        const { postIds, reason } = req.body;
+        if (!Array.isArray(postIds)) return res.status(400).json({ error: 'Post IDs array is required' });
+
+        const flagReason = reason || 'Bulk flagged by admin';
+
+        await prisma.post.updateMany({
+            where: { id: { in: postIds } },
+            data: { flagged: true, flagReason }
+        });
+
+        const logs = postIds.map(postId => ({
+            postId,
+            action: 'MANUAL_FLAG',
+            reason: flagReason,
+            adminId: req.user!.userId,
+        }));
+        await prisma.moderationLog.createMany({ data: logs });
+
+        res.json({ success: true, message: `${postIds.length} posts flagged` });
+    } catch (error) {
+        console.error('Bulk flag posts error:', error);
+        res.status(500).json({ error: 'Failed to bulk flag posts' });
+    }
+});
+
+// Bulk delete posts permanently
+router.post('/posts/bulk-delete', async (req: AuthRequest, res: Response) => {
+    try {
+        const { postIds } = req.body;
+        if (!Array.isArray(postIds)) return res.status(400).json({ error: 'Post IDs array is required' });
+
+        const logs = postIds.map(postId => ({
+            postId,
+            action: 'MANUAL_DELETE',
+            reason: 'Bulk deleted by admin',
+            adminId: req.user!.userId,
+        }));
+        await prisma.moderationLog.createMany({ data: logs });
+
+        await prisma.post.deleteMany({
+            where: { id: { in: postIds } },
+        });
+
+        res.json({ success: true, message: `${postIds.length} posts permanently deleted` });
+    } catch (error) {
+        console.error('Bulk delete posts error:', error);
+        res.status(500).json({ error: 'Failed to bulk delete posts' });
     }
 });
 
@@ -261,6 +426,24 @@ router.post('/reports/:id/dismiss', async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Dismiss report error:', error);
         res.status(500).json({ error: 'Failed to dismiss report' });
+    }
+});
+
+// Bulk dismiss reports
+router.post('/reports/bulk-dismiss', async (req: AuthRequest, res: Response) => {
+    try {
+        const { reportIds } = req.body;
+        if (!Array.isArray(reportIds)) return res.status(400).json({ error: 'Report IDs array is required' });
+
+        await prisma.report.updateMany({
+            where: { id: { in: reportIds } },
+            data: { status: 'DISMISSED' }
+        });
+
+        res.json({ success: true, message: `${reportIds.length} reports dismissed` });
+    } catch (error) {
+        console.error('Bulk dismiss reports error:', error);
+        res.status(500).json({ error: 'Failed to bulk dismiss reports' });
     }
 });
 

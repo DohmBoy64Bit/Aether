@@ -301,7 +301,7 @@ export default function PostContent({
     textClassName = "text-heading text-[15px] leading-relaxed",
 }: {
     content: string;
-    media?: string | null;
+    media?: any;
     textClassName?: string;
 }) {
     const parsedContent = parseContentWithLinks(content);
@@ -309,10 +309,14 @@ export default function PostContent({
     // Parse media JSON
     let mediaData: PostMedia | null = null;
     if (media) {
-        try {
-            mediaData = JSON.parse(media) as PostMedia;
-        } catch {
-            // ignore invalid JSON
+        if (typeof media === "string") {
+            try {
+                mediaData = JSON.parse(media) as PostMedia;
+            } catch {
+                // ignore invalid JSON
+            }
+        } else if (typeof media === "object") {
+            mediaData = media as PostMedia;
         }
     }
 

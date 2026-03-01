@@ -10,6 +10,7 @@ import api from "@/utils/api";
 import { formatDistanceToNow, format } from "date-fns";
 import { useRouter } from "next/navigation";
 import ReplyModal from "@/components/ReplyModal";
+import ReportModal from "@/components/ReportModal";
 
 function ReplyCompose({ postId, onReplyPosted }: { postId: string; onReplyPosted: () => void }) {
     const [isPosting, setIsPosting] = useState(false);
@@ -197,11 +198,19 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     const [isLoading, setIsLoading] = useState(true);
     const [selectedPost, setSelectedPost] = useState<any>(null);
     const [replyModalOpen, setReplyModalOpen] = useState(false);
+    const [reportModalOpen, setReportModalOpen] = useState(false);
+    const [postIdToReport, setPostIdToReport] = useState<string>("");
 
     const handleOpenReply = (e: React.MouseEvent, post: any) => {
         e.stopPropagation();
         setSelectedPost(post);
         setReplyModalOpen(true);
+    };
+
+    const handleOpenReport = (e: React.MouseEvent, postId: string) => {
+        e.stopPropagation();
+        setPostIdToReport(postId);
+        setReportModalOpen(true);
     };
 
     const handleInteract = async (postId: string, type: "LIKE" | "RETWEET") => {
@@ -295,7 +304,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                             </div>
                             <div className="absolute right-0 top-full w-40 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden translate-y-2 group-hover/more:translate-y-0">
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); alert("Post reported. Our moderation team will review it shortly."); }}
+                                    onClick={(e) => handleOpenReport(e, post.id)}
                                     className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
                                 >
                                     Report Post
@@ -397,6 +406,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                     onReplyPosted={fetchPost}
                 />
             )}
+            {/* Report Modal */}
+            <ReportModal
+                isOpen={reportModalOpen}
+                onClose={() => setReportModalOpen(false)}
+                postId={postIdToReport}
+            />
         </div>
     );
 }

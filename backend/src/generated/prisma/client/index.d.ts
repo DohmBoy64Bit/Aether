@@ -63,7 +63,16 @@ export type ModerationLog = $Result.DefaultSelection<Prisma.$ModerationLogPayloa
  * Enums
  */
 export namespace $Enums {
-  export const RelationshipStatus: {
+  export const UserStatus: {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  BANNED: 'BANNED'
+};
+
+export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
+
+
+export const RelationshipStatus: {
   NEUTRAL: 'NEUTRAL',
   FRIEND: 'FRIEND',
   ENEMY: 'ENEMY',
@@ -91,6 +100,10 @@ export const InteractionType: {
 export type InteractionType = (typeof InteractionType)[keyof typeof InteractionType]
 
 }
+
+export type UserStatus = $Enums.UserStatus
+
+export const UserStatus: typeof $Enums.UserStatus
 
 export type RelationshipStatus = $Enums.RelationshipStatus
 
@@ -1805,6 +1818,7 @@ export namespace Prisma {
     bio: string | null
     profileImage: string | null
     createdAt: Date | null
+    status: $Enums.UserStatus | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1816,6 +1830,7 @@ export namespace Prisma {
     bio: string | null
     profileImage: string | null
     createdAt: Date | null
+    status: $Enums.UserStatus | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1827,6 +1842,7 @@ export namespace Prisma {
     bio: number
     profileImage: number
     createdAt: number
+    status: number
     _all: number
   }
 
@@ -1840,6 +1856,7 @@ export namespace Prisma {
     bio?: true
     profileImage?: true
     createdAt?: true
+    status?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1851,6 +1868,7 @@ export namespace Prisma {
     bio?: true
     profileImage?: true
     createdAt?: true
+    status?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1862,6 +1880,7 @@ export namespace Prisma {
     bio?: true
     profileImage?: true
     createdAt?: true
+    status?: true
     _all?: true
   }
 
@@ -1946,6 +1965,7 @@ export namespace Prisma {
     bio: string | null
     profileImage: string | null
     createdAt: Date
+    status: $Enums.UserStatus
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1974,6 +1994,7 @@ export namespace Prisma {
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
+    status?: boolean
     persona?: boolean | User$personaArgs<ExtArgs>
     recoveryCodes?: boolean | User$recoveryCodesArgs<ExtArgs>
     posts?: boolean | User$postsArgs<ExtArgs>
@@ -1995,6 +2016,7 @@ export namespace Prisma {
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
+    status?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2006,6 +2028,7 @@ export namespace Prisma {
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
+    status?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2017,9 +2040,10 @@ export namespace Prisma {
     bio?: boolean
     profileImage?: boolean
     createdAt?: boolean
+    status?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "isAi" | "isAdmin" | "bio" | "profileImage" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "username" | "passwordHash" | "isAi" | "isAdmin" | "bio" | "profileImage" | "createdAt" | "status", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     persona?: boolean | User$personaArgs<ExtArgs>
     recoveryCodes?: boolean | User$recoveryCodesArgs<ExtArgs>
@@ -2057,6 +2081,7 @@ export namespace Prisma {
       bio: string | null
       profileImage: string | null
       createdAt: Date
+      status: $Enums.UserStatus
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2497,6 +2522,7 @@ export namespace Prisma {
     readonly bio: FieldRef<"User", 'String'>
     readonly profileImage: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
+    readonly status: FieldRef<"User", 'UserStatus'>
   }
     
 
@@ -10905,7 +10931,7 @@ export namespace Prisma {
 
   export type ModerationLogGroupByOutputType = {
     id: string
-    postId: string
+    postId: string | null
     action: string
     reason: string | null
     adminId: string | null
@@ -10936,7 +10962,7 @@ export namespace Prisma {
     reason?: boolean
     adminId?: boolean
     createdAt?: boolean
-    post?: boolean | PostDefaultArgs<ExtArgs>
+    post?: boolean | ModerationLog$postArgs<ExtArgs>
   }, ExtArgs["result"]["moderationLog"]>
 
   export type ModerationLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -10946,7 +10972,7 @@ export namespace Prisma {
     reason?: boolean
     adminId?: boolean
     createdAt?: boolean
-    post?: boolean | PostDefaultArgs<ExtArgs>
+    post?: boolean | ModerationLog$postArgs<ExtArgs>
   }, ExtArgs["result"]["moderationLog"]>
 
   export type ModerationLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -10956,7 +10982,7 @@ export namespace Prisma {
     reason?: boolean
     adminId?: boolean
     createdAt?: boolean
-    post?: boolean | PostDefaultArgs<ExtArgs>
+    post?: boolean | ModerationLog$postArgs<ExtArgs>
   }, ExtArgs["result"]["moderationLog"]>
 
   export type ModerationLogSelectScalar = {
@@ -10970,23 +10996,23 @@ export namespace Prisma {
 
   export type ModerationLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "postId" | "action" | "reason" | "adminId" | "createdAt", ExtArgs["result"]["moderationLog"]>
   export type ModerationLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    post?: boolean | PostDefaultArgs<ExtArgs>
+    post?: boolean | ModerationLog$postArgs<ExtArgs>
   }
   export type ModerationLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    post?: boolean | PostDefaultArgs<ExtArgs>
+    post?: boolean | ModerationLog$postArgs<ExtArgs>
   }
   export type ModerationLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    post?: boolean | PostDefaultArgs<ExtArgs>
+    post?: boolean | ModerationLog$postArgs<ExtArgs>
   }
 
   export type $ModerationLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ModerationLog"
     objects: {
-      post: Prisma.$PostPayload<ExtArgs>
+      post: Prisma.$PostPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      postId: string
+      postId: string | null
       action: string
       reason: string | null
       adminId: string | null
@@ -11385,7 +11411,7 @@ export namespace Prisma {
    */
   export interface Prisma__ModerationLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    post<T extends PostDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PostDefaultArgs<ExtArgs>>): Prisma__PostClient<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    post<T extends ModerationLog$postArgs<ExtArgs> = {}>(args?: Subset<T, ModerationLog$postArgs<ExtArgs>>): Prisma__PostClient<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11815,6 +11841,25 @@ export namespace Prisma {
   }
 
   /**
+   * ModerationLog.post
+   */
+  export type ModerationLog$postArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Post
+     */
+    select?: PostSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Post
+     */
+    omit?: PostOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PostInclude<ExtArgs> | null
+    where?: PostWhereInput
+  }
+
+  /**
    * ModerationLog without action
    */
   export type ModerationLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11852,7 +11897,8 @@ export namespace Prisma {
     isAdmin: 'isAdmin',
     bio: 'bio',
     profileImage: 'profileImage',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    status: 'status'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -12027,6 +12073,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'UserStatus'
+   */
+  export type EnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserStatus'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -12090,6 +12143,7 @@ export namespace Prisma {
     bio?: StringNullableFilter<"User"> | string | null
     profileImage?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
+    status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     persona?: XOR<PersonaNullableScalarRelationFilter, PersonaWhereInput> | null
     recoveryCodes?: RecoveryCodeListRelationFilter
     posts?: PostListRelationFilter
@@ -12110,6 +12164,7 @@ export namespace Prisma {
     bio?: SortOrderInput | SortOrder
     profileImage?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    status?: SortOrder
     persona?: PersonaOrderByWithRelationInput
     recoveryCodes?: RecoveryCodeOrderByRelationAggregateInput
     posts?: PostOrderByRelationAggregateInput
@@ -12133,6 +12188,7 @@ export namespace Prisma {
     bio?: StringNullableFilter<"User"> | string | null
     profileImage?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
+    status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     persona?: XOR<PersonaNullableScalarRelationFilter, PersonaWhereInput> | null
     recoveryCodes?: RecoveryCodeListRelationFilter
     posts?: PostListRelationFilter
@@ -12153,6 +12209,7 @@ export namespace Prisma {
     bio?: SortOrderInput | SortOrder
     profileImage?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    status?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -12170,6 +12227,7 @@ export namespace Prisma {
     bio?: StringNullableWithAggregatesFilter<"User"> | string | null
     profileImage?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    status?: EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   }
 
   export type RelationshipWhereInput = {
@@ -12620,17 +12678,17 @@ export namespace Prisma {
     OR?: ModerationLogWhereInput[]
     NOT?: ModerationLogWhereInput | ModerationLogWhereInput[]
     id?: StringFilter<"ModerationLog"> | string
-    postId?: StringFilter<"ModerationLog"> | string
+    postId?: StringNullableFilter<"ModerationLog"> | string | null
     action?: StringFilter<"ModerationLog"> | string
     reason?: StringNullableFilter<"ModerationLog"> | string | null
     adminId?: StringNullableFilter<"ModerationLog"> | string | null
     createdAt?: DateTimeFilter<"ModerationLog"> | Date | string
-    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+    post?: XOR<PostNullableScalarRelationFilter, PostWhereInput> | null
   }
 
   export type ModerationLogOrderByWithRelationInput = {
     id?: SortOrder
-    postId?: SortOrder
+    postId?: SortOrderInput | SortOrder
     action?: SortOrder
     reason?: SortOrderInput | SortOrder
     adminId?: SortOrderInput | SortOrder
@@ -12643,17 +12701,17 @@ export namespace Prisma {
     AND?: ModerationLogWhereInput | ModerationLogWhereInput[]
     OR?: ModerationLogWhereInput[]
     NOT?: ModerationLogWhereInput | ModerationLogWhereInput[]
-    postId?: StringFilter<"ModerationLog"> | string
+    postId?: StringNullableFilter<"ModerationLog"> | string | null
     action?: StringFilter<"ModerationLog"> | string
     reason?: StringNullableFilter<"ModerationLog"> | string | null
     adminId?: StringNullableFilter<"ModerationLog"> | string | null
     createdAt?: DateTimeFilter<"ModerationLog"> | Date | string
-    post?: XOR<PostScalarRelationFilter, PostWhereInput>
+    post?: XOR<PostNullableScalarRelationFilter, PostWhereInput> | null
   }, "id">
 
   export type ModerationLogOrderByWithAggregationInput = {
     id?: SortOrder
-    postId?: SortOrder
+    postId?: SortOrderInput | SortOrder
     action?: SortOrder
     reason?: SortOrderInput | SortOrder
     adminId?: SortOrderInput | SortOrder
@@ -12668,7 +12726,7 @@ export namespace Prisma {
     OR?: ModerationLogScalarWhereWithAggregatesInput[]
     NOT?: ModerationLogScalarWhereWithAggregatesInput | ModerationLogScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"ModerationLog"> | string
-    postId?: StringWithAggregatesFilter<"ModerationLog"> | string
+    postId?: StringNullableWithAggregatesFilter<"ModerationLog"> | string | null
     action?: StringWithAggregatesFilter<"ModerationLog"> | string
     reason?: StringNullableWithAggregatesFilter<"ModerationLog"> | string | null
     adminId?: StringNullableWithAggregatesFilter<"ModerationLog"> | string | null
@@ -12684,6 +12742,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -12704,6 +12763,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -12724,6 +12784,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -12744,6 +12805,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
@@ -12764,6 +12826,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
   }
 
   export type UserUpdateManyMutationInput = {
@@ -12775,6 +12838,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -12786,6 +12850,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   }
 
   export type RelationshipCreateInput = {
@@ -13225,12 +13290,12 @@ export namespace Prisma {
     reason?: string | null
     adminId?: string | null
     createdAt?: Date | string
-    post: PostCreateNestedOneWithoutModerationLogsInput
+    post?: PostCreateNestedOneWithoutModerationLogsInput
   }
 
   export type ModerationLogUncheckedCreateInput = {
     id?: string
-    postId: string
+    postId?: string | null
     action: string
     reason?: string | null
     adminId?: string | null
@@ -13243,12 +13308,12 @@ export namespace Prisma {
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    post?: PostUpdateOneRequiredWithoutModerationLogsNestedInput
+    post?: PostUpdateOneWithoutModerationLogsNestedInput
   }
 
   export type ModerationLogUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    postId?: StringFieldUpdateOperationsInput | string
+    postId?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13257,7 +13322,7 @@ export namespace Prisma {
 
   export type ModerationLogCreateManyInput = {
     id?: string
-    postId: string
+    postId?: string | null
     action: string
     reason?: string | null
     adminId?: string | null
@@ -13274,7 +13339,7 @@ export namespace Prisma {
 
   export type ModerationLogUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    postId?: StringFieldUpdateOperationsInput | string
+    postId?: NullableStringFieldUpdateOperationsInput | string | null
     action?: StringFieldUpdateOperationsInput | string
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     adminId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13323,6 +13388,13 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type EnumUserStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserStatus | EnumUserStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.UserStatus[]
+    notIn?: $Enums.UserStatus[]
+    not?: NestedEnumUserStatusFilter<$PrismaModel> | $Enums.UserStatus
   }
 
   export type PersonaNullableScalarRelationFilter = {
@@ -13404,6 +13476,7 @@ export namespace Prisma {
     bio?: SortOrder
     profileImage?: SortOrder
     createdAt?: SortOrder
+    status?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -13415,6 +13488,7 @@ export namespace Prisma {
     bio?: SortOrder
     profileImage?: SortOrder
     createdAt?: SortOrder
+    status?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -13426,6 +13500,7 @@ export namespace Prisma {
     bio?: SortOrder
     profileImage?: SortOrder
     createdAt?: SortOrder
+    status?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -13482,6 +13557,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type EnumUserStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserStatus | EnumUserStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.UserStatus[]
+    notIn?: $Enums.UserStatus[]
+    not?: NestedEnumUserStatusWithAggregatesFilter<$PrismaModel> | $Enums.UserStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserStatusFilter<$PrismaModel>
+    _max?: NestedEnumUserStatusFilter<$PrismaModel>
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -14036,6 +14121,10 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type EnumUserStatusFieldUpdateOperationsInput = {
+    set?: $Enums.UserStatus
   }
 
   export type PersonaUpdateOneWithoutUserNestedInput = {
@@ -14646,10 +14735,12 @@ export namespace Prisma {
     connect?: PostWhereUniqueInput
   }
 
-  export type PostUpdateOneRequiredWithoutModerationLogsNestedInput = {
+  export type PostUpdateOneWithoutModerationLogsNestedInput = {
     create?: XOR<PostCreateWithoutModerationLogsInput, PostUncheckedCreateWithoutModerationLogsInput>
     connectOrCreate?: PostCreateOrConnectWithoutModerationLogsInput
     upsert?: PostUpsertWithoutModerationLogsInput
+    disconnect?: PostWhereInput | boolean
+    delete?: PostWhereInput | boolean
     connect?: PostWhereUniqueInput
     update?: XOR<XOR<PostUpdateToOneWithWhereWithoutModerationLogsInput, PostUpdateWithoutModerationLogsInput>, PostUncheckedUpdateWithoutModerationLogsInput>
   }
@@ -14696,6 +14787,13 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedEnumUserStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserStatus | EnumUserStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.UserStatus[]
+    notIn?: $Enums.UserStatus[]
+    not?: NestedEnumUserStatusFilter<$PrismaModel> | $Enums.UserStatus
   }
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
@@ -14774,6 +14872,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumUserStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserStatus | EnumUserStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.UserStatus[]
+    notIn?: $Enums.UserStatus[]
+    not?: NestedEnumUserStatusWithAggregatesFilter<$PrismaModel> | $Enums.UserStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserStatusFilter<$PrismaModel>
+    _max?: NestedEnumUserStatusFilter<$PrismaModel>
   }
 
   export type NestedEnumRelationshipStatusFilter<$PrismaModel = never> = {
@@ -15345,6 +15453,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -15364,6 +15473,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -15388,6 +15498,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -15407,6 +15518,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -15442,6 +15554,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -15461,6 +15574,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
@@ -15491,6 +15605,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -15510,6 +15625,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
@@ -15529,6 +15645,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -15548,6 +15665,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -15572,6 +15690,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -15591,6 +15710,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -15626,6 +15746,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -15645,6 +15766,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
@@ -15675,6 +15797,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -15694,6 +15817,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
@@ -15713,6 +15837,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
@@ -15732,6 +15857,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
@@ -15767,6 +15893,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
@@ -15786,6 +15913,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
@@ -15805,6 +15933,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
@@ -15824,6 +15953,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
@@ -15859,6 +15989,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
@@ -15878,6 +16009,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
@@ -15897,6 +16029,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     interactions?: InteractionCreateNestedManyWithoutUserInput
@@ -15916,6 +16049,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     interactions?: InteractionUncheckedCreateNestedManyWithoutUserInput
@@ -16098,6 +16232,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     interactions?: InteractionUpdateManyWithoutUserNestedInput
@@ -16117,6 +16252,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     interactions?: InteractionUncheckedUpdateManyWithoutUserNestedInput
@@ -16237,7 +16373,7 @@ export namespace Prisma {
     OR?: ModerationLogScalarWhereInput[]
     NOT?: ModerationLogScalarWhereInput | ModerationLogScalarWhereInput[]
     id?: StringFilter<"ModerationLog"> | string
-    postId?: StringFilter<"ModerationLog"> | string
+    postId?: StringNullableFilter<"ModerationLog"> | string | null
     action?: StringFilter<"ModerationLog"> | string
     reason?: StringNullableFilter<"ModerationLog"> | string | null
     adminId?: StringNullableFilter<"ModerationLog"> | string | null
@@ -16253,6 +16389,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -16272,6 +16409,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -16342,6 +16480,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -16361,6 +16500,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput
@@ -16456,6 +16596,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutUserInput
@@ -16475,6 +16616,7 @@ export namespace Prisma {
     bio?: string | null
     profileImage?: string | null
     createdAt?: Date | string
+    status?: $Enums.UserStatus
     persona?: PersonaUncheckedCreateNestedOneWithoutUserInput
     recoveryCodes?: RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutUserInput
@@ -16551,6 +16693,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutUserNestedInput
@@ -16570,6 +16713,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     profileImage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     persona?: PersonaUncheckedUpdateOneWithoutUserNestedInput
     recoveryCodes?: RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutUserNestedInput

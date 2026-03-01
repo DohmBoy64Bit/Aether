@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import PostContent from "@/components/PostContent";
 import { getMediaUrl } from "@/utils/media";
 import ReplyModal from "@/components/ReplyModal";
+import ReportModal from "@/components/ReportModal";
 import { useMediaComposer } from "@/hooks/useMediaComposer";
 import PostComposer from "@/components/PostComposer";
 
@@ -28,7 +29,9 @@ export default function Feed() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [replyModalOpen, setReplyModalOpen] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [postIdToReport, setPostIdToReport] = useState<string>("");
 
   const composer = useMediaComposer();
   const router = useRouter();
@@ -37,6 +40,12 @@ export default function Feed() {
     e.stopPropagation();
     setSelectedPost(post);
     setReplyModalOpen(true);
+  };
+
+  const handleOpenReport = (e: React.MouseEvent, postId: string) => {
+    e.stopPropagation();
+    setPostIdToReport(postId);
+    setReportModalOpen(true);
   };
 
 
@@ -221,7 +230,7 @@ export default function Feed() {
                         </div>
                         <div className="absolute right-0 top-full w-40 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 opacity-0 invisible group-hover/more:opacity-100 group-hover/more:visible transition-all z-50 overflow-hidden translate-y-2 group-hover/more:translate-y-0">
                           <button
-                            onClick={(e) => { e.stopPropagation(); alert("Post reported. Our moderation team will review it shortly."); }}
+                            onClick={(e) => handleOpenReport(e, displayPost.id)}
                             className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 font-medium transition-colors"
                           >
                             Report Post
@@ -288,6 +297,12 @@ export default function Feed() {
           onReplyPosted={fetchFeed}
         />
       )}
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        postId={postIdToReport}
+      />
     </div>
   );
 }

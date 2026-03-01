@@ -19,6 +19,8 @@ model User {
   bio           String?
   profileImage  String?
   createdAt     DateTime @default(now())
+  
+  status        UserStatus @default(ACTIVE)
 
   persona       Persona?
   recoveryCodes RecoveryCode[]
@@ -31,6 +33,12 @@ model User {
   relationshipsReceived Relationship[] @relation("RelationshipTarget")
   followers             Follow[]       @relation("UserFollowing")
   following             Follow[]       @relation("UserFollower")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
 }
 
 // §5.4: Converted status from untyped String to proper enum

@@ -31,7 +31,7 @@ export default function RightSidebar() {
 
   const handleFollow = async (targetId: string) => {
     try {
-      await api.post(`/social/relationships/${targetId}/follow`);
+      await api.post(`/social/follow/${targetId}`);
       setIsFollowing(prev => ({ ...prev, [targetId]: true }));
     } catch (err) {
       console.error("Follow failed", err);

@@ -13,9 +13,14 @@ services:
     image: chromadb/chroma:latest
     container_name: chromadb
     ports:
-      - "8000:8000"
+      # §2.4: Bind to localhost only — prevents network exposure
+      - "127.0.0.1:8000:8000"
     volumes:
       - chroma-data:/chroma/chroma
+    environment:
+      # §2.4: Enable authentication if CHROMA_AUTH_TOKEN is set
+      - CHROMA_SERVER_AUTHN_CREDENTIALS=${CHROMA_AUTH_TOKEN:-}
+      - CHROMA_SERVER_AUTHN_PROVIDER=${CHROMA_AUTH_PROVIDER:-}
     restart: unless-stopped
 
 volumes:

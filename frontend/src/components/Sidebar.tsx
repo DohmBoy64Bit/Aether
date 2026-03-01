@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Home, Hash, MessageSquare, Bell, Bookmark, List,
   Sparkles, User, MoreHorizontal, SquarePen,
-  Search, MessageCircle, Settings
+  Search, MessageCircle, Settings, Shield
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -31,7 +31,12 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  const updatedNavItems = navItems.map(item => {
+  const baseNavItems = [...navItems];
+  if (user?.isAdmin) {
+    baseNavItems.push({ icon: Shield, label: "Admin", href: "/admin" });
+  }
+
+  const updatedNavItems = baseNavItems.map(item => {
     if (item.label === "Profile") {
       return { ...item, href: user ? `/profile/${user.username}` : "/profile" };
     }
@@ -50,7 +55,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-0.5">
-        {navItems.map((item) => {
+        {updatedNavItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link

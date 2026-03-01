@@ -1,21 +1,35 @@
 "use client";
 
-import { ArrowLeft, Settings, ChevronRight, Search, Sparkles, Users, Play, Pin } from "lucide-react";
+import { ArrowLeft, Settings, ChevronRight, Search, Sparkles, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import api from "@/utils/api";
 
 const myFeeds = [
-    { icon: Sparkles, label: "Discover", color: "bg-green-500" },
-    { icon: Users, label: "Following", color: "bg-[#0085ff]" },
-    { icon: Play, label: "Video", color: "bg-purple-500" },
-];
-
-const discoverFeeds = [
-    { name: "AI Conversations", author: "@aether.social", description: "Curated discussions between human and AI personas on Aether.", likes: "1,240" },
-    { name: "Tech Talk", author: "@techfeed", description: "The latest in technology, programming, and innovation.", likes: "892" },
-    { name: "Creative Corner", author: "@artfeed", description: "Digital art, music production, and creative writing by the Aether community.", likes: "567" },
+    { icon: Sparkles, label: "Discover", color: "bg-green-500", href: "/?tab=Discover" },
+    { icon: Users, label: "Following", color: "bg-[#0085ff]", href: "/?tab=Following" },
 ];
 
 export default function FeedsPage() {
+    const router = useRouter();
+    const [trending, setTrending] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTrending = async () => {
+            try {
+                const res = await api.get('/social/trending');
+                setTrending(res.data);
+            } catch (err) {
+                console.error("Failed to fetch trending tags", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchTrending();
+    }, []);
+
     return (
         <div className="flex flex-col">
             {/* Header */}
@@ -39,19 +53,21 @@ export default function FeedsPage() {
                     </div>
                     <div>
                         <h3 className="text-lg font-extrabold text-heading">My Feeds</h3>
-                        <p className="text-sm text-secondary-text">All the feeds you&apos;ve saved, right in one place.</p>
+                        <p className="text-sm text-secondary-text">All the feeds you&apos;ve pinned, right in one place.</p>
                     </div>
                 </div>
                 {myFeeds.map((feed) => (
-                    <div key={feed.label} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
-                        <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 ${feed.color} rounded-lg flex items-center justify-center`}>
-                                <feed.icon className="w-4 h-4 text-white" />
+                    <Link key={feed.label} href={feed.href}>
+                        <div className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 ${feed.color} rounded-lg flex items-center justify-center`}>
+                                    <feed.icon className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="font-medium text-heading text-[15px]">{feed.label}</span>
                             </div>
-                            <span className="font-medium text-heading text-[15px]">{feed.label}</span>
+                            <ChevronRight className="w-4 h-4 text-secondary-text" />
                         </div>
-                        <ChevronRight className="w-4 h-4 text-secondary-text" />
-                    </div>
+                    </Link>
                 ))}
             </div>
 
@@ -83,25 +99,35 @@ export default function FeedsPage() {
                     </div>
                 </div>
 
-                {discoverFeeds.map((feed) => (
-                    <div key={feed.name} className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-[#0085ff]" />
+                    </div>
+                ) : trending.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-secondary-text text-sm">
+                        No trending feeds found matching this description.
+                    </div>
+                ) : trending.map((feed: any) => (
+                    <div
+                        key={feed.tag}
+                        onClick={() => router.push(`/tag/${encodeURIComponent(feed.tag)}`)}
+                        className="px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-[#0085ff] rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                                    {feed.name[0]}
+                                <div className="w-10 h-10 bg-[#0085ff] rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                                    #
                                 </div>
                                 <div>
-                                    <span className="font-bold text-heading text-[15px]">{feed.name}</span>
-                                    <p className="text-xs text-secondary-text">Feed by {feed.author}</p>
+                                    <span className="font-bold text-heading text-[15px]">{feed.tag.startsWith('#') ? feed.tag : '#' + feed.tag}</span>
+                                    <p className="text-xs text-secondary-text mt-0.5">{feed.count} active posts</p>
                                 </div>
                             </div>
-                            <button className="flex items-center gap-1.5 bg-[#0085ff] hover:bg-[#006fd6] text-white font-bold rounded-full transition-colors text-xs py-1.5 px-3">
-                                <Pin className="w-3.5 h-3.5" />
-                                Pin Feed
+                            <button className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-heading font-bold rounded-full transition-colors text-xs py-1.5 px-3">
+                                <ChevronRight className="w-3.5 h-3.5" />
+                                View Feed
                             </button>
                         </div>
-                        <p className="text-sm text-secondary-text mt-2 ml-[52px]">{feed.description}</p>
-                        <p className="text-xs text-secondary-text mt-1 ml-[52px]">Liked by {feed.likes} users</p>
                     </div>
                 ))}
             </div>

@@ -125,7 +125,8 @@ exports.Prisma.UserScalarFieldEnum = {
   isAdmin: 'isAdmin',
   bio: 'bio',
   profileImage: 'profileImage',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  status: 'status'
 };
 
 exports.Prisma.RelationshipScalarFieldEnum = {
@@ -227,6 +228,12 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
+exports.UserStatus = exports.$Enums.UserStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  BANNED: 'BANNED'
+};
+
 exports.RelationshipStatus = exports.$Enums.RelationshipStatus = {
   NEUTRAL: 'NEUTRAL',
   FRIEND: 'FRIEND',
