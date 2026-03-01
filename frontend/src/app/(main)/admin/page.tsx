@@ -623,7 +623,7 @@ function StatCard({ label, value, icon: Icon, color, subtext }: any) {
                     {value}
                 </span>
                 <div className="flex items-center gap-3 w-full">
-                    <span className="text-secondary-text text-[13px] font-black uppercase tracking-[0.2em] opacity-70 truncate block">
+                    <span className="text-secondary-text text-[12px] font-black uppercase tracking-wider opacity-70 truncate block">
                         {label}
                     </span>
                 </div>
@@ -653,7 +653,7 @@ function TabButton({ active, onClick, icon: Icon, label, count }: any) {
         <button
             onClick={onClick}
             className={cn(
-                "flex-1 flex flex-col items-center justify-center gap-1.5 py-5 px-6 text-[12px] font-black transition-all relative flex-shrink-0 min-w-[150px] uppercase tracking-widest overflow-hidden group outline-none",
+                "flex-1 flex flex-col items-center justify-center gap-1.5 py-4 px-4 text-[12px] font-black transition-all relative flex-shrink-0 min-w-[120px] uppercase tracking-wider overflow-hidden group outline-none",
                 active
                     ? "text-[#0085ff]"
                     : "text-secondary-text opacity-50 hover:opacity-100 hover:bg-gray-50/50"
@@ -699,12 +699,12 @@ function AdminActionButton({ onClick, loading, icon: Icon, label, variant = "pri
             onClick={onClick}
             disabled={loading}
             className={cn(
-                "relative overflow-hidden flex-1 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest py-3 px-5 rounded-[1rem] transition-all border disabled:opacity-50 min-h-[44px] hover:-translate-y-[1px] active:scale-[0.98] active:translate-y-0 group",
+                "relative overflow-hidden flex-1 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-wider py-3 px-3.5 rounded-[1rem] transition-all border disabled:opacity-50 min-h-[44px] hover:-translate-y-[1px] active:scale-[0.98] active:translate-y-0 group",
                 variants[variant as keyof typeof variants]
             )}
         >
             {loading ? <Loader2 className="w-4 h-4 animate-spin relative z-10" /> : Icon && <Icon className="w-4 h-4 flex-shrink-0 stroke-[2.5] relative z-10 group-hover:scale-110 transition-transform duration-300" />}
-            <span className="truncate relative z-10">{label}</span>
+            <span className="relative z-10 whitespace-nowrap">{label}</span>
 
             {/* Subtle light sweep effect */}
             {variant !== 'secondary' && (
@@ -742,16 +742,16 @@ function FlaggedPostItem({ post, onRestore, onDelete, loading }: any) {
             </div>
 
             <div className="flex-1 min-w-0 relative z-10">
-                <div className="flex items-center gap-2 mb-3">
-                    <span className="font-black text-[16px] text-heading truncate hover:text-[#0085ff] transition-colors cursor-pointer">
+                <div className="flex items-center gap-2 mb-3 min-w-0">
+                    <span className="font-black text-[16px] text-heading truncate hover:text-[#0085ff] transition-colors cursor-pointer shrink-0 max-w-[150px] sm:max-w-none">
                         {post.user ? `@${post.user.username}` : '[Deleted User]'}
                     </span>
                     {post.user?.isAi && (
-                        <span className="text-[10px] font-black bg-gradient-to-r from-[#0085ff] to-cyan-400 text-white px-2 py-0.5 rounded-md flex-shrink-0 shadow-sm shadow-[#0085ff]/30 border border-white/10 uppercase tracking-widest">
+                        <span className="text-[10px] font-black bg-gradient-to-r from-[#0085ff] to-cyan-400 text-white px-2 py-0.5 rounded-md flex-shrink-0 shadow-sm shadow-[#0085ff]/30 border border-white/10 uppercase tracking-wider">
                             AI Agent
                         </span>
                     )}
-                    <span className="text-secondary-text text-[11px] font-bold ml-auto flex-shrink-0 opacity-50 uppercase tracking-widest">
+                    <span className="text-secondary-text text-[11px] font-bold ml-auto flex-shrink-0 opacity-50 uppercase tracking-wider">
                         {formatDistanceToNow(new Date(post.createdAt))} ago
                     </span>
                 </div>
@@ -796,13 +796,13 @@ function ReportItem({ report, onDelete, onDismiss, loading }: any) {
 
             <div className="flex items-center flex-wrap gap-x-3 gap-y-2 relative z-10">
                 <div className="flex items-center flex-wrap gap-2 text-[13px] font-bold text-secondary-text bg-white/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gray-100/50 shadow-sm">
-                    <span className="text-heading hover:text-[#0085ff] cursor-pointer transition-colors">@{report.reporter?.username || 'Unknown'}</span>
-                    <ArrowRight className="w-3.5 h-3.5 opacity-40 text-[#0085ff]" />
-                    <span className="text-red-600 hover:text-red-500 cursor-pointer transition-colors">@{report.post?.user?.username || 'Unknown'}</span>
-                    <span className="hidden sm:inline opacity-30 mx-1">·</span>
-                    <span className="text-[10px] opacity-60 uppercase tracking-widest">{formatDistanceToNow(new Date(report.createdAt))} ago</span>
+                    <span className="text-heading hover:text-[#0085ff] cursor-pointer transition-colors max-w-[120px] sm:max-w-none truncate">@{report.reporter?.username || 'Unknown'}</span>
+                    <ArrowRight className="w-3.5 h-3.5 opacity-40 text-[#0085ff] shrink-0" />
+                    <span className="text-red-600 hover:text-red-500 cursor-pointer transition-colors max-w-[120px] sm:max-w-none truncate">@{report.post?.user?.username || 'Unknown'}</span>
+                    <span className="hidden sm:inline opacity-30 mx-1 shrink-0">·</span>
+                    <span className="text-[10px] opacity-60 uppercase tracking-wider shrink-0">{formatDistanceToNow(new Date(report.createdAt))} ago</span>
                 </div>
-                <div className="sm:ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gradient-to-br from-orange-400 to-red-400 text-white shadow-md shadow-orange-500/20">
+                <div className="sm:ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl bg-gradient-to-br from-orange-400 to-red-400 text-white shadow-md shadow-orange-500/20 shrink-0">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     {report.status}
                 </div>
@@ -931,19 +931,19 @@ function UserItem({ user, onAction, loading }: any) {
 
                     <div className="flex gap-1.5 shrink-0">
                         {user.isAi && (
-                            <span className="text-[10px] font-black bg-gradient-to-r from-[#0085ff] to-cyan-400 text-white px-2 py-0.5 rounded-md shadow-sm shadow-[#0085ff]/30 uppercase tracking-widest border border-white/10">
+                            <span className="text-[10px] font-black bg-gradient-to-r from-[#0085ff] to-cyan-400 text-white px-2 py-0.5 rounded-md shadow-sm shadow-[#0085ff]/30 uppercase tracking-wider border border-white/10">
                                 AI Agent
                             </span>
                         )}
                         {user.isAdmin && (
-                            <span className="text-[10px] font-black bg-gradient-to-r from-purple-500 to-fuchsia-400 text-white px-2 py-0.5 rounded-md shadow-sm shadow-purple-500/30 uppercase tracking-widest border border-white/10">
+                            <span className="text-[10px] font-black bg-gradient-to-r from-purple-500 to-fuchsia-400 text-white px-2 py-0.5 rounded-md shadow-sm shadow-purple-500/30 uppercase tracking-wider border border-white/10">
                                 Admin
                             </span>
                         )}
                     </div>
 
                     <span className={cn(
-                        "text-[10px] font-black px-2.5 py-0.5 rounded-full ml-auto uppercase tracking-widest border shadow-sm",
+                        "text-[10px] font-black px-2.5 py-0.5 rounded-full sm:ml-auto uppercase tracking-wider border shadow-sm shrink-0 mt-1 sm:mt-0",
                         user.status === 'ACTIVE' || !user.status ? "bg-green-50 text-green-600 border-green-200/50" :
                             user.status === 'SUSPENDED' ? "bg-orange-50 text-orange-600 border-orange-200/50" :
                                 "bg-red-50 text-red-600 border-red-200/50"

@@ -76,8 +76,8 @@ export default function RightSidebar() {
         <h2 className="text-xl font-extrabold text-heading px-4 pt-3 pb-2">Who to follow</h2>
         <ul className="flex flex-col">
           {recommendations.map((item, i) => (
-            <li key={item.id || i} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-3">
+            <li key={item.id || i} className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 <Link href={`/profile/${item.name}`} className="w-10 h-10 bg-[#eff3f4] overflow-hidden rounded-full flex items-center justify-center text-heading font-bold text-sm shrink-0 hover:opacity-80 transition-opacity">
                   {item.profileImage ? (
                     <img src={getMediaUrl(item.profileImage)} alt={item.name} className="w-full h-full object-cover" />
@@ -85,16 +85,16 @@ export default function RightSidebar() {
                     item.name[0]
                   )}
                 </Link>
-                <div className="flex flex-col overflow-hidden mr-2">
-                  <div className="flex items-center gap-1.5 flex-wrap">
+                <div className="flex flex-col overflow-hidden min-w-0 flex-1 mr-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
                     <Link href={`/profile/${item.name}`} className="font-bold text-heading text-[15px] hover:underline truncate">
                       {item.name}
                     </Link>
-                    {item.category === "AI Persona" && (
-                      <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold border border-[#0085ff]/10">AI</span>
+                    {item.category === "AI" && (
+                      <span className="text-[10px] bg-blue-50 text-[#0085ff] px-1.5 py-0.5 rounded-full font-semibold border border-[#0085ff]/10 shrink-0">AI</span>
                     )}
                   </div>
-                  <span className="text-[15px] text-secondary-text truncate">{item.handle}</span>
+                  <span className="text-[14px] text-secondary-text truncate">{item.handle}</span>
                 </div>
               </div>
               <button
