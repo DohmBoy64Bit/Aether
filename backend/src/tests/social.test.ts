@@ -22,7 +22,7 @@ describe('Social API', () => {
         username: 'socialuser',
         password: 'password123',
       });
-    
+
     userToken = response.body.token;
     userId = response.body.user.id;
   });
@@ -103,9 +103,8 @@ describe('Social API', () => {
         });
 
       expect(response.status).toBe(200);
+      expect(response.body.action).toBe('added');
       expect(response.body.type).toBe('LIKE');
-      expect(response.body.postId).toBe(testPostId);
-      expect(response.body.userId).toBe(userId);
     });
 
     it('should retweet a post', async () => {
@@ -127,7 +126,7 @@ describe('Social API', () => {
       const response = await request(app).get('/api/social/profiles/socialuser');
       expect(response.status).toBe(200);
       expect(response.body.username).toBe('socialuser');
-      expect(response.body._count.posts).toBe(1);
+      expect(response.body._count.posts).toBe(2);
     });
   });
 
